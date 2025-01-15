@@ -1,0 +1,17 @@
+/* styles/login.css */
+.login-container {
+    @apply flex flex-col items-center justify-center min-h-screen bg-gray-100;
+  }
+  
+  .login-header {
+    @apply text-2xl font-bold mb-6;
+  }
+  
+  .input-field {
+    @apply px-4 py-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-blue-300;
+  }
+  
+  .login-button {
+    @apply w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600;
+  }
+  

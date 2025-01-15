@@ -1,62 +1,73 @@
-// src/pages/LoginPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import SkeletonLoader from '../components/SkeletonLoader';
+import axios, { AxiosError } from 'axios';
+import '../styles/login.css';
+import ErrorBoundary from '../components/ErrorBoundary'; // Import ErrorBoundary
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showErrorCard, setShowErrorCard] = useState(false); // Track error card visibility
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!username || !password) {
+      console.warn('Validation Error: Fields are empty');
+      setError('Please fill in all fields');
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    setShowErrorCard(false); // Reset error card
 
     try {
-      const { token, role } = await login(username, password);
+      console.log('Initiating login request...');
+      const response = await login(username, password);
+      console.log('Login API Response:', response);
 
-      // Store credentials in localStorage
-      localStorage.setItem('token', token);
+      const role = response.role;
+      console.log('User Role:', role);
+
+      localStorage.setItem('token', response.token);
       localStorage.setItem('username', username);
       localStorage.setItem('role', role);
 
-      // Redirect based on the role
-      if (role === 'ROLE_ADMIN') {
-        navigate('/admin-dashboard');
-      } else if (role === 'ROLE_USER') {
-        navigate('/user-dashboard');
-      } else {
-        throw new Error('Unknown role received from server');
-      }
+      console.log('User authenticated successfully. Navigating to dashboard...');
+      setTimeout(() => {
+        if (role === 'ROLE_ADMIN') {
+          navigate('/admin');
+        } else if (role === 'ROLE_USER') {
+          navigate('/user');
+        } else {
+          throw new Error('Unexpected role');
+        }
+      }, 1500);
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : 'Login failed');
-      setShowErrorCard(true); // Show the error card
-    } finally {
       setLoading(false);
+
+      if (axios.isAxiosError(err)) {
+        const axiosError = err as AxiosError<{ message: string }>;
+        console.error('Axios Error:', axiosError.response?.data?.message || axiosError.message);
+        if (axiosError.response?.status === 401) {
+          setError('Invalid username or password');
+        } else {
+          setError('An unexpected error occurred');
+        }
+      } else {
+        console.error('Unexpected Error:', err);
+        setError('An unexpected error occurred');
+      }
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      {showErrorCard ? (
-        <div className="bg-red-100 text-red-800 p-6 rounded shadow-md text-center">
-          <p className="font-semibold mb-4">Invalid username or password</p>
-          <button
-            onClick={() => setShowErrorCard(false)} // Close card and return to login form
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Return to Login
-          </button>
-        </div>
-      ) : (
+    <ErrorBoundary>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-2xl font-bold mb-6">Login</h1>
         <div className="flex flex-col w-64">
-          <h1 className="text-2xl font-bold mb-6">Login</h1>
           <label htmlFor="username" className="text-sm font-medium mb-2">
             Username
           </label>
@@ -90,16 +101,10 @@ const LoginPage: React.FC = () => {
               LOGIN
             </button>
           )}
-          <button
-            onClick={() => alert('Admin: admin/admin123\nUser: user/user123')}
-            className="w-full mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
-          >
-            Help
-          </button>
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
-      )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

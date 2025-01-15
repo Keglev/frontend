@@ -1,22 +1,29 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import FillFieldsPage from './pages/FillFieldsPage';
+import InvalidCredentialsPage from './pages/InvalidCredentialsPage';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
+import ErrorBoundary from './components/ErrorBoundary'; // Import ErrorBoundary
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/user-dashboard" element={<UserDashboard />} />
-         {/* Fallback route */}
-         <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          {/* Redirect root URL to Login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          {/* Define other routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/fill-fields" element={<FillFieldsPage />} />
+          <Route path="/invalid-credentials" element={<InvalidCredentialsPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/user" element={<UserDashboard />} />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 };
 
