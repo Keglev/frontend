@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from '../services/apiClient';
 
 // Fetch all products
 export const fetchProducts = async () => {

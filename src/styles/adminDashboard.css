@@ -1,0 +1,11 @@
+/* src/styles/adminDashboard.css */
+.dashboard-header {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    font-weight: bold;
+  }
+  
+  .dashboard-content {
+    margin: 2rem;
+  }
+  

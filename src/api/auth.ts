@@ -1,5 +1,5 @@
 // src/api/auth.ts
-import apiClient from './apiClient';
+import apiClient from '../services/apiClient';
 
 interface LoginResponse {
   success: boolean;
