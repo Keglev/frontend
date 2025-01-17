@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/addProduct.css';
-import ProductService from '../services/ProductService';
+import ProductService from '../services/ProductOperations';
 
 const AddProductPage: React.FC = () => {
   const [name, setName] = useState('');

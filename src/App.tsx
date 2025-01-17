@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AddProductPage from './pages/AddProductPage';
+import SearchProductPage from './pages/SearchProductPage';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,9 @@ const App: React.FC = () => {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/add-product" element={<AddProductPage />} />
+
+        {/* Inside <Routes> */}
+        <Route path="/search-products" element={<SearchProductPage />} />
       </Routes>
     </Router>
   );
