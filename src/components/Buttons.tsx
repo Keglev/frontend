@@ -14,25 +14,24 @@ const Buttons: React.FC = () => {
       </button>
       <button
         className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        onClick={() => alert('Delete Product functionality coming soon!')}
+        onClick={() => navigate('/delete-product')} // Placeholder, if applicable
       >
         Delete Product
       </button>
       <button
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={() => alert('Search by ID functionality coming soon!')}
+        onClick={() => navigate('/search-product')}
       >
-        Search by ID
+        Search Product
       </button>
       <button
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={() => alert('Search by Name functionality coming soon!')}
+        className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+        onClick={() => navigate('/list-stock')}
       >
-        Search by Name
+        List Stock
       </button>
     </div>
   );
 };
 
 export default Buttons;
-

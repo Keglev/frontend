@@ -4,6 +4,10 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AddProductPage from './pages/AddProductPage';
 import SearchProductPage from './pages/SearchProductPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import ChangeProductDetailsPage from './pages/ChangeProductDetailsPage';
+import DeleteProductPage from './pages/DeleteProductPage';
+import ListStockPage from './pages/ListStockPage';
 
 const App: React.FC = () => {
   return (
@@ -20,7 +24,11 @@ const App: React.FC = () => {
         <Route path="/add-product" element={<AddProductPage />} />
 
         {/* Inside <Routes> */}
-        <Route path="/search-products" element={<SearchProductPage />} />
+        <Route path="/search-product" element={<SearchProductPage />} />
+        <Route path="/product/:id" element={<ProductDetailsPage />} />
+        <Route path="/product/:productId/edit" element={<ChangeProductDetailsPage />} />
+        <Route path="/delete-product" element={<DeleteProductPage />} />
+        <Route path="/list-stock" element={<ListStockPage />} />
       </Routes>
     </Router>
   );

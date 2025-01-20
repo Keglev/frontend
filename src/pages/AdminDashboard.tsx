@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Buttons from '../components/Buttons';
+import DashboardLogic from '../logic/DashboardLogic';
 import '../styles/adminDashboard.css';
 
 const AdminDashboard: React.FC = () => {
+  const [stockValue, setStockValue] = useState<number>(0);
+  const [lowStockProducts, setLowStockProducts] = useState<{ id: number; name: string; quantity: number }[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { stockValue, lowStock } = await DashboardLogic.fetchDashboardData();
+        setStockValue(stockValue);
+        setLowStockProducts(lowStock);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -23,17 +48,47 @@ const AdminDashboard: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-grow flex flex-col items-center justify-center p-6">
+      <main className="flex-grow flex flex-col items-center p-6">
         <h2 className="text-2xl font-semibold mb-4">Welcome, Admin!</h2>
         <p className="text-lg text-gray-700 mb-8">Manage your products and stock efficiently.</p>
 
-        {/* Buttons for Admin Actions */}
-        <Buttons />
+        {loading ? (
+          <p className="text-gray-500">Loading dashboard data...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <div className="w-full max-w-4xl space-y-6">
+            {/* Total Stock Value */}
+            <div className="p-4 bg-white shadow rounded">
+              <h3 className="text-lg font-semibold">Total Stock Value</h3>
+              <p className="text-xl text-blue-600 font-bold">${stockValue.toFixed(2)}</p>
+            </div>
 
-        {/* Instructions */}
-        <p className="mt-8 text-gray-600 italic text-sm">
-          Use the buttons above to add, delete, or search for products.
-        </p>
+            {/* Low Stock Products */}
+            <div className="p-4 bg-white shadow rounded">
+              <h3 className="text-lg font-semibold">Low Stock Products</h3>
+              {lowStockProducts.length > 0 ? (
+                <ul className="mt-4 space-y-2">
+                  {lowStockProducts.map((product) => (
+                    <li
+                      key={product.id}
+                      className="p-2 bg-gray-100 border rounded"
+                    >
+                      {product.name} (Quantity: {product.quantity})
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-500 mt-2">All products are sufficiently stocked.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Buttons for Admin Actions */}
+        <div className="mt-8">
+          <Buttons />
+        </div>
       </main>
 
       <footer className="w-full bg-gray-200 text-center py-4">
