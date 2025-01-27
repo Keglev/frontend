@@ -1,0 +1,19 @@
+{
+    "login": {
+      "title": "Anmeldung",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "button": "Anmelden",
+      "error": {
+        "emptyFields": "Bitte füllen Sie alle Felder aus",
+        "invalidCredentials": "Ungültiger Benutzername oder Passwort",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      }
+    },
+    "errorBoundary": {
+      "title": "Etwas ist schief gelaufen!",
+      "reloadButton": "Seite neu laden"
+    }
+  }
+  
+  

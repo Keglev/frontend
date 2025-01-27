@@ -1,4 +1,6 @@
 import React from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -11,26 +13,28 @@ import ListStockPage from './pages/ListStockPage';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Redirect root URL to Login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+    <I18nextProvider i18n={i18n}>
+      <Router>
+        <Routes>
+          {/* Redirect root URL to Login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Login Routes */}
-        <Route path="/login" element={<LoginPage />} />
+          {/* Login Routes */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/add-product" element={<AddProductPage />} />
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/add-product" element={<AddProductPage />} />
 
-        {/* Inside <Routes> */}
-        <Route path="/search-product" element={<SearchProductPage />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route path="/product/:productId/edit" element={<ChangeProductDetailsPage />} />
-        <Route path="/delete-product" element={<DeleteProductPage />} />
-        <Route path="/list-stock" element={<ListStockPage />} />
-      </Routes>
-    </Router>
+          {/* Inside <Routes> */}
+          <Route path="/search-product" element={<SearchProductPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
+          <Route path="/product/:productId/edit" element={<ChangeProductDetailsPage />} />
+          <Route path="/delete-product" element={<DeleteProductPage />} />
+          <Route path="/list-stock" element={<ListStockPage />} />
+        </Routes>
+      </Router>
+    </I18nextProvider>
   );
 };
 

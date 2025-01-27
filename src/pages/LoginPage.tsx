@@ -4,19 +4,23 @@ import { login } from '../api/auth';
 import SkeletonLoader from '../components/SkeletonLoader';
 import axios, { AxiosError } from 'axios';
 import '../styles/login.css';
-import ErrorBoundary from '../components/ErrorBoundary'; // Import ErrorBoundary
+import ErrorBoundary from '../components/ErrorBoundary';
+import { useTranslation } from 'react-i18next';
+import Header from '../components/Header'; // Add the Header
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // New State for login
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!username || !password) {
       console.warn('Validation Error: Fields are empty');
-      setError('Please fill in all fields');
+      setError(t('login.error.emptyFields')); // Translated error
       return;
     }
 
@@ -35,6 +39,7 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('username', username);
       localStorage.setItem('role', role);
 
+      setIsLoggedIn(true); // Update login state
       console.log('User authenticated successfully. Navigating to dashboard...');
       setTimeout(() => {
         if (role === 'ROLE_ADMIN') {
@@ -52,24 +57,33 @@ const LoginPage: React.FC = () => {
         const axiosError = err as AxiosError<{ message: string }>;
         console.error('Axios Error:', axiosError.response?.data?.message || axiosError.message);
         if (axiosError.response?.status === 401) {
-          setError('Invalid username or password');
+          setError(t('login.error.invalidCredentials')); // Translated error
         } else {
-          setError('An unexpected error occurred');
+          setError(t('login.error.unexpectedError')); // Translated error
         }
       } else {
         console.error('Unexpected Error:', err);
-        setError('An unexpected error occurred');
+        setError(t('login.error.unexpectedError')); // Translated error
       }
     }
   };
 
   return (
     <ErrorBoundary>
+      <Header
+        title={t('login.title')}
+        isLoggedIn={isLoggedIn}
+        onLogout={() => {
+          localStorage.clear();
+          setIsLoggedIn(false); // Reset login state
+          navigate('/login');
+        }}
+      />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl font-bold mb-6">Login</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('login.title')}</h1>
         <div className="flex flex-col w-64">
           <label htmlFor="username" className="text-sm font-medium mb-2">
-            Username
+            {t('login.username')}
           </label>
           <input
             type="text"
@@ -80,7 +94,7 @@ const LoginPage: React.FC = () => {
             required
           />
           <label htmlFor="password" className="text-sm font-medium mb-2">
-            Password
+            {t('login.password')}
           </label>
           <input
             type="password"
@@ -98,7 +112,7 @@ const LoginPage: React.FC = () => {
               onClick={handleLogin}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              LOGIN
+              {t('login.button')}
             </button>
           )}
           {error && <p className="text-red-500 mt-4">{error}</p>}

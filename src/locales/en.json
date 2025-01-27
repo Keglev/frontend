@@ -1,0 +1,39 @@
+{
+    "login": {
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "button": "Login",
+      "error": {
+        "emptyFields": "Please fill in all fields",
+        "invalidCredentials": "Invalid username or password",
+        "unexpectedError": "An unexpected error occurred"
+      }
+    },
+    "errorBoundary": {
+      "title": "Something went wrong!",
+      "reloadButton": "Reload Page"
+  },
+  "header": {
+    "subtitle": "Manage your products and stock",
+    "logout": "Logout",
+    "language": "Choose Language"
+  },
+  "adminDashboard": {
+    "title": "Admin Dashboard",
+    "welcome": "Welcome, Admin!",
+    "subtitle": "Manage your products and stock efficiently",
+    "stockValue": "Total Stock Value",
+    "lowStock": "Low Stock Products",
+    "sufficientStock": "All products are sufficiently stocked"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "developer": "Developed by Carlos Keglevich"
+  },
+  "error": {
+    "unexpected": "An unexpected error occurred"
+  }
+}
+  
+  
