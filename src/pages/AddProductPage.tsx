@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/addProduct.css';
 import ProductService from '../api/ProductService';
+import { useTranslation } from 'react-i18next';
 
 const AddProductPage: React.FC = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
@@ -25,18 +27,18 @@ const AddProductPage: React.FC = () => {
         quantity: parseInt(quantity, 10),
         price: parseFloat(price),
       });
-      setMessage('Product successfully added.');
+      setMessage(t('addProduct.successMessage'));
       resetFields();
     } catch (error) {
-      setMessage('Failed to add product. Please try again.');
-      console.error('Error adding product:', error);
+      setMessage(t('addProduct.errorMessage'));
+      console.error(t('addProduct.errorLog'), error);
     }
     setConfirmation(false);
   };
 
   const handleCancel = () => {
     resetFields();
-    setMessage('Operation canceled.');
+    setMessage(t('addProduct.cancelMessage'));
     setConfirmation(false);
   };
 
@@ -48,19 +50,19 @@ const AddProductPage: React.FC = () => {
             className="text-white font-semibold"
             onClick={() => navigate('/admin')}
           >
-            ← Back to Dashboard
+            ← {t('addProduct.backToDashboard')}
           </button>
-          <h1 className="text-xl font-bold">Add New Product</h1>
+          <h1 className="text-xl font-bold">{t('addProduct.title')}</h1>
         </div>
       </header>
 
       <div className="w-96 bg-white p-6 shadow-md rounded mt-6">
-        <h2 className="text-lg font-semibold mb-4">Enter Product Details</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('addProduct.detailsTitle')}</h2>
 
         {/* Form Fields */}
         <div className="mb-4">
           <label htmlFor="name" className="block font-medium mb-2">
-            Name and Model
+            {t('addProduct.nameLabel')}
           </label>
           <input
             type="text"
@@ -73,7 +75,7 @@ const AddProductPage: React.FC = () => {
 
         <div className="mb-4">
           <label htmlFor="quantity" className="block font-medium mb-2">
-            Quantity
+            {t('addProduct.quantityLabel')}
           </label>
           <input
             type="number"
@@ -86,7 +88,7 @@ const AddProductPage: React.FC = () => {
 
         <div className="mb-4">
           <label htmlFor="price" className="block font-medium mb-2">
-            Price
+            {t('addProduct.priceLabel')}
           </label>
           <input
             type="number"
@@ -103,32 +105,32 @@ const AddProductPage: React.FC = () => {
             className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
             onClick={handleCancel}
           >
-            Cancel
+            {t('addProduct.cancelButton')}
           </button>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={() => setConfirmation(true)}
           >
-            Add Product
+            {t('addProduct.addButton')}
           </button>
         </div>
 
         {/* Confirmation Popup */}
         {confirmation && (
           <div className="mt-4 p-4 bg-gray-200 rounded">
-            <p>Are you sure you want to add this product?</p>
+            <p>{t('addProduct.confirmationMessage')}</p>
             <div className="flex justify-between mt-2">
               <button
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                 onClick={handleAddProduct}
               >
-                Yes
+                {t('addProduct.confirmYes')}
               </button>
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 onClick={handleCancel}
               >
-                No
+                {t('addProduct.confirmNo')}
               </button>
             </div>
           </div>
@@ -141,8 +143,8 @@ const AddProductPage: React.FC = () => {
       </div>
 
       <footer className="w-full bg-gray-200 text-center py-4">
-        <p className="text-sm text-gray-600">© 2025 StockEase. All rights reserved.</p>
-        <p className="text-sm text-gray-600">Developed by Carlos Keglevich</p>
+        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
+        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
       </footer>
     </div>
   );

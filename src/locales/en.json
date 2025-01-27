@@ -1,18 +1,18 @@
 {
-    "login": {
-      "title": "Login",
-      "username": "Username",
-      "password": "Password",
-      "button": "Login",
-      "error": {
-        "emptyFields": "Please fill in all fields",
-        "invalidCredentials": "Invalid username or password",
-        "unexpectedError": "An unexpected error occurred"
-      }
-    },
-    "errorBoundary": {
-      "title": "Something went wrong!",
-      "reloadButton": "Reload Page"
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "button": "Login",
+    "error": {
+      "emptyFields": "Please fill in all fields",
+      "invalidCredentials": "Invalid username or password",
+      "unexpectedError": "An unexpected error occurred"
+    }
+  },
+  "errorBoundary": {
+    "title": "Something went wrong!",
+    "reloadButton": "Reload Page"
   },
   "header": {
     "subtitle": "Manage your products and stock",
@@ -27,13 +27,34 @@
     "lowStock": "Low Stock Products",
     "sufficientStock": "All products are sufficiently stocked"
   },
+  "buttons": {
+    "addProduct": "Add Product",
+    "deleteProduct": "Delete Product",
+    "searchProduct": "Search Product",
+    "listStock": "List Stock"
+  },
   "footer": {
     "rights": "All rights reserved",
     "developer": "Developed by Carlos Keglevich"
   },
   "error": {
     "unexpected": "An unexpected error occurred"
+  },
+  "addProduct": {
+      "title": "Add New Product",
+      "detailsTitle": "Enter Product Details",
+      "nameLabel": "Name and Model",
+      "quantityLabel": "Quantity",
+      "priceLabel": "Price",
+      "addButton": "Add Product",
+      "cancelButton": "Cancel",
+      "confirmationMessage": "Are you sure you want to add this product?",
+      "confirmYes": "Yes",
+      "confirmNo": "No",
+      "successMessage": "Product successfully added.",
+      "errorMessage": "Failed to add product. Please try again.",
+      "cancelMessage": "Operation canceled.",
+      "backToDashboard": "Back to Dashboard",
+      "errorLog": "Error adding product:"
   }
 }
-  
-  

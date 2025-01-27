@@ -1,19 +1,65 @@
 {
-    "login": {
-      "title": "Anmeldung",
-      "username": "Benutzername",
-      "password": "Passwort",
-      "button": "Anmelden",
-      "error": {
-        "emptyFields": "Bitte füllen Sie alle Felder aus",
-        "invalidCredentials": "Ungültiger Benutzername oder Passwort",
-        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
-      }
-    },
-    "errorBoundary": {
-      "title": "Etwas ist schief gelaufen!",
-      "reloadButton": "Seite neu laden"
+  "login": {
+    "title": "Anmeldung",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "button": "Anmelden",
+    "error": {
+      "emptyFields": "Bitte füllen Sie alle Felder aus",
+      "invalidCredentials": "Ungültiger Benutzername oder Passwort",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
     }
-  }
+  },
+  "errorBoundary": {
+    "title": "Etwas ist schief gelaufen!",
+    "reloadButton": "Seite neu laden"
+  },
+  "header": {
+    "subtitle": "Verwalten Sie Ihre Produkte und Bestände",
+    "logout": "Abmelden",
+    "language": "Sprache wählen"
+  },
+  "adminDashboard": {
+    "title": "Admin-Dashboard",
+    "welcome": "Willkommen, Admin!",
+    "subtitle": "Verwalten Sie Ihre Produkte und Bestände effizient",
+    "stockValue": "Gesamtbestandwert",
+    "lowStock": "Produkte mit niedrigem Bestand",
+    "sufficientStock": "Alle Produkte sind ausreichend auf Lager",
+    "error": "Fehler beim Laden der Dashboard-Daten. Bitte versuchen Sie es erneut."
+  },
+  "buttons": {
+    "addProduct": "Produkt hinzufügen",
+    "deleteProduct": "Produkt löschen",
+    "searchProduct": "Produkt suchen",
+    "listStock": "Bestand auflisten"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten",
+    "developer": "Entwickelt von Carlos Keglevich"
+  },
+  "loading": "Daten werden geladen...",
+  "error": {
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+    "addProduct": {
+      "title": "Neues Produkt hinzufügen",
+      "detailsTitle": "Produktdetails eingeben",
+      "nameLabel": "Name und Modell",
+      "quantityLabel": "Menge",
+      "priceLabel": "Preis",
+      "addButton": "Produkt hinzufügen",
+      "cancelButton": "Abbrechen",
+      "confirmationMessage": "Möchten Sie dieses Produkt wirklich hinzufügen?",
+      "confirmYes": "Ja",
+      "confirmNo": "Nein",
+      "successMessage": "Produkt erfolgreich hinzugefügt.",
+      "errorMessage": "Fehler beim Hinzufügen des Produkts. Bitte versuchen Sie es erneut.",
+      "cancelMessage": "Vorgang abgebrochen.",
+      "backToDashboard": "Zurück zum Dashboard",
+      "errorLog": "Fehler beim Hinzufügen des Produkts:"
+    }
+}
+
   
   

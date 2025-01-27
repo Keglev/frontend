@@ -6,15 +6,19 @@ import Header from '../components/Header';
 import { useTranslation } from 'react-i18next';
 
 const AdminDashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [stockValue, setStockValue] = useState<number>(0);
   const [lowStockProducts, setLowStockProducts] = useState<
     { id: number; name: string; quantity: number }[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    i18n.changeLanguage(savedLanguage);
+  }, [i18n]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -41,7 +45,7 @@ const AdminDashboard: React.FC = () => {
         title={t('adminDashboard.title')}
         isLoggedIn={true}
         onLogout={() => {
-          localStorage.clear();
+          localStorage.clear(); // Clear language and user data
           navigate('/login');
         }}
       />

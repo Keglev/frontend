@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
@@ -12,7 +12,14 @@ const Header: React.FC<HeaderProps> = ({ title, isLoggedIn, onLogout }) => {
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng); // Save language in localStorage
   };
+
+  // Load the language from localStorage when the component mounts
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('language') || 'en'; // Default to English
+    i18n.changeLanguage(savedLanguage);
+  }, [i18n]);
 
   return (
     <header className="flex justify-between items-center bg-blue-500 text-white px-6 py-4">
