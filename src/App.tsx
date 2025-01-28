@@ -10,6 +10,7 @@ import ProductDetailsPage from './pages/ProductDetailsPage';
 import ChangeProductDetailsPage from './pages/ChangeProductDetailsPage';
 import DeleteProductPage from './pages/DeleteProductPage';
 import ListStockPage from './pages/ListStockPage';
+import UserDashboard from './pages/UserDashboard';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,9 @@ const App: React.FC = () => {
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/add-product" element={<AddProductPage />} />
+
+          {/* User Routes */}
+          <Route path="/user" element={<UserDashboard />} />
 
           {/* Inside <Routes> */}
           <Route path="/search-product" element={<SearchProductPage />} />

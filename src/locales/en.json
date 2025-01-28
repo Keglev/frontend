@@ -41,20 +41,120 @@
     "unexpected": "An unexpected error occurred"
   },
   "addProduct": {
-      "title": "Add New Product",
-      "detailsTitle": "Enter Product Details",
-      "nameLabel": "Name and Model",
-      "quantityLabel": "Quantity",
-      "priceLabel": "Price",
-      "addButton": "Add Product",
-      "cancelButton": "Cancel",
-      "confirmationMessage": "Are you sure you want to add this product?",
-      "confirmYes": "Yes",
-      "confirmNo": "No",
-      "successMessage": "Product successfully added.",
-      "errorMessage": "Failed to add product. Please try again.",
-      "cancelMessage": "Operation canceled.",
-      "backToDashboard": "Back to Dashboard",
-      "errorLog": "Error adding product:"
+    "title": "Add New Product",
+    "detailsTitle": "Enter Product Details",
+    "nameLabel": "Name and Model",
+    "quantityLabel": "Quantity",
+    "priceLabel": "Price",
+    "addButton": "Add Product",
+    "cancelButton": "Cancel",
+    "confirmationMessage": "Are you sure you want to add this product?",
+    "confirmYes": "Yes",
+    "confirmNo": "No",
+    "successMessage": "Product successfully added.",
+    "errorMessage": "Failed to add product. Please try again.",
+    "cancelMessage": "Operation canceled.",
+    "backToDashboard": "Back to Dashboard",
+    "errorLog": "Error adding product:"
+  },
+  "changeProduct": {
+    "title": "Edit Product",
+    "quantityLabel": "Current Quantity",
+    "priceLabel": "Current Price",
+    "saveButton": "Save Changes",
+    "cancelButton": "Cancel",
+    "confirmationMessage": "Are you sure you want to save these changes?",
+    "confirmYes": "Yes",
+    "confirmNo": "No",
+    "successMessage": "Product details updated successfully.",
+    "errorMessage": "Failed to update product details. Please try again.",
+    "cancelMessage": "Operation canceled.",
+    "backToSearch": "Back to Search",
+    "error": {
+      "fetch": "Error fetching product details.",
+      "update": "Error updating product details."
+    }
+  },
+  "deleteProduct": {
+    "title": "Delete Products",
+    "backToDashboard": "Back to Dashboard",
+    "findProduct": "Find a Product to Delete",
+    "searchPlaceholder": "Search by name...",
+      "messages": {
+        "notFound": "Product not found. Please try again.",
+        "error": "An error occurred. Please try again later.",
+        "success": "Product successfully deleted.",
+        "failed": "Failed to delete product. Please try again later.",
+        "canceled": "Operation canceled."
+      },
+      "confirmation": {
+        "first": "Do you really want to delete this product?",
+        "second": "If this is a return due to non-conformity, please contact the supplier first. If the product is to be scrapped, contact the financial services before proceeding."
+      },
+    "confirmYes": "Yes",
+    "confirmNo": "No",
+    "error": {
+      "fetch": "Error fetching products.",
+      "delete": "Error deleting product."
+    }
+  },
+  "listStock": {
+    "title": "List Stock",
+    "backToDashboard": "Back to Dashboard",
+    "totalStock": "Total Stock",
+    "noProducts": "No products available.",
+    "downloadCSV": "Download CSV",
+    "alert": {
+      "noProducts": "No products available to download."
+    },
+    "labels": {
+      "name": "Name",
+      "quantity": "Quantity",
+      "totalValue": "Total Value"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of"
+    },
+    "error": {
+      "fetch": "Error fetching products.",
+      "general": "Failed to fetch products. Please try again."
+    },
+    "csvHeader": {
+      "name": "Name",
+      "quantity": "Quantity",
+      "price": "Price",
+      "totalValue": "Total Value"
+    }
+  },
+  "productDetails": {
+    "title": "Product Details",
+    "quantity": "Quantity in Stock",
+    "price": "Price",
+    "totalValue": "Total Value",
+    "backToSearch": "Back to Search",
+    "error": {
+      "fetch": "Error fetching product details.",
+      "general": "Failed to fetch product details. Please try again."
+    }
+  },
+  "searchProduct": {
+    "title": "Search Products",
+    "subtitle": "Find Your Products",
+    "placeholder": "Search by name...",
+    "noResults": "Product not found. Please try again.",
+    "backToDashboard": "Back to Dashboard",
+    "details": {
+      "quantity": "Quantity",
+      "price": "Price",
+      "totalValue": "Total Value"
+    },
+    "editButton": "Edit {{name}}",
+    "error": {
+      "fetch": "Error fetching products.",
+      "details": "Error fetching product details."
+    }
   }
 }

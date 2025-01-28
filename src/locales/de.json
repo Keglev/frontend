@@ -42,23 +42,123 @@
   "error": {
     "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
   },
-    "addProduct": {
-      "title": "Neues Produkt hinzufügen",
-      "detailsTitle": "Produktdetails eingeben",
-      "nameLabel": "Name und Modell",
-      "quantityLabel": "Menge",
-      "priceLabel": "Preis",
-      "addButton": "Produkt hinzufügen",
-      "cancelButton": "Abbrechen",
-      "confirmationMessage": "Möchten Sie dieses Produkt wirklich hinzufügen?",
-      "confirmYes": "Ja",
-      "confirmNo": "Nein",
-      "successMessage": "Produkt erfolgreich hinzugefügt.",
-      "errorMessage": "Fehler beim Hinzufügen des Produkts. Bitte versuchen Sie es erneut.",
-      "cancelMessage": "Vorgang abgebrochen.",
-      "backToDashboard": "Zurück zum Dashboard",
-      "errorLog": "Fehler beim Hinzufügen des Produkts:"
+  "addProduct": {
+    "title": "Neues Produkt hinzufügen",
+    "detailsTitle": "Produktdetails eingeben",
+    "nameLabel": "Name und Modell",
+    "quantityLabel": "Menge",
+    "priceLabel": "Preis",
+    "addButton": "Produkt hinzufügen",
+    "cancelButton": "Abbrechen",
+    "confirmationMessage": "Möchten Sie dieses Produkt wirklich hinzufügen?",
+    "confirmYes": "Ja",
+    "confirmNo": "Nein",
+    "successMessage": "Produkt erfolgreich hinzugefügt.",
+    "errorMessage": "Fehler beim Hinzufügen des Produkts. Bitte versuchen Sie es erneut.",
+    "cancelMessage": "Vorgang abgebrochen.",
+    "backToDashboard": "Zurück zum Dashboard",
+    "errorLog": "Fehler beim Hinzufügen des Produkts:"
+  },
+  "changeProduct": {
+    "title": "Produkt bearbeiten",
+    "quantityLabel": "Aktuelle Menge",
+    "priceLabel": "Aktueller Preis",
+    "saveButton": "Änderungen speichern",
+    "cancelButton": "Abbrechen",
+    "confirmationMessage": "Sind Sie sicher, dass Sie diese Änderungen speichern möchten?",
+    "confirmYes": "Ja",
+    "confirmNo": "Nein",
+    "successMessage": "Produktdetails erfolgreich aktualisiert.",
+    "errorMessage": "Fehler beim Aktualisieren der Produktdetails. Bitte versuchen Sie es erneut.",
+    "cancelMessage": "Vorgang abgebrochen.",
+    "backToSearch": "Zurück zur Suche",
+    "error": {
+      "fetch": "Fehler beim Abrufen der Produktdetails.",
+      "update": "Fehler beim Aktualisieren der Produktdetails."
     }
+  },
+  "deleteProduct": {
+    "title": "Produkte löschen",
+    "backToDashboard": "Zurück zum Dashboard",
+    "findProduct": "Ein Produkt zum Löschen suchen",
+    "searchPlaceholder": "Nach Namen suchen...",
+    "messages": {
+      "notFound": "Produkt nicht gefunden. Bitte versuchen Sie es erneut.",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+      "success": "Produkt erfolgreich gelöscht.",
+      "failed": "Fehler beim Löschen des Produkts. Bitte versuchen Sie es später erneut.",
+      "canceled": "Vorgang abgebrochen."
+    },
+    "confirmation": {
+      "first": "Möchten Sie dieses Produkt wirklich löschen?",
+      "second": "Wenn dies eine Rückgabe wegen Nichtkonformität ist, wenden Sie sich bitte zuerst an den Lieferanten. Wenn das Produkt verschrottet werden soll, wenden Sie sich vor dem Fortfahren an die Finanzabteilung."
+    },
+    "confirmYes": "Ja",
+    "confirmNo": "Nein",
+    "error": {
+      "fetch": "Fehler beim Abrufen der Produkte.",
+      "delete": "Fehler beim Löschen des Produkts."
+    }
+  },
+  "listStock": {
+    "title": "Bestand auflisten",
+    "backToDashboard": "Zurück zum Dashboard",
+    "totalStock": "Gesamtbestand",
+    "noProducts": "Keine Produkte verfügbar.",
+    "downloadCSV": "CSV herunterladen",
+    "alert": {
+      "noProducts": "Keine Produkte zum Herunterladen verfügbar."
+    },
+    "labels": {
+      "name": "Name",
+      "quantity": "Menge",
+      "totalValue": "Gesamtwert"
+    },
+    "pagination": {
+      "previous": "Vorherige",
+      "next": "Nächste",
+      "page": "Seite",
+      "of": "von"
+    },
+    "error": {
+      "fetch": "Fehler beim Abrufen der Produkte.",
+      "general": "Produkte konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
+    },
+    "csvHeader": {
+      "name": "Name",
+      "quantity": "Menge",
+      "price": "Preis",
+      "totalValue": "Gesamtwert"
+    }
+  },
+  "productDetails": {
+    "title": "Produktdetails",
+    "quantity": "Menge auf Lager",
+    "price": "Preis",
+    "totalValue": "Gesamtwert",
+    "backToSearch": "Zurück zur Suche",
+    "error": {
+      "fetch": "Fehler beim Abrufen der Produktdetails.",
+      "general": "Produktdetails konnten nicht abgerufen werden. Bitte versuchen Sie es erneut."
+    }
+  },
+  "searchProduct": {
+    "title": "Produkte suchen",
+    "subtitle": "Finden Sie Ihre Produkte",
+    "placeholder": "Nach Name suchen...",
+    "noResults": "Produkt nicht gefunden. Bitte versuchen Sie es erneut.",
+    "backToDashboard": "Zurück zum Dashboard",
+    "details": {
+      "quantity": "Menge",
+      "price": "Preis",
+      "totalValue": "Gesamtwert"
+    },
+    "editButton": "{{name}} bearbeiten",
+    "error": {
+      "fetch": "Fehler beim Abrufen der Produkte.",
+      "details": "Fehler beim Abrufen der Produktdetails."
+    }
+  }
 }
 
   

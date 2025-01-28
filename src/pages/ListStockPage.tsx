@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { Product } from '../types/Product';
+import { useTranslation } from 'react-i18next';
 
 const ListStockPage: React.FC = () => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -20,8 +22,6 @@ const ListStockPage: React.FC = () => {
 
       try {
         const response = await ProductService.fetchPagedProducts(currentPage, pageSize);
-        console.log('Fetched Products:', response);
-
         if (response && response.content) {
           setProducts(response.content);
           setTotalPages(response.totalPages || 0);
@@ -30,15 +30,15 @@ const ListStockPage: React.FC = () => {
           setTotalPages(0);
         }
       } catch (err) {
-        console.error('Error fetching products:', err);
-        setError('Failed to fetch products. Please try again.');
+        console.error(t('listStock.error.fetch'), err);
+        setError(t('listStock.error.general'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [currentPage]);
+  }, [currentPage, t]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
@@ -48,19 +48,17 @@ const ListStockPage: React.FC = () => {
 
   const downloadCSV = () => {
     if (products.length === 0) {
-      alert('No products available to download.');
+      alert(t('listStock.alert.noProducts'));
       return;
     }
 
-    // Convert products to CSV format
-    const csvHeader = 'Name,Quantity,Price,Total Value\n';
+    const csvHeader = `${t('listStock.csvHeader.name')},${t('listStock.csvHeader.quantity')},${t('listStock.csvHeader.price')},${t('listStock.csvHeader.totalValue')}\n`;
     const csvRows = products
       .map((product) => `${product.name},${product.quantity},${product.price},${product.totalValue}`)
       .join('\n');
 
     const csvContent = csvHeader + csvRows;
 
-    // Create a Blob and trigger the download
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -71,31 +69,29 @@ const ListStockPage: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{t('loading')}</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
-      {/* Header with Back to Dashboard */}
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold">List Stock</h1>
+        <h1 className="text-lg font-semibold">{t('listStock.title')}</h1>
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
           onClick={() => navigate('/admin')}
         >
-          Back to Dashboard
+          {t('listStock.backToDashboard')}
         </button>
       </header>
 
-      {/* Main Section */}
       <main className="w-full max-w-4xl p-6 bg-white shadow-md rounded mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Total Stock</h2>
+          <h2 className="text-xl font-semibold">{t('listStock.totalStock')}</h2>
           <button
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             onClick={downloadCSV}
           >
-            Download CSV
+            {t('listStock.downloadCSV')}
           </button>
         </div>
 
@@ -106,41 +102,46 @@ const ListStockPage: React.FC = () => {
                 key={product.id}
                 className="p-4 border rounded shadow hover:bg-gray-100"
               >
-                <p><strong>Name:</strong> {product.name}</p>
-                <p><strong>Quantity:</strong> {product.quantity}</p>
-                <p><strong>Total Value:</strong> ${product.totalValue?.toFixed(2)}</p>
+                <p>
+                  <strong>{t('listStock.labels.name')}:</strong> {product.name}
+                </p>
+                <p>
+                  <strong>{t('listStock.labels.quantity')}:</strong> {product.quantity}
+                </p>
+                <p>
+                  <strong>{t('listStock.labels.totalValue')}:</strong> $
+                  {product.totalValue?.toFixed(2)}
+                </p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-500">No products available.</p>
+          <p className="text-center text-gray-500">{t('listStock.noProducts')}</p>
         )}
 
-        {/* Pagination Controls */}
         <div className="mt-6 flex justify-center gap-4">
           <button
             className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
             disabled={currentPage === 0}
             onClick={() => handlePageChange(currentPage - 1)}
           >
-            Previous
+            {t('listStock.pagination.previous')}
           </button>
           <span>
-            Page {currentPage + 1} of {totalPages}
+            {t('listStock.pagination.page')} {currentPage + 1} {t('listStock.pagination.of')} {totalPages}
           </span>
           <button
             className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
             disabled={currentPage === totalPages - 1}
             onClick={() => handlePageChange(currentPage + 1)}
           >
-            Next
+            {t('listStock.pagination.next')}
           </button>
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-        <p className="text-sm text-gray-600">© 2025 StockEase. All rights reserved.</p>
+        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
       </footer>
     </div>
   );

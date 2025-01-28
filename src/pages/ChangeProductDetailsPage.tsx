@@ -1,8 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductService from '../api/ProductService';
+import { useTranslation } from 'react-i18next';
 
 const ChangeProductDetailsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
 
@@ -20,16 +23,16 @@ const ChangeProductDetailsPage: React.FC = () => {
         setNewQuantity(productDetails.quantity);
         setNewPrice(productDetails.price);
       } catch (error) {
-        console.error('Error fetching product details:', error);
-        setMessage('Failed to load product details. Please try again.');
+        console.error(t('changeProduct.error.fetch'), error);
+        setMessage(t('changeProduct.errorMessage'));
       }
     };
 
     fetchProductDetails();
-  }, [productId]);
+  }, [productId, t]);
 
   const handleSaveChanges = async () => {
-    setMessage(''); // Clear any previous messages
+    setMessage('');
     try {
       if (newQuantity !== null) {
         await ProductService.updateProductQuantity(Number(productId), newQuantity);
@@ -37,35 +40,35 @@ const ChangeProductDetailsPage: React.FC = () => {
       if (newPrice !== null) {
         await ProductService.updateProductPrice(Number(productId), newPrice);
       }
-      setMessage('Product details updated successfully.');
-      setTimeout(() => navigate('/search-product'), 1500); // Redirect back after success
+      setMessage(t('changeProduct.successMessage'));
+      setTimeout(() => navigate('/search-product'), 1500);
     } catch (error) {
-      console.error('Error updating product details:', error);
-      setMessage('Failed to update product details. Please try again.');
+      console.error(t('changeProduct.error.update'), error);
+      setMessage(t('changeProduct.errorMessage'));
     }
-    setConfirmation(false); // Close confirmation modal
+    setConfirmation(false);
   };
 
   const handleCancel = () => {
     setNewQuantity(product?.quantity || 0);
     setNewPrice(product?.price || 0);
-    setConfirmation(false); // Close confirmation modal
-    setMessage('Operation canceled.');
+    setConfirmation(false);
+    setMessage(t('changeProduct.cancelMessage'));
   };
 
   if (!product) {
-    return <p>Loading product details...</p>;
+    return <p>{t('loading')}</p>;
   }
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Edit Product</h1>
+        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
           onClick={() => navigate('/search-product')}
         >
-          Back to Search
+          {t('changeProduct.backToSearch')}
         </button>
       </header>
 
@@ -73,7 +76,7 @@ const ChangeProductDetailsPage: React.FC = () => {
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
 
         <div className="mb-4">
-          <label className="block font-medium mb-2">Current Quantity</label>
+          <label className="block font-medium mb-2">{t('changeProduct.quantityLabel')}</label>
           <input
             type="number"
             value={newQuantity ?? product.quantity}
@@ -83,7 +86,7 @@ const ChangeProductDetailsPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block font-medium mb-2">Current Price</label>
+          <label className="block font-medium mb-2">{t('changeProduct.priceLabel')}</label>
           <input
             type="number"
             step="0.01"
@@ -98,31 +101,31 @@ const ChangeProductDetailsPage: React.FC = () => {
             className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
             onClick={handleCancel}
           >
-            Cancel
+            {t('changeProduct.cancelButton')}
           </button>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={() => setConfirmation(true)}
           >
-            Save Changes
+            {t('changeProduct.saveButton')}
           </button>
         </div>
 
         {confirmation && (
           <div className="mt-4 p-4 bg-gray-200 rounded">
-            <p>Are you sure you want to save these changes?</p>
+            <p>{t('changeProduct.confirmationMessage')}</p>
             <div className="flex justify-between mt-2">
               <button
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                 onClick={handleSaveChanges}
               >
-                Yes
+                {t('changeProduct.confirmYes')}
               </button>
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 onClick={handleCancel}
               >
-                No
+                {t('changeProduct.confirmNo')}
               </button>
             </div>
           </div>
@@ -132,8 +135,8 @@ const ChangeProductDetailsPage: React.FC = () => {
       </main>
 
       <footer className="w-full bg-gray-200 text-center py-4">
-        <p className="text-sm text-gray-600">© 2025 StockEase. All rights reserved.</p>
-        <p className="text-sm text-gray-600">Developed by Carlos Keglevich</p>
+        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
+        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
       </footer>
     </div>
   );
