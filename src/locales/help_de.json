@@ -1,0 +1,30 @@
+{
+    "login": {
+      "title": "Anmeldehilfe",
+      "content": "Geben Sie Ihren Benutzernamen und Ihr Passwort ein, um sich anzumelden. Falls Sie Ihr Passwort vergessen haben, wenden Sie sich an den Administrator."
+    },
+    "adminDashboard": {
+      "title": "Admin-Dashboard-Hilfe",
+      "content": "Dies ist das Haupt-Dashboard für Administratoren. Sie können Produkte, Lagerbestände und Benutzerrechte verwalten."
+    },
+    "userDashboard": {
+      "title": "Benutzer-Dashboard-Hilfe",
+      "content": "Dies ist das Haupt-Dashboard für Benutzer. Sie können Produkte suchen und Lagerbestände einsehen."
+    },
+    "addProduct": {
+      "title": "Produkte hinzufügen",
+      "content": "Geben Sie den Produktnamen, die Menge und den Preis ein. Klicken Sie auf 'Produkt hinzufügen', um zu bestätigen."
+    },
+    "deleteProduct": {
+      "title": "Produkte löschen",
+      "content": "Suchen Sie ein Produkt, wählen Sie es aus und bestätigen Sie die Löschung."
+    },
+    "changeProduct": {
+      "title": "Produkte bearbeiten",
+      "content": "Ändern Sie die Produktmenge oder den Preis und speichern Sie die Änderungen."
+    },
+    "help": {
+      "closeButton": "Schließen"
+    }
+  }
+  

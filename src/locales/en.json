@@ -10,11 +10,17 @@
       "unexpectedError": "An unexpected error occurred"
     }
   },
+  "userDashboard": {
+  "title": "User Dashboard",
+  "welcome": "Welcome, User!",
+  "subtitle": "View and manage your inventory efficiently."
+  },
   "errorBoundary": {
     "title": "Something went wrong!",
     "reloadButton": "Reload Page"
   },
   "header": {
+    "defaultTitle": "Login",
     "subtitle": "Manage your products and stock",
     "logout": "Logout",
     "language": "Choose Language"
@@ -59,6 +65,7 @@
   },
   "changeProduct": {
     "title": "Edit Product",
+    "backToDashboard": "Back to Dashboard",
     "quantityLabel": "Current Quantity",
     "priceLabel": "Current Price",
     "saveButton": "Save Changes",

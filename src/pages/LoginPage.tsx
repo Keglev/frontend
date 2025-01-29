@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import SkeletonLoader from '../components/SkeletonLoader';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import '../styles/login.css';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/Header'; // Add the Header
+import Header from '../components/Header';
+import HelpModal from '../components/HelpModal';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // New State for login
   const { t } = useTranslation();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role) {
+      navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user', { replace: true });
+    }
+  }, [navigate]);
 
   const handleLogin = async () => {
     if (!username || !password) {
-      console.warn('Validation Error: Fields are empty');
-      setError(t('login.error.emptyFields')); // Translated error
+      setError(t('login.error.emptyFields'));
       return;
     }
 
@@ -28,42 +35,24 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      console.log('Initiating login request...');
       const response = await login(username, password);
-      console.log('Login API Response:', response);
+      const { token, role } = response;
 
-      const role = response.role;
-      console.log('User Role:', role);
-
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('token', token);
       localStorage.setItem('username', username);
       localStorage.setItem('role', role);
 
-      setIsLoggedIn(true); // Update login state
-      console.log('User authenticated successfully. Navigating to dashboard...');
-      setTimeout(() => {
-        if (role === 'ROLE_ADMIN') {
-          navigate('/admin');
-        } else if (role === 'ROLE_USER') {
-          navigate('/user');
-        } else {
-          throw new Error('Unexpected role');
-        }
-      }, 1500);
+      navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user', { replace: true });
     } catch (err) {
       setLoading(false);
-
       if (axios.isAxiosError(err)) {
-        const axiosError = err as AxiosError<{ message: string }>;
-        console.error('Axios Error:', axiosError.response?.data?.message || axiosError.message);
-        if (axiosError.response?.status === 401) {
-          setError(t('login.error.invalidCredentials')); // Translated error
-        } else {
-          setError(t('login.error.unexpectedError')); // Translated error
-        }
+        setError(
+          err.response?.status === 401
+            ? t('login.error.invalidCredentials')
+            : t('login.error.unexpectedError')
+        );
       } else {
-        console.error('Unexpected Error:', err);
-        setError(t('login.error.unexpectedError')); // Translated error
+        setError(t('login.error.unexpectedError'));
       }
     }
   };
@@ -71,20 +60,20 @@ const LoginPage: React.FC = () => {
   return (
     <ErrorBoundary>
       <Header
-        title={t('login.title')}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={false}
         onLogout={() => {
           localStorage.clear();
-          setIsLoggedIn(false); // Reset login state
-          navigate('/login');
+          navigate('/login', { replace: true });
         }}
       />
+      
+      {/* Centered Container */}
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">{t('login.title')}</h1>
-        <div className="flex flex-col w-64">
-          <label htmlFor="username" className="text-sm font-medium mb-2">
-            {t('login.username')}
-          </label>
+
+        {/* Login Form */}
+        <div className="flex flex-col w-64 bg-white p-6 rounded-lg shadow-md">
+          <label htmlFor="username" className="text-sm font-medium mb-2">{t('login.username')}</label>
           <input
             type="text"
             id="username"
@@ -93,9 +82,7 @@ const LoginPage: React.FC = () => {
             className="px-4 py-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             required
           />
-          <label htmlFor="password" className="text-sm font-medium mb-2">
-            {t('login.password')}
-          </label>
+          <label htmlFor="password" className="text-sm font-medium mb-2">{t('login.password')}</label>
           <input
             type="password"
             id="password"
@@ -105,6 +92,7 @@ const LoginPage: React.FC = () => {
             required
             autoComplete="current-password"
           />
+
           {loading ? (
             <SkeletonLoader />
           ) : (
@@ -117,7 +105,18 @@ const LoginPage: React.FC = () => {
           )}
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
+
+        {/* Help Button Below the Form */}
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="mt-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+        >
+          {t('help.button')}
+        </button>
       </div>
+
+      {/* Help Modal (Outside the Container) */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="login" />
     </ErrorBoundary>
   );
 };

@@ -10,11 +10,17 @@
       "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
     }
   },
+  "userDashboard": {
+  "title": "Benutzer-Dashboard",
+  "welcome": "Willkommen, Benutzer!",
+  "subtitle": "Sehen und verwalten Sie Ihr Inventar effizient."
+  },
   "errorBoundary": {
     "title": "Etwas ist schief gelaufen!",
     "reloadButton": "Seite neu laden"
   },
   "header": {
+    "defaultTitle": "Anmeldung",
     "subtitle": "Verwalten Sie Ihre Produkte und Bestände",
     "logout": "Abmelden",
     "language": "Sprache wählen"
@@ -61,6 +67,7 @@
   },
   "changeProduct": {
     "title": "Produkt bearbeiten",
+    "backToDashboard": "Zurück zum Dashboard",
     "quantityLabel": "Aktuelle Menge",
     "priceLabel": "Aktueller Preis",
     "saveButton": "Änderungen speichern",

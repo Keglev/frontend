@@ -16,6 +16,18 @@ const SearchProductPage: React.FC = () => {
   } | null>(null);
   const navigate = useNavigate();
 
+  // Dynamically navigate to the correct dashboard based on role
+  const navigateToDashboard = () => {
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      navigate('/admin');
+    } else if (role === 'ROLE_USER') {
+      navigate('/user');
+    } else {
+      navigate('/login'); // Fallback to login if the role is undefined
+    }
+  };
+
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -55,7 +67,7 @@ const SearchProductPage: React.FC = () => {
         <h1 className="text-lg font-semibold">{t('searchProduct.title')}</h1>
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={() => navigate('/admin')}
+          onClick={navigateToDashboard} // Use the dynamic navigation function
         >
           {t('searchProduct.backToDashboard')}
         </button>

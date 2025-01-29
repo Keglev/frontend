@@ -6,9 +6,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en.json';
 import de from './locales/de.json';
 
+// Import help section translations
+import helpEn from './locales/help_en.json';
+import helpDe from './locales/help_de.json';
+
 const resources = {
-  en: { translation: en },
-  de: { translation: de },
+  en: { translation: en,
+    help: helpEn,
+   },
+  de: { translation: de,
+    help: helpDe,
+   },
 };
 
 i18n
@@ -16,7 +24,9 @@ i18n
   .use(initReactI18next) // Bind to React
   .init({
     resources,
-    fallbackLng: 'en', // Default language
+    fallbackLng: 'en', 
+    ns: ['translation', 'help'],
+    defaultNS: 'translation', // Default language
     interpolation: {
       escapeValue: false, // React already handles escaping
     },

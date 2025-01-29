@@ -18,6 +18,18 @@ const ProductDetailsPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Determine role and navigate back to the correct dashboard
+  const navigateToDashboard = () => {
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      navigate('/admin');
+    } else if (role === 'ROLE_USER') {
+      navigate('/user');
+    } else {
+      navigate('/login'); // Fallback to login if role is undefined
+    }
+  };
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -57,16 +69,14 @@ const ProductDetailsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-6">
-      <header className="w-full bg-blue-500 text-white p-4">
-        <div className="flex justify-between items-center">
-          <button
-            className="text-white font-semibold"
-            onClick={() => navigate('/search-product')}
-          >
-            ← {t('productDetails.backToSearch')}
-          </button>
-          <h1 className="text-xl font-bold">{t('productDetails.title')}</h1>
-        </div>
+      <header className="w-full bg-blue-500 text-white p-4 flex justify-between items-center">
+        <button
+          className="text-white font-semibold"
+          onClick={() => navigate('/search-product')}
+        >
+          ← {t('productDetails.backToSearch')}
+        </button>
+        <h1 className="text-xl font-bold">{t('productDetails.title')}</h1>
       </header>
 
       <main className="w-full max-w-md bg-white shadow-md rounded p-6 mt-6">
@@ -80,6 +90,15 @@ const ProductDetailsPage: React.FC = () => {
         <p>
           <strong>{t('productDetails.totalValue')}:</strong> ${product.totalValue.toFixed(2)}
         </p>
+
+        <div className="mt-6">
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={navigateToDashboard} // Navigate back to correct dashboard
+          >
+            {t('productDetails.backToDashboard')}
+          </button>
+        </div>
       </main>
 
       <footer className="w-full bg-gray-200 text-center py-4 mt-6">

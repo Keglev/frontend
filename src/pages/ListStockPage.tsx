@@ -15,6 +15,18 @@ const ListStockPage: React.FC = () => {
   const pageSize = 10; // Number of items per page
   const navigate = useNavigate();
 
+  // Determine role and navigate back to the correct dashboard
+  const navigateToDashboard = () => {
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      navigate('/admin');
+    } else if (role === 'ROLE_USER') {
+      navigate('/user');
+    } else {
+      navigate('/login'); // Fallback to login if role is undefined
+    }
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -78,7 +90,7 @@ const ListStockPage: React.FC = () => {
         <h1 className="text-lg font-semibold">{t('listStock.title')}</h1>
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={() => navigate('/admin')}
+          onClick={navigateToDashboard} // Use dynamic navigation
         >
           {t('listStock.backToDashboard')}
         </button>

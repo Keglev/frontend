@@ -42,7 +42,6 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header
-        title={t('adminDashboard.title')}
         isLoggedIn={true}
         onLogout={() => {
           localStorage.clear(); // Clear language and user data

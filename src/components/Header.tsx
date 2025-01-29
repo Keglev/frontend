@@ -1,25 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
-  title: string;
   isLoggedIn: boolean;
   onLogout?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, isLoggedIn, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
   const { t, i18n } = useTranslation();
+  const [title, setTitle] = useState(t('header.defaultTitle'));
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng); // Save language in localStorage
+    if (i18n.language !== lng) {
+      i18n.changeLanguage(lng);
+      localStorage.setItem('language', lng);
+    }
   };
 
-  // Load the language from localStorage when the component mounts
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') || 'en'; // Default to English
-    i18n.changeLanguage(savedLanguage);
-  }, [i18n]);
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    
+    if (i18n.language !== savedLanguage) {
+      i18n.changeLanguage(savedLanguage);
+    }
+
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      setTitle(t('adminDashboard.title'));
+    } else if (role === 'ROLE_USER') {
+      setTitle(t('userDashboard.title'));
+    } else {
+      setTitle(t('header.defaultTitle'));
+    }
+  }, [i18n, t]); // ✅ **Now includes dependencies correctly**
 
   return (
     <header className="flex justify-between items-center bg-blue-500 text-white px-6 py-4">
@@ -28,7 +41,6 @@ const Header: React.FC<HeaderProps> = ({ title, isLoggedIn, onLogout }) => {
         <p className="text-sm">{t('header.subtitle')}</p>
       </div>
       <div className="flex items-center space-x-4">
-        {/* Language Selection Buttons - Visible only when not logged in */}
         {!isLoggedIn && (
           <div className="flex space-x-2">
             <button
@@ -46,7 +58,6 @@ const Header: React.FC<HeaderProps> = ({ title, isLoggedIn, onLogout }) => {
           </div>
         )}
 
-        {/* Logout Button - Visible only when logged in */}
         {isLoggedIn && onLogout && (
           <button
             onClick={onLogout}

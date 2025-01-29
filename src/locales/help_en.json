@@ -1,0 +1,30 @@
+{
+    "login": {
+      "title": "Login Help",
+      "content": "Enter your username and password to log in. If you forgot your password, contact the administrator."
+    },
+    "adminDashboard": {
+      "title": "Admin Dashboard Help",
+      "content": "This is the main dashboard for administrators. You can manage products, stock levels, and user permissions."
+    },
+    "userDashboard": {
+      "title": "User Dashboard Help",
+      "content": "This is the main dashboard for users. You can search for products and view stock levels."
+    },
+    "addProduct": {
+      "title": "Adding Products",
+      "content": "To add a product, enter its name, quantity, and price. Click 'Add Product' to confirm."
+    },
+    "deleteProduct": {
+      "title": "Deleting Products",
+      "content": "To delete a product, search for it, select it, and confirm deletion."
+    },
+    "changeProduct": {
+      "title": "Editing Products",
+      "content": "Modify the product quantity or price and save the changes."
+    },
+    "help": {
+      "closeButton": "Close"
+    }
+  }
+  

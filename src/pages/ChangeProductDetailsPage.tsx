@@ -15,6 +15,18 @@ const ChangeProductDetailsPage: React.FC = () => {
   const [confirmation, setConfirmation] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Determine role and navigate back to the correct dashboard
+  const navigateToDashboard = () => {
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      navigate('/admin');
+    } else if (role === 'ROLE_USER') {
+      navigate('/user');
+    } else {
+      navigate('/login'); // Fallback to login if role is undefined
+    }
+  };
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -41,7 +53,7 @@ const ChangeProductDetailsPage: React.FC = () => {
         await ProductService.updateProductPrice(Number(productId), newPrice);
       }
       setMessage(t('changeProduct.successMessage'));
-      setTimeout(() => navigate('/search-product'), 1500);
+      setTimeout(() => navigateToDashboard(), 1500);
     } catch (error) {
       console.error(t('changeProduct.error.update'), error);
       setMessage(t('changeProduct.errorMessage'));
@@ -63,13 +75,16 @@ const ChangeProductDetailsPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={() => navigate('/search-product')}
+          onClick={() => {
+            const role = localStorage.getItem('role');
+            navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user');
+          }}
         >
-          {t('changeProduct.backToSearch')}
+          {t('changeProduct.backToDashboard')}
         </button>
+        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
       </header>
 
       <main className="w-full max-w-2xl p-6 bg-white shadow rounded mt-6">
