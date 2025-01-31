@@ -1,30 +1,44 @@
 {
-    "login": {
-      "title": "Login Help",
-      "content": "Enter your username and password to log in. If you forgot your password, contact the administrator."
-    },
-    "adminDashboard": {
-      "title": "Admin Dashboard Help",
-      "content": "This is the main dashboard for administrators. You can manage products, stock levels, and user permissions."
-    },
-    "userDashboard": {
-      "title": "User Dashboard Help",
-      "content": "This is the main dashboard for users. You can search for products and view stock levels."
-    },
-    "addProduct": {
-      "title": "Adding Products",
-      "content": "To add a product, enter its name, quantity, and price. Click 'Add Product' to confirm."
-    },
-    "deleteProduct": {
-      "title": "Deleting Products",
-      "content": "To delete a product, search for it, select it, and confirm deletion."
-    },
-    "changeProduct": {
-      "title": "Editing Products",
-      "content": "Modify the product quantity or price and save the changes."
-    },
-    "help": {
+  "login": {
+    "title": "Login Help",
+    "content": "Enter your username and password to log in. If you forgot your password, please use the following credentials to test the system:\n\n• **Administrator Login:**\n  - Username: `admin`\n  - Password: `admin123`\n\n• **User Login:**\n  - Username: `user`\n  - Password: `user123`\n\n🔹 The **Administrator** has full access to product management, while the **User** has limited access. Try both roles to understand the differences."
+  },
+  "adminDashboard": {
+    "title": "Admin Dashboard Help",
+    "content": "Welcome to the **Admin Dashboard**. Here, you can manage inventory and monitor stock levels.\n\n### Features Available to Admins:\n- **Add Products:** Register new products with name, quantity, and price.\n- **Delete Products:** Remove unwanted products from stock.\n- **Edit Product Details:** Modify quantity or price.\n- **Monitor Inventory:** View total stock value and low-stock alerts."
+  },
+  "userDashboard": {
+    "title": "User Dashboard Help",
+    "content": "Welcome to the **User Dashboard**. As a user, you have limited access to inventory features.\n\n### Features Available to Users:\n- **Search for Products:** Look up product details by name.\n- **View Stock Information:** Check product availability and stock levels.\n- **Modify Product Details:** Users **can update stock quantity and price** to reflect market conditions.\n\n⚠ **Restrictions:** Users **cannot add or delete products.** Only administrators have full inventory control."
+  },
+  "addProduct": {
+    "title": "Adding Products",
+    "content": "To add a product:\n1. Enter the **product name**, **quantity**, and **price**.\n2. Click **'Add Product'** to confirm.\n\n🔹 Only **administrators** can add new products."
+  },
+  "deleteProduct": {
+    "title": "Deleting Products",
+    "content": "To delete a product:\n1. Search for the product by name.\n2. Select the product from the list.\n3. Confirm deletion.\n\n⚠ **Warning:** Deleted products cannot be recovered."
+  },
+  "changeProduct": {
+    "title": "Editing Products",
+    "content": "Modify product details:\n- **Update quantity** if stock levels change.\n- **Adjust price** based on market conditions.\n\nClick **'Save Changes'** to confirm."
+  },
+  "searchProduct": {
+    "title": "Searching for Products",
+    "content": "Use the search bar to find products in inventory. You can:\n- View product details (quantity, price, total value).\n- As an administrator, edit product information directly from search results."
+  },
+  "listStock": {
+    "title": "Viewing Stock Levels",
+    "content": "This page provides an overview of all inventory. You can:\n- Check available stock levels for each product.\n- Download a **CSV file** containing inventory data."
+  },
+    "help": "Help",
+    "helpModal": {
       "closeButton": "Close"
-    }
-  }
-  
+    },
+      "header": {
+        "defaultTitle": "StockEase",
+        "subtitle": "Manage your products and stock",
+        "logout": "Logout",
+        "returnToDashboard": "Return to Dashboard"
+      }
+}

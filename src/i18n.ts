@@ -24,11 +24,15 @@ i18n
   .use(initReactI18next) // Bind to React
   .init({
     resources,
-    fallbackLng: 'en', 
+    fallbackLng: 'en',
     ns: ['translation', 'help'],
     defaultNS: 'translation', // Default language
     interpolation: {
       escapeValue: false, // React already handles escaping
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
     },
   });
 

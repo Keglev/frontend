@@ -23,7 +23,8 @@
     "defaultTitle": "Login",
     "subtitle": "Manage your products and stock",
     "logout": "Logout",
-    "language": "Choose Language"
+    "language": "Choose Language",
+    "returnToDashboard": "Return to Dashboard"
   },
   "adminDashboard": {
     "title": "Admin Dashboard",
@@ -158,10 +159,13 @@
       "price": "Price",
       "totalValue": "Total Value"
     },
-    "editButton": "Edit {{name}}",
-    "error": {
+  "editButton": "Edit {{name}}",
+  "error": {
       "fetch": "Error fetching products.",
       "details": "Error fetching product details."
     }
-  }
+  },
+    "help": {
+      "button": "Help"
+    }
 }

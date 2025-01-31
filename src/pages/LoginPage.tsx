@@ -7,7 +7,6 @@ import '../styles/login.css';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
-import HelpModal from '../components/HelpModal';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -15,7 +14,6 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,19 +57,9 @@ const LoginPage: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Header
-        isLoggedIn={false}
-        onLogout={() => {
-          localStorage.clear();
-          navigate('/login', { replace: true });
-        }}
-      />
-      
-      {/* Centered Container */}
+      <Header isLoggedIn={false} />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">{t('login.title')}</h1>
-
-        {/* Login Form */}
         <div className="flex flex-col w-64 bg-white p-6 rounded-lg shadow-md">
           <label htmlFor="username" className="text-sm font-medium mb-2">{t('login.username')}</label>
           <input
@@ -92,7 +80,6 @@ const LoginPage: React.FC = () => {
             required
             autoComplete="current-password"
           />
-
           {loading ? (
             <SkeletonLoader />
           ) : (
@@ -105,18 +92,7 @@ const LoginPage: React.FC = () => {
           )}
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
-
-        {/* Help Button Below the Form */}
-        <button
-          onClick={() => setIsHelpOpen(true)}
-          className="mt-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
-        >
-          {t('help.button')}
-        </button>
       </div>
-
-      {/* Help Modal (Outside the Container) */}
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="login" />
     </ErrorBoundary>
   );
 };

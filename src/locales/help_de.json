@@ -1,30 +1,38 @@
 {
-    "login": {
-      "title": "Anmeldehilfe",
-      "content": "Geben Sie Ihren Benutzernamen und Ihr Passwort ein, um sich anzumelden. Falls Sie Ihr Passwort vergessen haben, wenden Sie sich an den Administrator."
-    },
-    "adminDashboard": {
-      "title": "Admin-Dashboard-Hilfe",
-      "content": "Dies ist das Haupt-Dashboard für Administratoren. Sie können Produkte, Lagerbestände und Benutzerrechte verwalten."
-    },
-    "userDashboard": {
-      "title": "Benutzer-Dashboard-Hilfe",
-      "content": "Dies ist das Haupt-Dashboard für Benutzer. Sie können Produkte suchen und Lagerbestände einsehen."
-    },
-    "addProduct": {
-      "title": "Produkte hinzufügen",
-      "content": "Geben Sie den Produktnamen, die Menge und den Preis ein. Klicken Sie auf 'Produkt hinzufügen', um zu bestätigen."
-    },
-    "deleteProduct": {
-      "title": "Produkte löschen",
-      "content": "Suchen Sie ein Produkt, wählen Sie es aus und bestätigen Sie die Löschung."
-    },
-    "changeProduct": {
-      "title": "Produkte bearbeiten",
-      "content": "Ändern Sie die Produktmenge oder den Preis und speichern Sie die Änderungen."
-    },
-    "help": {
+  "login": {
+    "title": "Anmeldehilfe",
+    "content": "Geben Sie Ihren Benutzernamen und Ihr Passwort ein, um sich anzumelden. Falls Sie Ihr Passwort vergessen haben, können Sie die folgenden Testanmeldedaten verwenden:\n\n• **Administrator Login:**\n  - Benutzername: `admin`\n  - Passwort: `admin123`\n\n• **Benutzer Login:**\n  - Benutzername: `user`\n  - Passwort: `user123`\n\n🔹 Der **Administrator** hat vollen Zugriff auf die Produktverwaltung, während der **Benutzer** eingeschränkten Zugriff hat. Testen Sie beide Rollen, um die Unterschiede kennenzulernen."
+  },
+  "adminDashboard": {
+    "title": "Admin-Dashboard-Hilfe",
+    "content": "Willkommen im **Admin-Dashboard**. Hier können Sie das Inventar verwalten und Lagerbestände überwachen.\n\n### Funktionen für Administratoren:\n- **Produkte hinzufügen:** Neue Produkte mit Namen, Menge und Preis registrieren.\n- **Produkte löschen:** Nicht mehr benötigte Produkte aus dem Lager entfernen.\n- **Produktdetails bearbeiten:** Menge oder Preis ändern.\n- **Lagerbestände überwachen:** Gesamtwert des Lagers anzeigen und Warnungen bei niedrigem Bestand erhalten."
+  },
+  "userDashboard": {
+    "title": "Benutzer-Dashboard-Hilfe",
+    "content": "Willkommen im **Benutzer-Dashboard**. Als Benutzer haben Sie eingeschränkten Zugriff auf die Inventarfunktionen.\n\n### Funktionen für Benutzer:\n- **Produkte suchen:** Produktdetails nach Namen abrufen.\n- **Lagerbestand anzeigen:** Verfügbarkeit und Lagerbestände prüfen.\n- **Produktdetails ändern:** Benutzer **können die Menge und den Preis von Produkten aktualisieren**, um Marktveränderungen widerzuspiegeln.\n\n⚠ **Einschränkungen:** Benutzer **können keine Produkte hinzufügen oder löschen.** Nur Administratoren haben die vollständige Kontrolle über das Inventar."
+  },
+  "addProduct": {
+    "title": "Produkte hinzufügen",
+    "content": "So fügen Sie ein Produkt hinzu:\n1. Geben Sie den **Produktnamen**, die **Menge** und den **Preis** ein.\n2. Klicken Sie auf **'Produkt hinzufügen'**, um zu bestätigen.\n\n🔹 Nur **Administratoren** können neue Produkte hinzufügen."
+  },
+  "deleteProduct": {
+    "title": "Produkte löschen",
+    "content": "So löschen Sie ein Produkt:\n1. Suchen Sie das Produkt nach Namen.\n2. Wählen Sie das Produkt aus der Liste aus.\n3. Bestätigen Sie die Löschung.\n\n⚠ **Achtung:** Gelöschte Produkte können nicht wiederhergestellt werden."
+  },
+  "changeProduct": {
+    "title": "Produkte bearbeiten",
+    "content": "Produktdetails ändern:\n- **Menge aktualisieren**, falls sich die Lagerbestände ändern.\n- **Preis anpassen**, um Marktveränderungen zu berücksichtigen.\n\nKlicken Sie auf **'Änderungen speichern'**, um zu bestätigen."
+  },
+  "searchProduct": {
+    "title": "Produkte suchen",
+    "content": "Verwenden Sie die Suchleiste, um Produkte im Inventar zu finden. Sie können:\n- Produktdetails (Menge, Preis, Gesamtwert) einsehen.\n- Als Administrator direkt aus den Suchergebnissen Produktinformationen bearbeiten."
+  },
+  "listStock": {
+    "title": "Lagerbestand anzeigen",
+    "content": "Diese Seite bietet eine Übersicht über alle Bestände. Sie können:\n- Lagerbestände für jedes Produkt prüfen.\n- Eine **CSV-Datei** mit Inventardaten herunterladen."
+  },
+    "help": "Hilfe",
+    "helpModal": {
       "closeButton": "Schließen"
     }
   }
-  

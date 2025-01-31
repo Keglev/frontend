@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
+import HelpModal from '../components/HelpModal';
 
 const DeleteProductPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(); // ✅ Import i18n correctly
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string } | null>(null);
   const [confirmation, setConfirmation] = useState<'first' | 'second' | null>(null);
   const [message, setMessage] = useState('');
+  const [isHelpOpen, setIsHelpOpen] = useState(false); // ✅ Define the missing state
   const navigate = useNavigate();
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +70,16 @@ const DeleteProductPage: React.FC = () => {
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
         <h1 className="text-lg font-semibold">{t('deleteProduct.title')}</h1>
+        
+        {/* ✅ Help Button */}
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language} // ✅ Ensures correct translation updates
+        >
+          {t('help.button')}
+        </button>
+
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
           onClick={() => navigate('/admin')}
@@ -75,6 +87,9 @@ const DeleteProductPage: React.FC = () => {
           {t('deleteProduct.backToDashboard')}
         </button>
       </header>
+
+      {/* ✅ Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="deleteProduct" />
 
       <main className="flex flex-col items-center w-full max-w-2xl p-4 mt-6 bg-white shadow rounded">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">{t('deleteProduct.findProduct')}</h2>

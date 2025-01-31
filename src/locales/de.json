@@ -164,6 +164,15 @@
     "error": {
       "fetch": "Fehler beim Abrufen der Produkte.",
       "details": "Fehler beim Abrufen der Produktdetails."
+    },
+    "header": {
+      "defaultTitle": "StockEase",
+      "subtitle": "Verwalten Sie Ihre Produkte und Bestände",
+      "logout": "Abmelden",
+      "returnToDashboard": "Zurück zum Dashboard"
+    },
+    "help": {
+    "button": "Hilfe"
     }
   }
 }
