@@ -31,7 +31,7 @@
     "title": "Viewing Stock Levels",
     "content": "This page provides an overview of all inventory. You can:\n- Check available stock levels for each product.\n- Download a **CSV file** containing inventory data."
   },
-    "help": "Help",
+    "button": "Help",
     "helpModal": {
       "closeButton": "Close"
     },

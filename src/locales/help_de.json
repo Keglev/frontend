@@ -31,7 +31,7 @@
     "title": "Lagerbestand anzeigen",
     "content": "Diese Seite bietet eine Übersicht über alle Bestände. Sie können:\n- Lagerbestände für jedes Produkt prüfen.\n- Eine **CSV-Datei** mit Inventardaten herunterladen."
   },
-    "help": "Hilfe",
+    "button": "Hilfe",
     "helpModal": {
       "closeButton": "Schließen"
     }

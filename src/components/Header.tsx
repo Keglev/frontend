@@ -9,13 +9,24 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']); // ✅ Ensure both namespaces are loaded
   const location = useLocation();
   const navigate = useNavigate();
   const [title, setTitle] = useState(t('header.defaultTitle'));
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language);
 
-  // ✅ **Keeps the logic for dynamically determining the Help Section**
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setCurrentLang(lng); // ✅ Ensure re-render on language change
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+
   const getPageKey = () => {
     const path = location.pathname;
     if (path.startsWith('/admin')) return 'adminDashboard';
@@ -29,7 +40,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
     return 'default';
   };
 
-  // ✅ **Keeps Role-Based Title Updates**
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     if (i18n.language !== savedLanguage) {
@@ -46,16 +56,13 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
     }
   }, [i18n, i18n.language, t]);
 
-  // ✅ **Keeps the fix for language not updating after logout**
   const changeLanguage = (lng: string) => {
     localStorage.setItem('language', lng);
     i18n.changeLanguage(lng);
-    window.location.reload(); // ✅ Ensures immediate language update
   };
 
-  // ✅ **Determine Button Label & Action (Dashboard vs Logout)**
   const isDashboard = location.pathname === '/admin' || location.pathname === '/user';
-  const buttonLabel = isDashboard ? t('header.logout') : t('header.returnToDashboard');
+  const buttonLabel = isDashboard ? t('header.logout') : t(`${getPageKey()}.backToDashboard`);
 
   const handleButtonClick = () => {
     if (isDashboard) {
@@ -74,7 +81,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
         <p className="text-sm">{t('header.subtitle')}</p>
       </div>
       <div className="flex items-center space-x-4">
-        {/* ✅ Language Selection (Keeps Fix for Logout Language Issue) */}
         <button
           className="px-4 py-2 bg-gray-100 text-black rounded hover:bg-gray-200"
           onClick={() => changeLanguage('en')}
@@ -88,16 +94,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
           🇩🇪 Deutsch
         </button>
 
-        {/* ✅ Help Button - Now Appears on All Pages */}
+        {/* ✅ Fix: Ensure Help Button Translates Correctly */}
         <button
           onClick={() => setIsHelpOpen(true)}
           className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-          key={i18n.language} // ✅ Forces re-render when language changes
+          key={currentLang} // ✅ Ensures translation updates
         >
-          {t('help.button')}
+          {t('help.button')} {/* ✅ Corrected reference */}
         </button>
 
-        {/* ✅ "Logout" (on Dashboard) OR "Return to Dashboard" (on Other Pages) */}
         {isLoggedIn && (
           <button
             onClick={handleButtonClick}
@@ -108,53 +113,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
         )}
       </div>
 
-      {/* ✅ Help Modal (Ensures Correct PageKey is Passed) */}
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey={getPageKey()} />
-    </header>
-  );
-
-  return (
-    <header className="flex justify-between items-center bg-blue-500 text-white px-6 py-4">
-      <div>
-        <h1 className="text-xl font-bold">{title}</h1>
-        <p className="text-sm">{t('header.subtitle')}</p>
-      </div>
-      <div className="flex items-center space-x-4">
-        {/* ✅ Language Selection (Keeps Fix for Logout Language Issue) */}
-        <button
-          className="px-4 py-2 bg-gray-100 text-black rounded hover:bg-gray-200"
-          onClick={() => changeLanguage('en')}
-        >
-          🇬🇧 English
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-100 text-black rounded hover:bg-gray-200"
-          onClick={() => changeLanguage('de')}
-        >
-          🇩🇪 Deutsch
-        </button>
-
-        {/* ✅ Help Button - Now Appears on All Pages */}
-        <button
-          onClick={() => setIsHelpOpen(true)}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-          key={i18n.language} // ✅ Forces re-render when language changes
-        >
-          {t('help.button')}
-        </button>
-
-        {/* ✅ "Logout" (on Dashboard) OR "Return to Dashboard" (on Other Pages) */}
-        {isLoggedIn && (
-          <button
-            onClick={handleButtonClick}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            {t(buttonLabel)}
-          </button>
-        )}
-      </div>
-
-      {/* ✅ Help Modal (Ensures Correct PageKey is Passed) */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey={getPageKey()} />
     </header>
   );

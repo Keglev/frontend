@@ -5,35 +5,43 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translations
 import en from './locales/en.json';
 import de from './locales/de.json';
-
-// Import help section translations
 import helpEn from './locales/help_en.json';
 import helpDe from './locales/help_de.json';
 
+declare global {
+  interface Window {
+    i18next: typeof i18n;
+  }
+}
+
 const resources = {
-  en: { translation: en,
-    help: helpEn,
-   },
-  de: { translation: de,
-    help: helpDe,
-   },
+  en: { translation: en, help: helpEn },
+  de: { translation: de, help: helpDe },
 };
 
 i18n
-  .use(LanguageDetector) // Detect user language
-  .use(initReactI18next) // Bind to React
+  .use(LanguageDetector)
+  .use(initReactI18next)
   .init({
     resources,
     fallbackLng: 'en',
-    ns: ['translation', 'help'],
-    defaultNS: 'translation', // Default language
+    ns: ['translation', 'help'], // ✅ Ensure help namespace is loaded
+    defaultNS: 'translation',
     interpolation: {
-      escapeValue: false, // React already handles escaping
+      escapeValue: false,
     },
     detection: {
       order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
+      caches: ['localStorage'], // ✅ Ensure language selection persists
     },
   });
+
+// ✅ Ensure `localStorage` is correctly updated
+const storedLanguage = localStorage.getItem('language') || 'en';
+if (i18n.language !== storedLanguage) {
+  i18n.changeLanguage(storedLanguage);
+}
+
+window.i18next = i18n; // ✅ Attach to `window` for debugging
 
 export default i18n;

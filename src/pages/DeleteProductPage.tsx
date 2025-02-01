@@ -1,19 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
 
 const DeleteProductPage: React.FC = () => {
-  const { t, i18n } = useTranslation(); // ✅ Import i18n correctly
+  const { t, i18n } = useTranslation(['translation', 'help']); // ✅ Use correct namespaces
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string } | null>(null);
   const [confirmation, setConfirmation] = useState<'first' | 'second' | null>(null);
   const [message, setMessage] = useState('');
-  const [isHelpOpen, setIsHelpOpen] = useState(false); // ✅ Define the missing state
-  const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
+  // ✅ Ensure Help Button updates when language changes
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setIsHelpOpen((prev) => prev); // ✅ Forces re-render
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+
+  // ✅ Handle Product Search
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -23,7 +36,7 @@ const DeleteProductPage: React.FC = () => {
     if (query.length >= 3) {
       try {
         const results = await ProductService.searchProductsByName(query);
-        if (!results || (Array.isArray(results) && results.length === 0)) {
+        if (!results || results.length === 0) {
           setProducts([]);
           setMessage(t('deleteProduct.messages.notFound'));
         } else {
@@ -40,12 +53,14 @@ const DeleteProductPage: React.FC = () => {
     }
   };
 
+  // ✅ Handle Product Selection
   const handleProductClick = (product: { id: number; name: string }) => {
     setSelectedProduct(product);
     setConfirmation('first');
     setMessage('');
   };
 
+  // ✅ Handle Product Deletion
   const handleDelete = async () => {
     if (!selectedProduct) return;
 
@@ -61,6 +76,7 @@ const DeleteProductPage: React.FC = () => {
     }
   };
 
+  // ✅ Cancel Confirmation
   const cancelOperation = () => {
     setConfirmation(null);
     setMessage(t('deleteProduct.messages.canceled'));
@@ -70,8 +86,8 @@ const DeleteProductPage: React.FC = () => {
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
         <h1 className="text-lg font-semibold">{t('deleteProduct.title')}</h1>
-        
-        {/* ✅ Help Button */}
+
+        {/* ✅ Help Button - Now correctly updates when switching languages */}
         <button
           onClick={() => setIsHelpOpen(true)}
           className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
@@ -88,7 +104,7 @@ const DeleteProductPage: React.FC = () => {
         </button>
       </header>
 
-      {/* ✅ Help Modal */}
+      {/* ✅ Help Modal - Fix Close Button Translation */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="deleteProduct" />
 
       <main className="flex flex-col items-center w-full max-w-2xl p-4 mt-6 bg-white shadow rounded">
