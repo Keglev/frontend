@@ -11,9 +11,13 @@
     }
   },
   "userDashboard": {
-  "title": "Benutzer-Dashboard",
-  "welcome": "Willkommen, Benutzer!",
-  "subtitle": "Sehen und verwalten Sie Ihr Inventar effizient."
+    "title": "Benutzer-Dashboard",
+    "welcome": "Willkommen, Benutzer!",
+    "subtitle": "Sehen und verwalten Sie Ihr Inventar effizient.",
+    "stockValue": "Gesamtbestandwert",
+    "lowStock": "Produkte mit niedrigem Bestand",
+    "sufficientStock": "Alle Produkte sind ausreichend auf Lager",
+    "error": "Fehler beim Laden der Dashboard-Daten. Bitte versuchen Sie es erneut."
   },
   "errorBoundary": {
     "title": "Etwas ist schief gelaufen!",

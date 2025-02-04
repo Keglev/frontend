@@ -11,9 +11,12 @@
     }
   },
   "userDashboard": {
-  "title": "User Dashboard",
-  "welcome": "Welcome, User!",
-  "subtitle": "View and manage your inventory efficiently."
+    "title": "User Dashboard",
+    "welcome": "Welcome, User!",
+    "subtitle": "View and manage your inventory efficiently.",
+    "stockValue": "Total Stock Value",
+    "lowStock": "Low Stock Products",
+    "sufficientStock": "All products are sufficiently stocked"
   },
   "errorBoundary": {
     "title": "Something went wrong!",

@@ -4,15 +4,17 @@ import '../styles/addProduct.css';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
+import HelpModal from '../components/HelpModal';
 
 const AddProductPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [confirmation, setConfirmation] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Determine role and navigate back to the correct dashboard
   const navigateToDashboard = () => {
@@ -59,6 +61,18 @@ const AddProductPage: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* ✅ Ensure Header is included */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
+
+      {/* ✅ Help Button inside Header (Same as AdminDashboard.tsx & DeleteProductPage.tsx) */}
+      <button
+        onClick={() => setIsHelpOpen(true)}
+        className="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+        key={i18n.language}
+      >
+        {t('button', { ns: 'help' })}
+      </button>
+
+      {/* ✅ Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="addProduct" />
 
       <main className="flex flex-col items-center justify-center flex-grow">
         <div className="w-96 bg-white p-6 shadow-md rounded mt-6">

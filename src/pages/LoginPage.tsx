@@ -7,14 +7,16 @@ import '../styles/login.css';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
+import HelpModal from '../components/HelpModal';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem('role');
@@ -57,11 +59,27 @@ const LoginPage: React.FC = () => {
 
   return (
     <ErrorBoundary>
+      {/* ✅ Keep the existing Header component */}
       <Header isLoggedIn={false} />
+
+      {/* ✅ Place Help Button inside the existing Header (like AdminDashboard.tsx & DeleteProductPage.tsx) */}
+      <button
+        onClick={() => setIsHelpOpen(true)}
+        className="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+        key={i18n.language}
+      >
+        {t('button', { ns: 'help' })}
+      </button>
+
+      {/* ✅ Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="login" />
+
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">{t('login.title')}</h1>
         <div className="flex flex-col w-64 bg-white p-6 rounded-lg shadow-md">
-          <label htmlFor="username" className="text-sm font-medium mb-2">{t('login.username')}</label>
+          <label htmlFor="username" className="text-sm font-medium mb-2">
+            {t('login.username')}
+          </label>
           <input
             type="text"
             id="username"
@@ -70,7 +88,9 @@ const LoginPage: React.FC = () => {
             className="px-4 py-2 mb-4 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             required
           />
-          <label htmlFor="password" className="text-sm font-medium mb-2">{t('login.password')}</label>
+          <label htmlFor="password" className="text-sm font-medium mb-2">
+            {t('login.password')}
+          </label>
           <input
             type="password"
             id="password"
