@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
+import HelpModal from '../components/HelpModal';
 
 const SearchProductPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<{
@@ -14,19 +15,27 @@ const SearchProductPage: React.FC = () => {
     price?: number;
     totalValue?: number;
   } | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Dynamically navigate to the correct dashboard based on role
+  // Role-based navigation
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
-    if (role === 'ROLE_ADMIN') {
-      navigate('/admin');
-    } else if (role === 'ROLE_USER') {
-      navigate('/user');
-    } else {
-      navigate('/login'); // Fallback to login if the role is undefined
-    }
+    if (role === 'ROLE_ADMIN') navigate('/admin');
+    else if (role === 'ROLE_USER') navigate('/user');
+    else navigate('/login');
   };
+
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setIsHelpOpen((prev) => prev);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -36,12 +45,7 @@ const SearchProductPage: React.FC = () => {
     if (query.length >= 3) {
       try {
         const results = await ProductService.searchProductsByName(query);
-
-        if (!results || (Array.isArray(results) && results.length === 0)) {
-          setProducts([]);
-        } else {
-          setProducts(results);
-        }
+        setProducts(results && results.length > 0 ? results : []);
       } catch (error) {
         console.error(t('searchProduct.error.fetch'), error);
         setProducts([]);
@@ -64,19 +68,30 @@ const SearchProductPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
+        {/* Help Button */}
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+
         <h1 className="text-lg font-semibold">{t('searchProduct.title')}</h1>
+
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={navigateToDashboard} // Use the dynamic navigation function
+          onClick={navigateToDashboard}
         >
           {t('searchProduct.backToDashboard')}
         </button>
       </header>
 
+      {/* Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="searchProduct" />
+
       <main className="flex flex-col items-center w-full max-w-2xl p-4 mt-6 bg-white shadow rounded">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-          {t('searchProduct.subtitle')}
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">{t('searchProduct.subtitle')}</h2>
 
         <div className="w-full flex flex-col gap-4">
           <input
@@ -87,8 +102,8 @@ const SearchProductPage: React.FC = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
           />
 
-          {searchQuery.length >= 3 && (
-            products.length > 0 ? (
+          {searchQuery.length >= 3 &&
+            (products.length > 0 ? (
               <ul className="w-full mt-4 space-y-2">
                 {products.map((product) => (
                   <li
@@ -102,17 +117,28 @@ const SearchProductPage: React.FC = () => {
               </ul>
             ) : (
               <p className="text-gray-500 text-center mt-4">{t('searchProduct.noResults')}</p>
-            )
-          )}
+            ))}
 
           {selectedProduct && (
             <div className="mt-6 p-4 bg-gray-100 border rounded shadow-md">
               <h3 className="text-lg font-semibold">{selectedProduct.name}</h3>
-              <p className="text-gray-700">{t('searchProduct.details.quantity')}: {selectedProduct.quantity}</p>
-              <p className="text-gray-700">{t('searchProduct.details.price')}: ${selectedProduct.price?.toFixed(2)}</p>
-              <p className="text-gray-700">{t('searchProduct.details.totalValue')}: ${selectedProduct.totalValue?.toFixed(2)}</p>
+              <p className="text-gray-700">
+                {t('searchProduct.details.quantity')}: {selectedProduct.quantity}
+              </p>
+              <p className="text-gray-700">
+                {t('searchProduct.details.price')}: ${selectedProduct.price?.toFixed(2)}
+              </p>
+              <p className="text-gray-700">
+                {t('searchProduct.details.totalValue')}: ${selectedProduct.totalValue?.toFixed(2)}
+              </p>
 
-              <div className="mt-4">
+              <div className="mt-4 flex justify-between">
+                <button
+                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  {t('searchProduct.cancelButton')}
+                </button>
                 <button
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   onClick={() => navigate(`/product/${selectedProduct.id}/edit`)}

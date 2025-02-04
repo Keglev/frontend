@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
+import HelpModal from '../components/HelpModal';
 
 interface Product {
   id: number;
@@ -12,22 +13,19 @@ interface Product {
 }
 
 const ProductDetailsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Determine role and navigate back to the correct dashboard
+  // Role-based navigation
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
-    if (role === 'ROLE_ADMIN') {
-      navigate('/admin');
-    } else if (role === 'ROLE_USER') {
-      navigate('/user');
-    } else {
-      navigate('/login'); // Fallback to login if role is undefined
-    }
+    if (role === 'ROLE_ADMIN') navigate('/admin');
+    else if (role === 'ROLE_USER') navigate('/user');
+    else navigate('/login');
   };
 
   useEffect(() => {
@@ -43,6 +41,17 @@ const ProductDetailsPage: React.FC = () => {
 
     fetchProductDetails();
   }, [id, t]);
+
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setIsHelpOpen((prev) => prev);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   if (error) {
     return (
@@ -71,13 +80,25 @@ const ProductDetailsPage: React.FC = () => {
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-6">
       <header className="w-full bg-blue-500 text-white p-4 flex justify-between items-center">
         <button
-          className="text-white font-semibold"
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+
+        <h1 className="text-xl font-bold">{t('productDetails.title')}</h1>
+
+        <button
+          className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
           onClick={() => navigate('/search-product')}
         >
-          ← {t('productDetails.backToSearch')}
+          {t('productDetails.backToSearch')}
         </button>
-        <h1 className="text-xl font-bold">{t('productDetails.title')}</h1>
       </header>
+
+      {/* Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="productDetails" />
 
       <main className="w-full max-w-md bg-white shadow-md rounded p-6 mt-6">
         <h2 className="text-xl font-bold mb-4">{product.name}</h2>
@@ -91,10 +112,16 @@ const ProductDetailsPage: React.FC = () => {
           <strong>{t('productDetails.totalValue')}:</strong> ${product.totalValue.toFixed(2)}
         </p>
 
-        <div className="mt-6">
+        <div className="mt-6 flex justify-between">
+          <button
+            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            onClick={() => navigate('/search-product')}
+          >
+            {t('productDetails.backToSearch')}
+          </button>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={navigateToDashboard} // Navigate back to correct dashboard
+            onClick={navigateToDashboard}
           >
             {t('productDetails.backToDashboard')}
           </button>

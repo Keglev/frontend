@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Buttons from '../components/Buttons';
 import DashboardLogic from '../logic/DashboardLogic';
 import Header from '../components/Header';
+import HelpModal from '../components/HelpModal';
 import { useTranslation } from 'react-i18next';
 
 const AdminDashboard: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const [stockValue, setStockValue] = useState<number>(0);
   const [lowStockProducts, setLowStockProducts] = useState<
     { id: number; name: string; quantity: number }[]
@@ -14,12 +15,17 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
+  // ✅ Ensure language is set correctly
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
-    i18n.changeLanguage(savedLanguage);
+    if (i18n.language !== savedLanguage) {
+      i18n.changeLanguage(savedLanguage);
+    }
   }, [i18n]);
 
+  // ✅ Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -41,16 +47,32 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* ✅ Keep the original header */}
       <Header
         isLoggedIn={true}
         onLogout={() => {
-          localStorage.clear(); // Clear language and user data
+          localStorage.clear();
           navigate('/login');
         }}
       />
 
-      <main className="flex-grow flex flex-col items-center p-6">
-        <h2 className="text-2xl font-semibold mb-4">{t('adminDashboard.welcome')}</h2>
+      {/* ✅ Help Button inside Header, next to language buttons */}
+      <div className="absolute top-4 right-40">
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+      </div>
+
+      {/* ✅ Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="adminDashboard" />
+
+      {/* ✅ Centered dashboard layout */}
+      <main className="flex-grow flex flex-col items-center justify-center p-6">
+        <h2 className="text-2xl font-semibold">{t('adminDashboard.welcome')}</h2>
         <p className="text-lg text-gray-700 mb-8">{t('adminDashboard.subtitle')}</p>
 
         {loading ? (
@@ -59,11 +81,13 @@ const AdminDashboard: React.FC = () => {
           <p className="text-red-500">{error}</p>
         ) : (
           <div className="w-full max-w-4xl space-y-6">
+            {/* ✅ Stock Value Section */}
             <div className="p-4 bg-white shadow rounded">
               <h3 className="text-lg font-semibold">{t('adminDashboard.stockValue')}</h3>
               <p className="text-xl text-blue-600 font-bold">${stockValue.toFixed(2)}</p>
             </div>
 
+            {/* ✅ Low Stock Products Section */}
             <div className="p-4 bg-white shadow rounded">
               <h3 className="text-lg font-semibold">{t('adminDashboard.lowStock')}</h3>
               {lowStockProducts.length > 0 ? (
@@ -88,7 +112,6 @@ const AdminDashboard: React.FC = () => {
 
       <footer className="w-full bg-gray-200 text-center py-4">
         <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
       </footer>
     </div>
   );

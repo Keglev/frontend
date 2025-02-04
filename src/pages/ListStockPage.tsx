@@ -3,28 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { Product } from '../types/Product';
 import { useTranslation } from 'react-i18next';
+import HelpModal from '../components/HelpModal';
 
 const ListStockPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const [products, setProducts] = useState<Product[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const pageSize = 10; // Number of items per page
+  const pageSize = 10;
   const navigate = useNavigate();
 
-  // Determine role and navigate back to the correct dashboard
+  // Role-based navigation
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
-    if (role === 'ROLE_ADMIN') {
-      navigate('/admin');
-    } else if (role === 'ROLE_USER') {
-      navigate('/user');
-    } else {
-      navigate('/login'); // Fallback to login if role is undefined
-    }
+    if (role === 'ROLE_ADMIN') navigate('/admin');
+    else if (role === 'ROLE_USER') navigate('/user');
+    else navigate('/login');
   };
 
   useEffect(() => {
@@ -52,6 +50,17 @@ const ListStockPage: React.FC = () => {
     fetchProducts();
   }, [currentPage, t]);
 
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setIsHelpOpen((prev) => prev);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage);
@@ -70,7 +79,6 @@ const ListStockPage: React.FC = () => {
       .join('\n');
 
     const csvContent = csvHeader + csvRows;
-
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -87,14 +95,26 @@ const ListStockPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+
         <h1 className="text-lg font-semibold">{t('listStock.title')}</h1>
+
         <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={navigateToDashboard} // Use dynamic navigation
+          onClick={navigateToDashboard}
         >
           {t('listStock.backToDashboard')}
         </button>
       </header>
+
+      {/* Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="listStock" />
 
       <main className="w-full max-w-4xl p-6 bg-white shadow-md rounded mt-6">
         <div className="flex justify-between items-center mb-4">
@@ -110,10 +130,7 @@ const ListStockPage: React.FC = () => {
         {products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {products.map((product) => (
-              <div
-                key={product.id}
-                className="p-4 border rounded shadow hover:bg-gray-100"
-              >
+              <div key={product.id} className="p-4 border rounded shadow hover:bg-gray-100">
                 <p>
                   <strong>{t('listStock.labels.name')}:</strong> {product.name}
                 </p>
@@ -121,8 +138,7 @@ const ListStockPage: React.FC = () => {
                   <strong>{t('listStock.labels.quantity')}:</strong> {product.quantity}
                 </p>
                 <p>
-                  <strong>{t('listStock.labels.totalValue')}:</strong> $
-                  {product.totalValue?.toFixed(2)}
+                  <strong>{t('listStock.labels.totalValue')}:</strong> ${product.totalValue?.toFixed(2)}
                 </p>
               </div>
             ))}

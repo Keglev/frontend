@@ -161,6 +161,7 @@
       "totalValue": "Gesamtwert"
     },
     "editButton": "{{name}} bearbeiten",
+    "cancelButton": "Abbrechen",
     "error": {
       "fetch": "Fehler beim Abrufen der Produkte.",
       "details": "Fehler beim Abrufen der Produktdetails."

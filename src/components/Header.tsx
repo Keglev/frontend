@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import HelpModal from '../components/HelpModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
@@ -8,25 +7,13 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
-  const { t, i18n } = useTranslation(['translation', 'help']); // ✅ Ensure both namespaces are loaded
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const location = useLocation();
   const navigate = useNavigate();
-  const [title, setTitle] = useState(t('header.defaultTitle'));
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState(i18n.language);
+  const [title, setTitle] = useState('');
 
-  useEffect(() => {
-    const handleLanguageChange = (lng: string) => {
-      setCurrentLang(lng); // ✅ Ensure re-render on language change
-    };
-
-    i18n.on('languageChanged', handleLanguageChange);
-    return () => {
-      i18n.off('languageChanged', handleLanguageChange);
-    };
-  }, [i18n]);
-
+  // 🔍 Determine the current page key for correct translation
   const getPageKey = () => {
     const path = location.pathname;
     if (path.startsWith('/admin')) return 'adminDashboard';
@@ -40,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
     return 'default';
   };
 
+  // 🌍 Update language and title when page changes
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     if (i18n.language !== savedLanguage) {
@@ -54,20 +42,27 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
     } else {
       setTitle(t('header.defaultTitle'));
     }
-  }, [i18n, i18n.language, t]);
+  }, [i18n, i18n.language, location.pathname, t]);
 
+  // 🔄 Change Language
   const changeLanguage = (lng: string) => {
     localStorage.setItem('language', lng);
     i18n.changeLanguage(lng);
   };
 
+  // 🚀 Determine if we are on a Dashboard
   const isDashboard = location.pathname === '/admin' || location.pathname === '/user';
   const buttonLabel = isDashboard ? t('header.logout') : t(`${getPageKey()}.backToDashboard`);
 
+  // 🏃‍♂️ Handle Logout or Navigation
   const handleButtonClick = () => {
     if (isDashboard) {
-      localStorage.clear();
-      navigate('/login', { replace: true });
+      if (onLogout) {
+        onLogout();
+      } else {
+        localStorage.clear();
+        navigate('/login', { replace: true });
+      }
     } else {
       const role = localStorage.getItem('role');
       navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user', { replace: true });
@@ -94,26 +89,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
           🇩🇪 Deutsch
         </button>
 
-        {/* ✅ Fix: Ensure Help Button Translates Correctly */}
-        <button
-          onClick={() => setIsHelpOpen(true)}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-          key={currentLang} // ✅ Ensures translation updates
-        >
-          {t('help.button')} {/* ✅ Corrected reference */}
-        </button>
-
         {isLoggedIn && (
           <button
             onClick={handleButtonClick}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
-            {t(buttonLabel)}
+            {buttonLabel}
           </button>
         )}
       </div>
-
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey={getPageKey()} />
     </header>
   );
 };

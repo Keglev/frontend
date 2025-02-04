@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/addProduct.css';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/Header'; 
+import Header from '../components/Header';
 
 const AddProductPage: React.FC = () => {
   const { t } = useTranslation();
@@ -13,6 +13,18 @@ const AddProductPage: React.FC = () => {
   const [confirmation, setConfirmation] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+
+  // Determine role and navigate back to the correct dashboard
+  const navigateToDashboard = () => {
+    const role = localStorage.getItem('role');
+    if (role === 'ROLE_ADMIN') {
+      navigate('/admin');
+    } else if (role === 'ROLE_USER') {
+      navigate('/user');
+    } else {
+      navigate('/login'); // Fallback to login if role is undefined
+    }
+  };
 
   const resetFields = () => {
     setName('');
@@ -136,9 +148,15 @@ const AddProductPage: React.FC = () => {
         </div>
       </main>
 
-      <footer className="w-full bg-gray-200 text-center py-4">
+      {/* ✅ Corrected Footer with Proper Role Navigation */}
+      <footer className="w-full bg-gray-200 text-center py-4 mt-6">
         <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
+        <button
+          className="text-blue-600 underline mt-2"
+          onClick={navigateToDashboard}
+        >
+          {t('addProduct.backToDashboard')}
+        </button>
       </footer>
     </div>
   );

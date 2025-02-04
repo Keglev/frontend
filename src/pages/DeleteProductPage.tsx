@@ -93,7 +93,7 @@ const DeleteProductPage: React.FC = () => {
           className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
           key={i18n.language} // ✅ Ensures correct translation updates
         >
-          {t('help.button')}
+          {t('button', { ns: 'help' })} {/* ✅ Corrected reference */}
         </button>
 
         <button

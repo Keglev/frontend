@@ -26,6 +26,7 @@ const App: React.FC = () => {
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/add-product" element={<AddProductPage />} />
+          <Route path="/delete-product" element={<DeleteProductPage />} />
 
           {/* User Routes */}
           <Route path="/user" element={<UserDashboard />} />
@@ -34,7 +35,7 @@ const App: React.FC = () => {
           <Route path="/search-product" element={<SearchProductPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/product/:productId/edit" element={<ChangeProductDetailsPage />} />
-          <Route path="/delete-product" element={<DeleteProductPage />} />
+          
           <Route path="/list-stock" element={<ListStockPage />} />
         </Routes>
       </Router>

@@ -159,6 +159,7 @@
       "price": "Price",
       "totalValue": "Total Value"
     },
+  "cancelButton": "Cancel",
   "editButton": "Edit {{name}}",
   "error": {
       "fetch": "Error fetching products.",

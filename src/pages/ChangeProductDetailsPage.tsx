@@ -1,30 +1,26 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
+import HelpModal from '../components/HelpModal';
 
 const ChangeProductDetailsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-
   const [product, setProduct] = useState<{ id: number; name: string; quantity: number; price: number } | null>(null);
   const [newQuantity, setNewQuantity] = useState<number | null>(null);
   const [newPrice, setNewPrice] = useState<number | null>(null);
   const [confirmation, setConfirmation] = useState(false);
   const [message, setMessage] = useState('');
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Determine role and navigate back to the correct dashboard
+  // Role-based navigation
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
-    if (role === 'ROLE_ADMIN') {
-      navigate('/admin');
-    } else if (role === 'ROLE_USER') {
-      navigate('/user');
-    } else {
-      navigate('/login'); // Fallback to login if role is undefined
-    }
+    if (role === 'ROLE_ADMIN') navigate('/admin');
+    else if (role === 'ROLE_USER') navigate('/user');
+    else navigate('/login');
   };
 
   useEffect(() => {
@@ -42,6 +38,17 @@ const ChangeProductDetailsPage: React.FC = () => {
 
     fetchProductDetails();
   }, [productId, t]);
+
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setIsHelpOpen((prev) => prev); // Ensures Help Button updates properly
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   const handleSaveChanges = async () => {
     setMessage('');
@@ -68,24 +75,31 @@ const ChangeProductDetailsPage: React.FC = () => {
     setMessage(t('changeProduct.cancelMessage'));
   };
 
-  if (!product) {
-    return <p>{t('loading')}</p>;
-  }
+  if (!product) return <p>{t('loading')}</p>;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
         <button
+          onClick={() => setIsHelpOpen(true)}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+
+        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
+
+        <button
           className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={() => {
-            const role = localStorage.getItem('role');
-            navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user');
-          }}
+          onClick={navigateToDashboard}
         >
           {t('changeProduct.backToDashboard')}
         </button>
-        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
       </header>
+
+      {/* Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="changeProduct" />
 
       <main className="w-full max-w-2xl p-6 bg-white shadow rounded mt-6">
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
@@ -151,7 +165,6 @@ const ChangeProductDetailsPage: React.FC = () => {
 
       <footer className="w-full bg-gray-200 text-center py-4">
         <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
       </footer>
     </div>
   );
