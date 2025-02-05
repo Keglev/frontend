@@ -1,0 +1,29 @@
+@import './tailwindCustom.css'; /* ✅ Import Global Styles */
+
+/* ✅ Header Styling */
+.header-container {
+    @apply flex justify-between items-center bg-blue-600 text-white px-6 py-4 shadow-md h-16;
+}
+
+/* ✅ Header Title */
+.header-title {
+    @apply text-2xl font-bold tracking-wide;
+}
+
+/* ✅ Header Subtitle */
+.header-subtitle {
+    @apply text-sm opacity-80;
+}
+
+/* ✅ Header Buttons */
+.button-secondary {
+    @apply px-4 py-2 bg-gray-100 text-black rounded-lg transition-all duration-200 ease-in-out 
+      hover:bg-gray-300;
+}
+
+/* ✅ Primary Button (Logout, Back) */
+.button-primary {
+    @apply px-4 py-2 bg-red-500 text-white rounded-lg transition-all duration-200 ease-in-out
+      hover:bg-red-600 active:scale-95;
+}
+

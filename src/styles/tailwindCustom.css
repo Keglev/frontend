@@ -8,11 +8,30 @@
 .button-primary {
   @apply w-full px-4 py-2 bg-blue-500 text-white rounded transition-all duration-200 ease-in-out
     hover:bg-blue-600 active:scale-95 mt-4;
-}
+  }
 
   
   /* ✅ Reusable Tailwind Styles for Box Shadows */
-  .box-shadow {
-    @apply shadow-lg rounded-lg p-6 bg-white;
-  }
+.box-shadow {
+  @apply shadow-lg rounded-lg p-6 bg-white;
+}
+  /* ✅ Reusable Tailwind Style for Language Buttons */
+.language-button {
+  @apply px-4 py-2 text-sm bg-gray-100 text-black rounded-md hover:bg-gray-200 transition-all;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+  /* ✅ Reusable Style for Logout / Back to Dashboard Button */
+.logout-button {
+  @apply px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-all;
+  min-width: 100px; /* Slightly larger than language buttons */
+  height: 40px; /* Ensures equal height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
   
