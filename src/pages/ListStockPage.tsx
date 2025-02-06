@@ -4,6 +4,8 @@ import ProductService from '../api/ProductService';
 import { Product } from '../types/Product';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
+import '../styles/tailwindCustom.css'; // ✅ Import Tailwind styles
+import Header from '../components/Header'; // ✅ Consistent Header Component
 
 const ListStockPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -93,36 +95,29 @@ const ListStockPage: React.FC = () => {
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-50">
-      <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* ✅ Consistent Header */}
+      <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
+
+      {/* ✅ Help Button - Centered in Header */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          className="button-secondary"
           key={i18n.language}
         >
           {t('button', { ns: 'help' })}
         </button>
+      </div>
 
-        <h1 className="text-lg font-semibold">{t('listStock.title')}</h1>
-
-        <button
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={navigateToDashboard}
-        >
-          {t('listStock.backToDashboard')}
-        </button>
-      </header>
-
-      {/* Help Modal */}
+      {/* ✅ Help Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="listStock" />
 
-      <main className="w-full max-w-4xl p-6 bg-white shadow-md rounded mt-6">
+      {/* ✅ Main Section */}
+      <main className="w-full max-w-4xl p-6 bg-white shadow-lg rounded mx-auto mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{t('listStock.totalStock')}</h2>
-          <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onClick={downloadCSV}
-          >
+          <button className="button-primary px-3 py-2 h-10 min-w-[120px] max-w-[180px] text-sm" onClick={downloadCSV}>
             {t('listStock.downloadCSV')}
           </button>
         </div>
@@ -147,9 +142,10 @@ const ListStockPage: React.FC = () => {
           <p className="text-center text-gray-500">{t('listStock.noProducts')}</p>
         )}
 
+        {/* ✅ Pagination Buttons */}
         <div className="mt-6 flex justify-center gap-4">
           <button
-            className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+            className="button-secondary"
             disabled={currentPage === 0}
             onClick={() => handlePageChange(currentPage - 1)}
           >
@@ -159,7 +155,7 @@ const ListStockPage: React.FC = () => {
             {t('listStock.pagination.page')} {currentPage + 1} {t('listStock.pagination.of')} {totalPages}
           </span>
           <button
-            className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+            className="button-secondary"
             disabled={currentPage === totalPages - 1}
             onClick={() => handlePageChange(currentPage + 1)}
           >
@@ -168,6 +164,14 @@ const ListStockPage: React.FC = () => {
         </div>
       </main>
 
+      {/* ✅ Back to Dashboard Button */}
+      <div className="mt-6 flex justify-center">
+        <button className="logout-button" onClick={navigateToDashboard}>
+          {t('listStock.backToDashboard')}
+        </button>
+      </div>
+
+      {/* ✅ Footer */}
       <footer className="w-full bg-gray-200 text-center py-4 mt-6">
         <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
       </footer>

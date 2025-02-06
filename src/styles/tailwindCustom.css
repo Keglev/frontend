@@ -4,12 +4,17 @@
       transition-all duration-300 ease-in-out hover:bg-yellow-100 focus:bg-yellow-300;
   }
   
-  /* ✅ Reusable Tailwind Styles for Buttons */
+  /* ✅ Reusable Tailwind Styles for Primary Buttons */
 .button-primary {
   @apply w-full px-4 py-2 bg-blue-500 text-white rounded transition-all duration-200 ease-in-out
-    hover:bg-blue-600 active:scale-95 mt-4;
+    hover:bg-blue-600 active:scale-95 min-w-[120px];
   }
 
+  /* ✅ Reusable Tailwind Styles for Secondary Buttons */
+.button-secondary {
+  @apply px-4 py-2 bg-gray-400 text-white rounded transition-all duration-200 ease-in-out
+    hover:bg-gray-500 active:scale-95 min-w-[120px];
+}
   
   /* ✅ Reusable Tailwind Styles for Box Shadows */
 .box-shadow {
@@ -17,7 +22,8 @@
 }
   /* ✅ Reusable Tailwind Style for Language Buttons */
 .language-button {
-  @apply px-4 py-2 text-sm bg-gray-100 text-black rounded-md hover:bg-gray-200 transition-all;
+  @apply px-4 py-2 text-sm bg-gray-100 text-black rounded-md hover:bg-gray-200 transition-all
+    active:scale-95;
   min-width: 100px;
   height: 40px;
   display: flex;
@@ -26,12 +32,68 @@
 }
   /* ✅ Reusable Style for Logout / Back to Dashboard Button */
 .logout-button {
-  @apply px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-all;
+  @apply px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200 ease-in-out
+    active:scale-95;
   min-width: 100px; /* Slightly larger than language buttons */
   height: 40px; /* Ensures equal height */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ✅ Reusable Tailwind Styles for Confirmation Buttons */
+.button-confirmation {
+  @apply px-4 py-2 text-white rounded transition-all duration-200 ease-in-out 
+    active:scale-95;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ Yes Button (Green) */
+.button-confirmation-yes {
+  @apply px-4 py-2 bg-green-500 text-white rounded transition-all duration-200 ease-in-out
+  hover:bg-green-600 active:scale-95 min-w-[120px];
+}
+
+/* ✅ No Button (Red) */
+.button-confirmation-no {
+  @apply px-4 py-2 bg-red-500 text-white rounded transition-all duration-200 ease-in-out
+  hover:bg-red-600 active:scale-95 min-w-[120px];
+}
+
+/* ✅ Reusable Tailwind Styles for Dashboard Buttons */
+.dashboard-button {
+  @apply px-4 py-2 text-white rounded transition-all duration-200 ease-in-out 
+    active:scale-95 shadow-md;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ Color Variants */
+.button-add {
+  @apply bg-green-500 hover:bg-green-600;
+}
+
+.button-delete {
+  @apply bg-red-500 hover:bg-red-600;
+}
+
+.button-search {
+  @apply bg-blue-500 hover:bg-blue-600;
+}
+
+.button-stock {
+  @apply bg-yellow-500 hover:bg-yellow-600;
+}
+
+/* ✅ Help Button */
+.button-help {
+  @apply px-4 py-2 bg-gray-300 text-black rounded transition-all duration-200 ease-in-out
+  hover:bg-gray-400 active:scale-95 min-w-[120px];
 }
 
   

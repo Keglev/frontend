@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
+import Header from '../components/Header';
+import '../styles/tailwindCustom.css'; // ✅ Import Tailwind styles
 
 const ChangeProductDetailsPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -78,42 +80,40 @@ const ChangeProductDetailsPage: React.FC = () => {
   if (!product) return <p>{t('loading')}</p>;
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100">
-      <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* ✅ Consistent Header with Language Buttons */}
+      <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
+
+      {/* ✅ Help Button - Centered in Header */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          className="button-secondary"
           key={i18n.language}
         >
           {t('button', { ns: 'help' })}
         </button>
+      </div>
 
-        <h1 className="text-lg font-semibold">{t('changeProduct.title')}</h1>
-
-        <button
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={navigateToDashboard}
-        >
-          {t('changeProduct.backToDashboard')}
-        </button>
-      </header>
-
-      {/* Help Modal */}
+      {/* ✅ Help Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="changeProduct" />
 
-      <main className="w-full max-w-2xl p-6 bg-white shadow rounded mt-6">
+      {/* ✅ Main Section */}
+      <main className="w-full max-w-2xl p-6 bg-white shadow-lg rounded mx-auto mt-6">
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
 
+        {/* ✅ Quantity Input */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.quantityLabel')}</label>
           <input
             type="number"
             value={newQuantity ?? product.quantity}
             onChange={(e) => setNewQuantity(Number(e.target.value))}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+            className="input-field"
           />
         </div>
 
+        {/* ✅ Price Input */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.priceLabel')}</label>
           <input
@@ -121,49 +121,41 @@ const ChangeProductDetailsPage: React.FC = () => {
             step="0.01"
             value={newPrice ?? product.price}
             onChange={(e) => setNewPrice(parseFloat(e.target.value))}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+            className="input-field"
           />
         </div>
 
+        {/* ✅ Action Buttons */}
         <div className="flex justify-between">
-          <button
-            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-            onClick={handleCancel}
-          >
+          <button className="button-secondary" onClick={handleCancel}>
             {t('changeProduct.cancelButton')}
           </button>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => setConfirmation(true)}
-          >
+          <button className="button-primary" onClick={() => setConfirmation(true)}>
             {t('changeProduct.saveButton')}
           </button>
         </div>
 
+        {/* ✅ Confirmation Popup */}
         {confirmation && (
           <div className="mt-4 p-4 bg-gray-200 rounded">
             <p>{t('changeProduct.confirmationMessage')}</p>
             <div className="flex justify-between mt-2">
-              <button
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                onClick={handleSaveChanges}
-              >
+              <button className="button-primary" onClick={handleSaveChanges}>
                 {t('changeProduct.confirmYes')}
               </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={handleCancel}
-              >
+              <button className="button-secondary" onClick={handleCancel}>
                 {t('changeProduct.confirmNo')}
               </button>
             </div>
           </div>
         )}
 
+        {/* ✅ Feedback Message */}
         {message && <p className="mt-4 text-blue-500 font-semibold">{message}</p>}
       </main>
 
-      <footer className="w-full bg-gray-200 text-center py-4">
+      {/* ✅ Footer */}
+      <footer className="w-full bg-gray-200 text-center py-4 mt-6">
         <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
       </footer>
     </div>

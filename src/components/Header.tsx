@@ -76,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
         <h1 className="header-title">{title}</h1>
         <p className="header-subtitle">{t('header.subtitle')}</p>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="header-buttons">
         {/* ✅ Language Buttons */}
         <button
           className="language-button"

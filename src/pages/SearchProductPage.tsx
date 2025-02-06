@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
+import '../styles/tailwindCustom.css'; // ✅ Import global styles
 
 const SearchProductPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -68,10 +69,10 @@ const SearchProductPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50">
       <header className="w-full bg-blue-600 text-white p-4 flex justify-between items-center">
-        {/* Help Button */}
+        {/* ✅ Standardized Help Button */}
         <button
           onClick={() => setIsHelpOpen(true)}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          className="button-secondary min-w-[120px]"
           key={i18n.language}
         >
           {t('button', { ns: 'help' })}
@@ -79,27 +80,26 @@ const SearchProductPage: React.FC = () => {
 
         <h1 className="text-lg font-semibold">{t('searchProduct.title')}</h1>
 
-        <button
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded"
-          onClick={navigateToDashboard}
-        >
+        {/* ✅ Standardized Back Button */}
+        <button className="button-primary min-w-[140px]" onClick={navigateToDashboard}>
           {t('searchProduct.backToDashboard')}
         </button>
       </header>
 
-      {/* Help Modal */}
+      {/* ✅ Help Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="searchProduct" />
 
       <main className="flex flex-col items-center w-full max-w-2xl p-4 mt-6 bg-white shadow rounded">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">{t('searchProduct.subtitle')}</h2>
 
         <div className="w-full flex flex-col gap-4">
+          {/* ✅ Standardized Input Field */}
           <input
             type="text"
             placeholder={t('searchProduct.placeholder')}
             value={searchQuery}
             onChange={handleSearch}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
+            className="input-field"
           />
 
           {searchQuery.length >= 3 &&
@@ -133,14 +133,12 @@ const SearchProductPage: React.FC = () => {
               </p>
 
               <div className="mt-4 flex justify-between">
-                <button
-                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                  onClick={() => setSelectedProduct(null)}
-                >
+                {/* ✅ Standardized Buttons */}
+                <button className="button-secondary min-w-[140px]" onClick={() => setSelectedProduct(null)}>
                   {t('searchProduct.cancelButton')}
                 </button>
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="button-primary min-w-[140px]"
                   onClick={() => navigate(`/product/${selectedProduct.id}/edit`)}
                 >
                   {t('searchProduct.editButton', { name: selectedProduct.name })}

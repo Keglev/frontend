@@ -59,121 +59,121 @@ const AddProductPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* ✅ Ensure Header is included */}
-      <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
+    {/* ✅ Ensure Header is included */}
+    <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* ✅ Help Button inside Header (Same as AdminDashboard.tsx & DeleteProductPage.tsx) */}
-      <button
-        onClick={() => setIsHelpOpen(true)}
-        className="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-        key={i18n.language}
-      >
-        {t('button', { ns: 'help' })}
-      </button>
+    {/* ✅ Help Button inside Header (Same as AdminDashboard.tsx & DeleteProductPage.tsx) */}
+    <button
+      onClick={() => setIsHelpOpen(true)}
+      className="absolute top-4 left-1/2 transform -translate-x-1/2 button-secondary"
+      key={i18n.language}
+    >
+      {t('button', { ns: 'help' })}
+    </button>
 
-      {/* ✅ Help Modal */}
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="addProduct" />
+    {/* ✅ Help Modal */}
+    <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="addProduct" />
 
-      <main className="flex flex-col items-center justify-center flex-grow">
-        <div className="w-96 bg-white p-6 shadow-md rounded mt-6">
-          <h2 className="text-lg font-semibold mb-4">{t('addProduct.detailsTitle')}</h2>
+    <main className="flex flex-col items-center justify-center flex-grow">
+      <div className="w-96 box-shadow mt-6">
+        <h2 className="text-lg font-semibold mb-4">{t('addProduct.detailsTitle')}</h2>
 
-          {/* Form Fields */}
-          <div className="mb-4">
-            <label htmlFor="name" className="block font-medium mb-2">
-              {t('addProduct.nameLabel')}
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="quantity" className="block font-medium mb-2">
-              {t('addProduct.quantityLabel')}
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="price" className="block font-medium mb-2">
-              {t('addProduct.priceLabel')}
-            </label>
-            <input
-              type="number"
-              id="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-between mt-6">
-            <button
-              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-              onClick={handleCancel}
-            >
-              {t('addProduct.cancelButton')}
-            </button>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={() => setConfirmation(true)}
-            >
-              {t('addProduct.addButton')}
-            </button>
-          </div>
-
-          {/* Confirmation Popup */}
-          {confirmation && (
-            <div className="mt-4 p-4 bg-gray-200 rounded">
-              <p>{t('addProduct.confirmationMessage')}</p>
-              <div className="flex justify-between mt-2">
-                <button
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                  onClick={handleAddProduct}
-                >
-                  {t('addProduct.confirmYes')}
-                </button>
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                  onClick={handleCancel}
-                >
-                  {t('addProduct.confirmNo')}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Feedback Message */}
-          {message && (
-            <p className="mt-4 text-center text-blue-500 font-semibold">{message}</p>
-          )}
+        {/* ✅ Form Fields - Using Global Tailwind Styles */}
+        <div className="mb-4">
+          <label htmlFor="name" className="block font-medium mb-2">
+            {t('addProduct.nameLabel')}
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input-field"
+          />
         </div>
-      </main>
 
-      {/* ✅ Corrected Footer with Proper Role Navigation */}
-      <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <button
-          className="text-blue-600 underline mt-2"
-          onClick={navigateToDashboard}
-        >
-          {t('addProduct.backToDashboard')}
-        </button>
-      </footer>
-    </div>
-  );
+        <div className="mb-4">
+          <label htmlFor="quantity" className="block font-medium mb-2">
+            {t('addProduct.quantityLabel')}
+          </label>
+          <input
+            type="number"
+            id="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="input-field"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="price" className="block font-medium mb-2">
+            {t('addProduct.priceLabel')}
+          </label>
+          <input
+            type="number"
+            id="price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="input-field"
+          />
+        </div>
+
+        {/* ✅ Action Buttons - Using Global Tailwind Styles */}
+        <div className="flex justify-between mt-6">
+          <button
+            className="button-confirmation-no"
+            onClick={handleCancel}
+          >
+            {t('addProduct.cancelButton')}
+          </button>
+          <button
+            className="button-confirmation-yes"
+            onClick={() => setConfirmation(true)}
+          >
+            {t('addProduct.addButton')}
+          </button>
+        </div>
+
+        {/* ✅ Confirmation Popup */}
+        {confirmation && (
+          <div className="mt-4 p-4 bg-gray-200 rounded">
+            <p>{t('addProduct.confirmationMessage')}</p>
+            <div className="flex justify-between mt-2">
+              <button
+                className="button-confirm-yes"
+                onClick={handleAddProduct}
+              >
+                {t('addProduct.confirmYes')}
+              </button>
+              <button
+                className="button-confirm-no"
+                onClick={handleCancel}
+              >
+                {t('addProduct.confirmNo')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ Feedback Message */}
+        {message && (
+          <p className="mt-4 text-center text-blue-500 font-semibold">{message}</p>
+        )}
+      </div>
+    </main>
+
+    {/* ✅ Corrected Footer with Proper Role Navigation */}
+    <footer className="w-full bg-gray-200 text-center py-4 mt-6">
+      <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
+      <button
+        className="text-blue-600 underline mt-2"
+        onClick={navigateToDashboard}
+      >
+        {t('addProduct.backToDashboard')}
+      </button>
+    </footer>
+  </div>
+);
 };
 
 export default AddProductPage;
