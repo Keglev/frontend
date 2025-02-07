@@ -6,9 +6,10 @@ import '../styles/header.css'; // ✅ Import custom styles
 interface HeaderProps {
   isLoggedIn: boolean;
   onLogout?: () => void;
+  hideBackButton?: boolean; // ✅ NEW PROP to hide the back button when needed
 }
 
-const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = false }) => {
   const { t, i18n } = useTranslation(['translation', 'help']);
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,19 +79,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
       </div>
       <div className="header-buttons">
         {/* ✅ Language Buttons */}
-        <button
-          className="language-button"
-          onClick={() => changeLanguage('en')}>
+        <button className="language-button" onClick={() => changeLanguage('en')}>
           🇬🇧 English
         </button>
-        <button
-          className="language-button"
-          onClick={() => changeLanguage('de')}>
+        <button className="language-button" onClick={() => changeLanguage('de')}>
           🇩🇪 Deutsch
         </button>
 
-        {/* ✅ Logout / Back Button */}
-        {isLoggedIn && (
+        {/* ✅ Logout / Back Button - ONLY if `hideBackButton` is false */}
+        {isLoggedIn && !hideBackButton && (
           <button onClick={handleButtonClick} className="logout-button">
             {buttonLabel}
           </button>

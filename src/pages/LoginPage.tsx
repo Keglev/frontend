@@ -8,14 +8,16 @@ import '../styles/tailwindCustom.css'; // ✅ Import Global Tailwind Styles
 import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
+import HelpModal from '../components/HelpModal';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem('role');
@@ -58,14 +60,28 @@ const LoginPage: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Header isLoggedIn={false} />
+      {/* ✅ Ensure Header does NOT include "Back to Dashboard" button */}
+      <Header isLoggedIn={false} hideBackButton={true} />
+
+      {/* ✅ Help Button - Positioned in the Center */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+        <button
+          onClick={() => setIsHelpOpen(true)}
+          className="dashboard-button button-help"
+          key={i18n.language}
+        >
+          {t('button', { ns: 'help' })}
+        </button>
+      </div>
+
+      {/* ✅ Help Modal */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="login" />
+
       <div className="login-container">
         <h1 className="login-header">{t('login.title')}</h1>
 
-        {/* ✅ Apply 'login-box' class for shadow effect */}
         <div className="login-box w-64">
           <label htmlFor="username" className="text-sm font-medium mb-2">{t('login.username')}</label>
-          {/* ✅ Apply 'login-input' class (linked to global 'input-field') */}
           <input
             type="text"
             id="username"
@@ -76,13 +92,12 @@ const LoginPage: React.FC = () => {
           />
 
           <label htmlFor="password" className="text-sm font-medium mb-2">{t('login.password')}</label>
-          {/* ✅ Apply 'login-input' class (linked to global 'input-field') */}
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="login-input"
+            className="login-input mb-4"
             required
             autoComplete="current-password"
           />
@@ -90,17 +105,18 @@ const LoginPage: React.FC = () => {
           {loading ? (
             <SkeletonLoader />
           ) : (
-            // ✅ Apply 'login-button' class (linked to global 'button-primary')
-            <button
-              onClick={handleLogin}
-              className="login-button"
-            >
+            <button onClick={handleLogin} className="login-button mt-4">
               {t('login.button')}
             </button>
           )}
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
+        {/* ✅ Footer - Same as Other Pages */}
+        <footer className="w-full bg-gray-200 text-center py-4 mt-6">
+          <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
+          <p className="text-sm text-gray-600">{t('footer.developer')}</p>
+        </footer>
       </div>
     </ErrorBoundary>
   );

@@ -16,18 +16,6 @@ const AddProductPage: React.FC = () => {
   const navigate = useNavigate();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Determine role and navigate back to the correct dashboard
-  const navigateToDashboard = () => {
-    const role = localStorage.getItem('role');
-    if (role === 'ROLE_ADMIN') {
-      navigate('/admin');
-    } else if (role === 'ROLE_USER') {
-      navigate('/user');
-    } else {
-      navigate('/login'); // Fallback to login if role is undefined
-    }
-  };
-
   const resetFields = () => {
     setName('');
     setQuantity('');
@@ -140,13 +128,13 @@ const AddProductPage: React.FC = () => {
             <p>{t('addProduct.confirmationMessage')}</p>
             <div className="flex justify-between mt-2">
               <button
-                className="button-confirm-yes"
+                className="button-confirmation-yes"
                 onClick={handleAddProduct}
               >
                 {t('addProduct.confirmYes')}
               </button>
               <button
-                className="button-confirm-no"
+                className="button-confirmation-no"
                 onClick={handleCancel}
               >
                 {t('addProduct.confirmNo')}
@@ -165,12 +153,6 @@ const AddProductPage: React.FC = () => {
     {/* ✅ Corrected Footer with Proper Role Navigation */}
     <footer className="w-full bg-gray-200 text-center py-4 mt-6">
       <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-      <button
-        className="text-blue-600 underline mt-2"
-        onClick={navigateToDashboard}
-      >
-        {t('addProduct.backToDashboard')}
-      </button>
     </footer>
   </div>
 );

@@ -126,11 +126,11 @@ const ChangeProductDetailsPage: React.FC = () => {
         </div>
 
         {/* ✅ Action Buttons */}
-        <div className="flex justify-between">
-          <button className="button-secondary" onClick={handleCancel}>
+        <div className="flex justify-between space-x-4">
+          <button className="button-confirmation button-confirmation-no" onClick={handleCancel}>
             {t('changeProduct.cancelButton')}
           </button>
-          <button className="button-primary" onClick={() => setConfirmation(true)}>
+          <button className="button-confirmation button-confirmation-yes" onClick={() => setConfirmation(true)}>
             {t('changeProduct.saveButton')}
           </button>
         </div>
@@ -139,11 +139,11 @@ const ChangeProductDetailsPage: React.FC = () => {
         {confirmation && (
           <div className="mt-4 p-4 bg-gray-200 rounded">
             <p>{t('changeProduct.confirmationMessage')}</p>
-            <div className="flex justify-between mt-2">
-              <button className="button-primary" onClick={handleSaveChanges}>
+            <div className="flex justify-between space-x-4">
+              <button className="button-confirmation button-confirmation-yes" onClick={handleSaveChanges}>
                 {t('changeProduct.confirmYes')}
               </button>
-              <button className="button-secondary" onClick={handleCancel}>
+              <button className="button-confirmation button-confirmation-no" onClick={handleCancel}>
                 {t('changeProduct.confirmNo')}
               </button>
             </div>
