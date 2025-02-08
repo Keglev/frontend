@@ -5,6 +5,7 @@ import DashboardLogic from '../logic/DashboardLogic';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
 import { useTranslation } from 'react-i18next';
+import Footer from '../components/Footer';
 
 const AdminDashboard: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -110,9 +111,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </main>
 
-      <footer className="w-full bg-gray-200 text-center py-4">
-        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

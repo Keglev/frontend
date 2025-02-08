@@ -5,6 +5,7 @@ import Buttons from '../components/Buttons';
 import DashboardLogic from '../logic/DashboardLogic';
 import HelpModal from '../components/HelpModal';
 import { useTranslation } from 'react-i18next';
+import Footer from '../components/Footer';
 
 const UserDashboard: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -112,10 +113,7 @@ const UserDashboard: React.FC = () => {
         </div>
       </main>
 
-      <footer className="w-full bg-gray-200 text-center py-4">
-        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

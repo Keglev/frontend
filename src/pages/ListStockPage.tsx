@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
 import '../styles/tailwindCustom.css'; // ✅ Import Tailwind styles
 import Header from '../components/Header'; // ✅ Consistent Header Component
+import Footer from '../components/Footer';
 
 const ListStockPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -172,9 +173,7 @@ const ListStockPage: React.FC = () => {
       </div>
 
       {/* ✅ Footer */}
-      <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

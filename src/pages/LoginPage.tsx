@@ -9,6 +9,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
+import Footer from '../components/Footer';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -113,10 +114,7 @@ const LoginPage: React.FC = () => {
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
         {/* ✅ Footer - Same as Other Pages */}
-        <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-          <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-          <p className="text-sm text-gray-600">{t('footer.developer')}</p>
-        </footer>
+        <Footer />
       </div>
     </ErrorBoundary>
   );

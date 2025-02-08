@@ -5,6 +5,7 @@ import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
+import Footer from '../components/Footer';
 
 const AddProductPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -151,9 +152,7 @@ const AddProductPage: React.FC = () => {
     </main>
 
     {/* ✅ Corrected Footer with Proper Role Navigation */}
-    <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-      <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-    </footer>
+    <Footer />
   </div>
 );
 };

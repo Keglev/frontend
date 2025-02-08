@@ -4,6 +4,7 @@ import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
 import Header from '../components/Header'; // ✅ Use the correct Header component
+import Footer from '../components/Footer';
 
 const DeleteProductPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']); // ✅ Use correct namespaces
@@ -172,10 +173,7 @@ const DeleteProductPage: React.FC = () => {
         )}
       </main>
 
-      <footer className="w-full bg-gray-200 text-center py-4 mt-6">
-        <p className="text-sm text-gray-600">© 2025 StockEase. {t('footer.rights')}</p>
-        <p className="text-sm text-gray-600">{t('footer.developer')}</p>
-      </footer>
+      <Footer />
     </div>
   );
 };
