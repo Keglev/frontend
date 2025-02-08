@@ -1,9 +1,19 @@
 {
+  "home": {
+      "title": "StockEase - Your way to manage your merchandise stock",
+      "point1": "Manage your inventory online efficiently.",
+      "point2": "Ideal for businesses selling on platforms like Amazon, eBay, Shopify, Etsy, OTTO, Bonanza, etc.",
+      "point3": "Continuously improving to add more features.",
+      "point4": "Contact me via LinkedIn/GitHub if you want to copy or deploy this project.",
+      "point5": "Click 'To Login' to test the software or use the 'Help' button for guidance.",
+      "loginButton": "To Login"
+  },
   "login": {
     "title": "Login",
     "username": "Username",
     "password": "Password",
     "button": "Login",
+    "backToHome": "Back to Home",
     "error": {
       "emptyFields": "Please fill in all fields",
       "invalidCredentials": "Invalid username or password",

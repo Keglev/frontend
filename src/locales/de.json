@@ -1,9 +1,19 @@
 {
+  "home": {
+        "title": "StockEase - Ihr Weg zur Verwaltung Ihres Warenbestands",
+        "point1": "Verwalten Sie Ihr Inventar effizient online.",
+        "point2": "Ideal für Unternehmen, die auf Plattformen wie Amazon, eBay, Shopify, Etsy, OTTO, Bonanza usw. verkaufen.",
+        "point3": "Wird kontinuierlich verbessert, um weitere Funktionen hinzuzufügen.",
+        "point4": "Kontaktieren Sie mich über LinkedIn/GitHub, wenn Sie dieses Projekt kopieren oder bereitstellen möchten.",
+        "point5": "Klicken Sie auf 'Zum Login', um die Software zu testen, oder nutzen Sie die 'Hilfe'-Schaltfläche für Anleitungen.",
+        "loginButton": "Zum Login"
+  },
   "login": {
     "title": "Anmeldung",
     "username": "Benutzername",
     "password": "Passwort",
     "button": "Anmelden",
+    "backToHome": "Zurück zur Startseite",
     "error": {
       "emptyFields": "Bitte füllen Sie alle Felder aus",
       "invalidCredentials": "Ungültiger Benutzername oder Passwort",

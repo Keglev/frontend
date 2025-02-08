@@ -106,9 +106,20 @@ const LoginPage: React.FC = () => {
           {loading ? (
             <SkeletonLoader />
           ) : (
-            <button onClick={handleLogin} className="login-button mt-4">
-              {t('login.button')}
-            </button>
+            <>
+              {/* ✅ Login Button */}
+              <button onClick={handleLogin} className="login-button mt-4">
+                {t('login.button')}
+              </button>
+
+              {/* ✅ Back to Home Button */}
+              <button
+                onClick={() => navigate('/')}
+                className="button-secondary mt-4"
+              >
+                {t('login.backToHome')}
+              </button>
+            </>
           )}
 
           {error && <p className="text-red-500 mt-4">{error}</p>}
