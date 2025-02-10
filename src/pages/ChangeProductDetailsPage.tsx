@@ -138,7 +138,7 @@ const ChangeProductDetailsPage: React.FC = () => {
 
         {/* ✅ Confirmation Popup */}
         {confirmation && (
-          <div className="mt-4 p-4 bg-gray-200 rounded">
+          <div className="confirmation-box mt-4">
             <p>{t('changeProduct.confirmationMessage')}</p>
             <div className="flex justify-between space-x-4">
               <button className="button-confirmation button-confirmation-yes" onClick={handleSaveChanges}>

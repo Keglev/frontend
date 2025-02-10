@@ -122,7 +122,9 @@ const DeleteProductPage: React.FC = () => {
           {products.map((product) => (
             <li
               key={product.id}
-              className="p-2 bg-gray-100 border rounded hover:bg-gray-200 cursor-pointer"
+              className={`p-2 border rounded hover:bg-gray-200 cursor-pointer ${
+                selectedProduct?.id === product.id ? 'selected-product' : 'be-gray-100'
+              }`}
               onClick={() => handleProductClick(product)}
             >
               {product.name}

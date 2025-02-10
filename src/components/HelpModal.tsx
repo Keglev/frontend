@@ -19,7 +19,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, pageKey }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-w-full">
         {/* ✅ Title */}
-        <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">
+        <h2 className="help-modal-title text-2xl font-semibold border-b pb-2">
           {t(`${pageKey}.title`)}
         </h2>
 

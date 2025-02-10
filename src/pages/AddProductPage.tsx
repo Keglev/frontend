@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
 import Footer from '../components/Footer';
+import '../styles/tailwindCustom.css'
 
 const AddProductPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -52,13 +53,15 @@ const AddProductPage: React.FC = () => {
     <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
     {/* ✅ Help Button inside Header (Same as AdminDashboard.tsx & DeleteProductPage.tsx) */}
-    <button
-      onClick={() => setIsHelpOpen(true)}
-      className="absolute top-4 left-1/2 transform -translate-x-1/2 button-secondary"
-      key={i18n.language}
-    >
-      {t('button', { ns: 'help' })}
-    </button>
+    <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+      <button
+        onClick={() => setIsHelpOpen(true)}
+        className="button-secondary"
+        key={i18n.language}
+      >
+        {t('button', { ns: 'help' })}
+      </button>
+    </div>
 
     {/* ✅ Help Modal */}
     <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="addProduct" />
@@ -125,7 +128,7 @@ const AddProductPage: React.FC = () => {
 
         {/* ✅ Confirmation Popup */}
         {confirmation && (
-          <div className="mt-4 p-4 bg-gray-200 rounded">
+          <div className="confirmation-box mt-4">
             <p>{t('addProduct.confirmationMessage')}</p>
             <div className="flex justify-between mt-2">
               <button

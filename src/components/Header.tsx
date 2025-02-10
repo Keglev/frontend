@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FaMoon, FaSun } from 'react-icons/fa';
 import '../styles/header.css'; // ✅ Import custom styles
 
 interface HeaderProps {
@@ -14,6 +15,33 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
   const location = useLocation();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
+  const [darkMode, setDarkMode] = useState<boolean>(
+    localStorage.getItem('darkMode') === 'enabled'
+  );
+
+  // ✅ Dark Mode Toggle
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode ? 'enabled' : 'disabled');
+    document.documentElement.classList.toggle('dark', newMode);
+  };
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // ✅ Keep Existing Language Change Logic
+  const changeLanguage = (lng: string) => {
+    if (i18n.language !== lng) {
+      localStorage.setItem('language', lng);
+      i18n.changeLanguage(lng);
+    }
+  };
 
   // 🔍 Determine the current page key for correct translation
   const getPageKey = () => {
@@ -29,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     return 'default';
   };
 
-  // 🌍 Update language and title when page changes
+  // ✅ Update Language & Title
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     if (i18n.language !== savedLanguage) {
@@ -45,12 +73,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
       setTitle(t('header.defaultTitle'));
     }
   }, [i18n, i18n.language, location.pathname, t]);
-
-  // 🔄 Change Language
-  const changeLanguage = (lng: string) => {
-    localStorage.setItem('language', lng);
-    i18n.changeLanguage(lng);
-  };
 
   // 🚀 Determine if we are on a Dashboard
   const isDashboard = location.pathname === '/admin' || location.pathname === '/user';
@@ -78,6 +100,11 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
         <p className="header-subtitle">{t('header.subtitle')}</p>
       </div>
       <div className="header-buttons">
+        {/* ✅ Dark Mode Toggle Button */}
+        <button className="dark-mode-button" onClick={toggleDarkMode}>
+          {darkMode ? <FaMoon size={20} /> : <FaSun size={20} />}
+        </button>
+        
         {/* ✅ Language Buttons */}
         <button className="language-button" onClick={() => changeLanguage('en')}>
           🇬🇧 English

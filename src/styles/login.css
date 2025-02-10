@@ -3,12 +3,12 @@
 
 /* ✅ Login Page Container */
 .login-container {
-    @apply flex flex-col items-center justify-center min-h-screen bg-gray-100;
+    @apply flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900;
 }
 
 /* ✅ Login Page Header */
 .login-header {
-    @apply text-2xl font-bold mb-6;
+    @apply text-2xl font-bold mb-6 dark:text-white;
 }
 
 /* ✅ Use the global .input-field class */
@@ -21,7 +21,8 @@
     @apply button-primary;
 }
 
-/* ✅ Add a shadow effect to the login box */
+/* ✅ Add a proper shadow effect to the login box */
 .login-box {
-    @apply box-shadow;
+    @apply shadow-lg rounded-lg bg-white dark:bg-gray-800 p-6;
 }
+

@@ -1,99 +1,318 @@
-/* ✅ Reusable Tailwind Styles for Input Fields */
+/* ✅ Import Tailwind Base Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ GLOBAL COLOR VARIABLES */
+:root {
+  --bg-color: #f9fafb; /* Light Gray */
+  --text-color: #1f2937; /* Dark Text */
+  --card-bg: #ffffff; /* White for Cards */
+  --border-color: #d1d5db; /* Soft Borders */
+  --button-bg: #2563eb; /* Primary Blue */
+  --button-text: #ffffff; /* White Text */
+  --button-hover: #1e40af; /* Darker Blue */
+  --button-secondary: #6b7280; /* Gray */
+  --button-secondary-hover: #374151; /* Darker Gray */
+}
+
+.dark {
+  --bg-color: #1a202c; /* Dark Background */
+  --text-color: #f7fafc; /* Light Text */
+  --card-bg: #2d3748; /* Darker Cards */
+  --border-color: #4a5568; /* Borders */
+  --button-bg: #60a5fa; /* Soft Blue */
+  --button-text: #f8fafc; /* Light Text */
+  --button-hover: #3b82f6; /* Bright Blue */
+  --button-secondary: #9ca3af; /* Light Gray */
+  --button-secondary-hover: #6b7280; /* Darker Gray */
+}
+
+/* ✅ APPLY DARK MODE STYLES */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* ✅ Ensure Dark Mode Applies Correctly */
+.dark body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* ✅ FIX CONTAINERS & BACKGROUNDS */
+.dark .bg-gray-100 {
+  background-color: var(--bg-color) !important;
+}
+
+.dark .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+.dark .text-gray-700 {
+  color: var(--text-color) !important;
+}
+
+/* ✅ HEADER & FOOTER */
+.header-container {
+  @apply bg-white text-gray-900 shadow-md;
+}
+
+.dark .header-container,
+.dark .footer-container {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.footer-container {
+  @apply bg-gray-200 text-gray-700 text-center py-4;
+}
+
+/* ✅ INPUT FIELDS (With Effects) */
 .input-field {
-    @apply w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-yellow-500 
-      transition-all duration-300 ease-in-out hover:bg-yellow-100 focus:bg-yellow-300;
-  }
-  
-  /* ✅ Reusable Tailwind Styles for Primary Buttons */
+  @apply w-full px-4 py-2 border rounded transition-all duration-300 ease-in-out
+      focus:outline-none focus:ring focus:ring-yellow-500
+      hover:bg-yellow-100 focus:bg-yellow-300
+}
+
+.dark .input-field {
+  @apply bg-gray-700 text-white border-gray-500
+  focus:bg-gray-600 hover:bg-gray-600;
+}
+
+/* ✅ PRIMARY & SECONDARY BUTTONS */
 .button-primary {
-  @apply w-full px-4 py-2 bg-blue-500 text-white rounded transition-all duration-200 ease-in-out
-    hover:bg-blue-600 active:scale-95 min-w-[120px];
-  }
+  @apply w-full px-4 py-2 rounded transition-all duration-200 ease-in-out
+    active:scale-95 min-w-[120px]
+    bg-blue-500 text-white hover:bg-blue-600
+}
 
-  /* ✅ Reusable Tailwind Styles for Secondary Buttons */
+.dark .button-primary {
+  @apply bg-blue-500 hover:bg-blue-400 text-white;
+}
+
 .button-secondary {
-  @apply px-4 py-2 bg-gray-400 text-white rounded transition-all duration-200 ease-in-out
-    hover:bg-gray-500 active:scale-95 min-w-[120px];
-}
-  
-  /* ✅ Reusable Tailwind Styles for Box Shadows */
-.box-shadow {
-  @apply shadow-lg rounded-lg p-6 bg-white;
-}
-  /* ✅ Reusable Tailwind Style for Language Buttons */
-.language-button {
-  @apply px-4 py-2 text-sm bg-gray-100 text-black rounded-md hover:bg-gray-200 transition-all
-    active:scale-95;
-  min-width: 100px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  /* ✅ Reusable Style for Logout / Back to Dashboard Button */
-.logout-button {
-  @apply px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200 ease-in-out
-    active:scale-95;
-  min-width: 100px; /* Slightly larger than language buttons */
-  height: 40px; /* Ensures equal height */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply w-full px-4 py-2 rounded transition-all duration-200 ease-in-out
+    active:scale-95 min-w-[120px] 
+    bg-gray-400 text-white hover:bg-gray-500
+    dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white;
 }
 
-/* ✅ Reusable Tailwind Styles for Confirmation Buttons */
+/* ✅ CONFIRMATION BUTTONS */
 .button-confirmation {
-  @apply px-4 py-2 text-white rounded transition-all duration-200 ease-in-out 
-    active:scale-95;
-  min-width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply px-4 py-2 rounded transition-all duration-200 ease-in-out active:scale-95;
 }
 
 /* ✅ Yes Button (Green) */
 .button-confirmation-yes {
-  @apply px-4 py-2 bg-green-500 text-white rounded transition-all duration-200 ease-in-out
-  hover:bg-green-600 active:scale-95 min-w-[120px];
+  @apply bg-green-600 text-white font-semibold rounded-lg px-4 py-2 
+    hover:bg-green-700 active:scale-95;
+}
+
+.dark .button-confirmation-yes {
+  @apply bg-green-500 hover:bg-green-400;
 }
 
 /* ✅ No Button (Red) */
 .button-confirmation-no {
-  @apply px-4 py-2 bg-red-500 text-white rounded transition-all duration-200 ease-in-out
-  hover:bg-red-600 active:scale-95 min-w-[120px];
+  @apply bg-red-600 text-white font-semibold rounded-lg px-4 py-2
+    hover:bg-red-700 active:scale-95;
 }
 
-/* ✅ Reusable Tailwind Styles for Dashboard Buttons */
-.dashboard-button {
-  @apply px-4 py-2 text-white rounded transition-all duration-200 ease-in-out 
-    active:scale-95 shadow-md;
-  min-width: 150px;
+.dark .button-confirmation-no {
+  @apply bg-red-500 hover:bg-red-400;
+}
+
+/* ✅ LOGOUT & DASHBOARD BUTTON */
+.logout-button {
+  @apply px-4 py-2 text-sm rounded-md transition-all duration-200 ease-in-out active:scale-95;
+  background-color: #ef4444;
+  color: white;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
+}
+
+.dark .logout-button {
+  background-color: #e53e3e !important;
+}
+
+.dark .logout-button:hover {
+  background-color: #b91c1c !important;
+}
+
+/* ✅ HELP BUTTON */
+.button-help {
+  @apply px-4 py-2 rounded transition-all duration-200 ease-in-out 
+  active:scale-95 min-w-[120px] 
+  bg-gray-300 text-black hover:bg-gray-400 
+  dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600;
+}
+
+/* ✅ LANGUAGE BUTTON */
+.language-button {
+  @apply px-4 py-2 text-sm rounded-md transition-all
+    active:scale-95
+    bg-gray-100 text-black hover:bg-gray-300 /* Light Mode */
+}
+
+.dark .language-button {
+  @apply bg-blue-500 text-white hover:bg-blue-400; /* Dark Mode */
+}
+
+/* ✅ MODAL STYLES */
+.help-modal {
+  @apply bg-white shadow-lg rounded-lg p-6;
+}
+
+.dark .help-modal {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Help Modal Title */
+.help-modal-title {
+  @apply text-gray-800;
+}
+
+/* Dark Mode Help Modal*/
+.dark .help-modal-title {
+  color: var(--text-color) !important;
+}
+
+/* ✅ TEXT STYLES */
+.text-dark {
+  @apply text-gray-900;
+}
+
+.dark .text-dark {
+  color: var(--text-color) !important;
+}
+
+.text-muted {
+  @apply text-gray-600;
+}
+
+.dark .text-muted {
+  color: var(--text-color) !important;
+}
+
+/* ✅ DARK MODE TOGGLE BUTTON */
+.dark-mode-button {
+  @apply p-2 rounded-md transition-all active:scale-95;
+  background-color: #696a6b;
+  color: var(--text-color);
+  min-width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
 }
 
-/* ✅ Color Variants */
+/* ✅ Light Mode: Sun Icon - Light Yellow */
+.dark-mode-button svg {
+  color: #facc15; /* Light yellow for sun icon */
+}
+
+/* ✅ Dark Mode: Moon Icon - White */
+.dark .dark-mode-button svg {
+  color: #f8fafc; /* White for moon icon */
+}
+
+/* ✅ Hover Effect - Works in Both Modes */
+.dark-mode-button:hover {
+  background-color: var(--button-secondary-hover);
+  transform: scale(1.1);
+}
+
+/* ✅ ADMIN & USER DASHBOARD BUTTONS */
 .button-add {
-  @apply bg-green-500 hover:bg-green-600;
+  @apply bg-green-600 text-white rounded-lg px-5 py-2 transition-all
+    hover:bg-green-700 active:scale-95;
+}
+
+.dark .button-add {
+  @apply bg-green-500 hover:bg-green-400;
 }
 
 .button-delete {
-  @apply bg-red-500 hover:bg-red-600;
+  @apply bg-red-600 text-white rounded-lg px-5 py-2 transition-all
+    hover:bg-red-700 active:scale-95;
+}
+
+.dark .button-delete {
+  @apply bg-red-500 hover:bg-red-400;
 }
 
 .button-search {
-  @apply bg-blue-500 hover:bg-blue-600;
+  @apply bg-blue-600 text-white rounded-lg px-5 py-2 transition-all
+    hover:bg-blue-700 active:scale-95;
+}
+
+.dark .button-search {
+  @apply bg-blue-500 hover:bg-blue-400;
 }
 
 .button-stock {
-  @apply bg-yellow-500 hover:bg-yellow-600;
+  @apply bg-yellow-600 text-white rounded-lg px-5 py-2 transition-all
+    hover:bg-yellow-700 active:scale-95;
 }
 
-/* ✅ Help Button */
-.button-help {
-  @apply px-4 py-2 bg-gray-300 text-black rounded transition-all duration-200 ease-in-out
-  hover:bg-gray-400 active:scale-95 min-w-[120px];
+.dark .button-stock {
+  @apply bg-yellow-500 hover:bg-yellow-400;
 }
 
-  
+
+/* ✅ FOOTER & SOCIAL MEDIA ICONS */
+.dark .footer-container a {
+  color: var(--text-color) !important;
+}
+
+.dark .footer-container a:hover {
+  color: #facc15 !important; /* Yellow */
+}
+
+/* ✅ LIST STOCK - Product Cards */
+.product-card {
+  @apply p-4 border rounded shadow transition-all duration-200;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+/* ✅ Hover Effect for Light Mode */
+.product-card:hover {
+  background-color: #f3f4f6; /* Lighter Gray */
+}
+
+/* ✅ Fix Hover Effect for Dark Mode */
+.dark .product-card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.dark .product-card:hover {
+  background-color: #374151 !important; /* Darker Hover Effect */
+}
+
+/* ✅ Highlight Selected Product */
+.selected-product {
+  @apply bg-blue-200 border-blue-500 text-blue-900 font-semibold;
+}
+
+.dark .selected-product {
+  @apply bg-blue-600 border-blue-400 text-white;
+}
+
+/* ✅ Fix Confirmation Message Box */
+.confirmation-box {
+  @apply p-4 border rounded shadow-md bg-gray-200 text-black;
+}
+
+/* ✅ Dark Mode */
+.dark .confirmation-box {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
