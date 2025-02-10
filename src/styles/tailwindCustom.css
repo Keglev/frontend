@@ -316,3 +316,19 @@ body {
   color: var(--text-color);
   border: 1px solid var(--border-color);
 }
+
+/* ✅ Skeleton Loader Container */
+.skeleton-loader-container {
+  @apply fixed inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900;
+}
+
+/* ✅ Skeleton Box (Smaller & Centered) */
+.skeleton-box {
+  @apply p-6 rounded-lg shadow-lg bg-white dark:bg-gray-800;
+}
+
+/* ✅ Skeleton Loading Text */
+.skeleton-text {
+  @apply text-lg font-semibold text-gray-700 dark:text-white animate-pulse;
+}
+

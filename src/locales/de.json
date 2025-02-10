@@ -8,6 +8,10 @@
         "point5": "Klicken Sie auf 'Zum Login', um die Software zu testen, oder nutzen Sie die 'Hilfe'-Schaltfläche für Anleitungen.",
         "loginButton": "Zum Login"
   },
+  "loading": "Daten werden geladen...",
+  "error": {
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+  },
   "login": {
     "title": "Anmeldung",
     "username": "Benutzername",
@@ -57,10 +61,6 @@
   "footer": {
     "rights": "Alle Rechte vorbehalten",
     "developer": "Entwickelt von Carlos Keglevich"
-  },
-  "loading": "Daten werden geladen...",
-  "error": {
-    "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
   },
   "addProduct": {
     "title": "Neues Produkt hinzufügen",

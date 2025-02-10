@@ -8,6 +8,10 @@
       "point5": "Click 'To Login' to test the software or use the 'Help' button for guidance.",
       "loginButton": "To Login"
   },
+  "loading": "Loading data...",
+    "error": {
+      "unexpected": "An unexpected error occurred"
+    },
   "login": {
     "title": "Login",
     "username": "Username",
@@ -56,9 +60,6 @@
   "footer": {
     "rights": "All rights reserved",
     "developer": "Developed by Carlos Keglevich"
-  },
-  "error": {
-    "unexpected": "An unexpected error occurred"
   },
   "addProduct": {
     "title": "Add New Product",
