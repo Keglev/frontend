@@ -1,25 +1,33 @@
+// src/components/SkeletonLoader.tsx
+// This component provides a loading animation while fetching data or processing user actions.
+// It displays a temporary "Loading..." message that disappears after a set duration.
+
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SkeletonLoader: React.FC = () => {
-  const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(true);
+  const { t } = useTranslation(); // Load translations for "Loading..." message
+  const [isVisible, setIsVisible] = useState(true); // State to control visibility of the loader
 
   useEffect(() => {
-    // ✅ Delay Skeleton Loader for 3 seconds before hiding it
+    // Automatically hide the skeleton loader after a delay (3 seconds)
     const timeout = setTimeout(() => {
       setIsVisible(false);
-    }, 3000); // Adjust time as needed (3000ms = 3 seconds)
+    }, 3000); // Adjust timing if necessary (3000ms = 3 seconds)
 
+    // Cleanup function to clear the timeout if the component unmounts early
     return () => clearTimeout(timeout);
   }, []);
 
+  // If the loader has completed its duration, remove it from the UI
   if (!isVisible) return null;
 
   return (
-    <div className="skeleton-loader-container">
-      <div className="skeleton-box">
-        <p className="skeleton-text">{t('loading')}</p>
+    <div className="skeleton-loader-container flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="skeleton-box p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <p className="skeleton-text text-lg font-semibold text-gray-700 dark:text-white">
+          {t('loading')}
+        </p>
       </div>
     </div>
   );

@@ -7,8 +7,18 @@ import HelpModal from '../components/HelpModal';
 import { useTranslation } from 'react-i18next';
 import Footer from '../components/Footer';
 
+/**
+ * AdminDashboard Component
+ * Displays an overview of the inventory for administrators.
+ * 
+ * Features:
+ * - Shows total stock value.
+ * - Lists low-stock products.
+ * - Provides navigation buttons for product management.
+ * - Includes a help modal for guidance.
+ */
 const AdminDashboard: React.FC = () => {
-  const { t, i18n } = useTranslation(['translation', 'help']);
+  const { t, i18n } = useTranslation(['translation', 'help']); // Load translations
   const [stockValue, setStockValue] = useState<number>(0);
   const [lowStockProducts, setLowStockProducts] = useState<
     { id: number; name: string; quantity: number }[]
@@ -18,7 +28,9 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // ✅ Ensure language is set correctly
+  /**
+   * Ensures the correct language is set based on user preferences.
+   */
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     if (i18n.language !== savedLanguage) {
@@ -26,7 +38,9 @@ const AdminDashboard: React.FC = () => {
     }
   }, [i18n]);
 
-  // ✅ Fetch dashboard data
+  /**
+   * Fetches dashboard data including total stock value and low-stock products.
+   */
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -37,7 +51,7 @@ const AdminDashboard: React.FC = () => {
         setLowStockProducts(lowStock);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setError(t('adminDashboard.error'));
+        setError(t('adminDashboard.error')); // Display localized error message
       } finally {
         setLoading(false);
       }
@@ -48,7 +62,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* ✅ Keep the original header */}
+      {/* Header with Logout Functionality */}
       <Header
         isLoggedIn={true}
         onLogout={() => {
@@ -57,7 +71,7 @@ const AdminDashboard: React.FC = () => {
         }}
       />
 
-      {/* ✅ Help Button - centered in Header (just like DeleteProductPage.tsx) */}
+      {/* Help Button (Centered in Header) */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -68,27 +82,28 @@ const AdminDashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* ✅ Help Modal */}
+      {/* Help Modal for User Guidance */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="adminDashboard" />
 
-      {/* ✅ Centered dashboard layout */}
+      {/* Main Content - Dashboard Overview */}
       <main className="flex-grow flex flex-col items-center justify-center p-6">
         <h2 className="text-2xl font-semibold">{t('adminDashboard.welcome')}</h2>
         <p className="text-lg text-gray-700 mb-8">{t('adminDashboard.subtitle')}</p>
 
+        {/* Loading & Error Handling */}
         {loading ? (
           <p className="text-gray-500">{t('loading')}</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
           <div className="w-full max-w-4xl space-y-6">
-            {/* ✅ Stock Value Section */}
+            {/* Total Stock Value Section */}
             <div className="p-4 bg-white shadow rounded">
               <h3 className="text-lg font-semibold">{t('adminDashboard.stockValue')}</h3>
               <p className="text-xl text-blue-600 font-bold">${stockValue.toFixed(2)}</p>
             </div>
 
-            {/* ✅ Low Stock Products Section */}
+            {/* Low-Stock Products Section */}
             <div className="p-4 bg-white shadow rounded">
               <h3 className="text-lg font-semibold">{t('adminDashboard.lowStock')}</h3>
               {lowStockProducts.length > 0 ? (
@@ -106,11 +121,13 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
+        {/* Navigation Buttons for Inventory Management */}
         <div className="mt-8">
           <Buttons />
         </div>
       </main>
 
+      {/* Footer for Consistency */}
       <Footer />
     </div>
   );

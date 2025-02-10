@@ -4,9 +4,19 @@ import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
 import Header from '../components/Header';
-import '../styles/tailwindCustom.css'; // ✅ Import Tailwind styles
-import Footer from '../components/Footer'; // ✅ Import Footer component
+import '../styles/tailwindCustom.css';
+import Footer from '../components/Footer';
 
+/**
+ * ChangeProductDetailsPage Component
+ * Allows users to update the quantity and price of a specific product.
+ * 
+ * Features:
+ * - Fetches and displays product details.
+ * - Enables input fields for modifying product attributes.
+ * - Provides confirmation before saving changes.
+ * - Supports role-based navigation after updates.
+ */
 const ChangeProductDetailsPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
   const { productId } = useParams<{ productId: string }>();
@@ -18,7 +28,10 @@ const ChangeProductDetailsPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Role-based navigation
+  /**
+   * Redirects the user back to the appropriate dashboard based on role.
+   * If the role is undefined, the user is redirected to the login page.
+   */
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
     if (role === 'ROLE_ADMIN') navigate('/admin');
@@ -26,6 +39,10 @@ const ChangeProductDetailsPage: React.FC = () => {
     else navigate('/login');
   };
 
+  /**
+   * Fetches the product details based on the product ID from the URL.
+   * Updates the state with the retrieved product data.
+   */
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -42,9 +59,12 @@ const ChangeProductDetailsPage: React.FC = () => {
     fetchProductDetails();
   }, [productId, t]);
 
+  /**
+   * Ensures that the help button updates properly when the language is changed.
+   */
   useEffect(() => {
     const handleLanguageChange = () => {
-      setIsHelpOpen((prev) => prev); // Ensures Help Button updates properly
+      setIsHelpOpen((prev) => prev);
     };
 
     i18n.on('languageChanged', handleLanguageChange);
@@ -53,6 +73,10 @@ const ChangeProductDetailsPage: React.FC = () => {
     };
   }, [i18n]);
 
+  /**
+   * Handles the process of saving updated product details.
+   * Sends API requests to update the product's quantity and/or price.
+   */
   const handleSaveChanges = async () => {
     setMessage('');
     try {
@@ -63,6 +87,8 @@ const ChangeProductDetailsPage: React.FC = () => {
         await ProductService.updateProductPrice(Number(productId), newPrice);
       }
       setMessage(t('changeProduct.successMessage'));
+
+      // Redirects the user back to the dashboard after a short delay.
       setTimeout(() => navigateToDashboard(), 1500);
     } catch (error) {
       console.error(t('changeProduct.error.update'), error);
@@ -71,6 +97,9 @@ const ChangeProductDetailsPage: React.FC = () => {
     setConfirmation(false);
   };
 
+  /**
+   * Resets the input fields and cancels any pending updates.
+   */
   const handleCancel = () => {
     setNewQuantity(product?.quantity || 0);
     setNewPrice(product?.price || 0);
@@ -78,14 +107,15 @@ const ChangeProductDetailsPage: React.FC = () => {
     setMessage(t('changeProduct.cancelMessage'));
   };
 
+  // Displays a loading message if the product data has not been retrieved yet.
   if (!product) return <p>{t('loading')}</p>;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* ✅ Consistent Header with Language Buttons */}
+      {/* Page header with logout functionality */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* ✅ Help Button - Centered in Header */}
+      {/* Help button positioned in the center of the header */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -96,14 +126,14 @@ const ChangeProductDetailsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* ✅ Help Modal */}
+      {/* Help modal for guidance */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="changeProduct" />
 
-      {/* ✅ Main Section */}
+      {/* Main section containing product details and input fields */}
       <main className="w-full max-w-2xl p-6 bg-white shadow-lg rounded mx-auto mt-6">
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
 
-        {/* ✅ Quantity Input */}
+        {/* Input field for updating product quantity */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.quantityLabel')}</label>
           <input
@@ -114,7 +144,7 @@ const ChangeProductDetailsPage: React.FC = () => {
           />
         </div>
 
-        {/* ✅ Price Input */}
+        {/* Input field for updating product price */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.priceLabel')}</label>
           <input
@@ -126,7 +156,7 @@ const ChangeProductDetailsPage: React.FC = () => {
           />
         </div>
 
-        {/* ✅ Action Buttons */}
+        {/* Action buttons for canceling or saving changes */}
         <div className="flex justify-between space-x-4">
           <button className="button-confirmation button-confirmation-no" onClick={handleCancel}>
             {t('changeProduct.cancelButton')}
@@ -136,7 +166,7 @@ const ChangeProductDetailsPage: React.FC = () => {
           </button>
         </div>
 
-        {/* ✅ Confirmation Popup */}
+        {/* Confirmation popup before saving changes */}
         {confirmation && (
           <div className="confirmation-box mt-4">
             <p>{t('changeProduct.confirmationMessage')}</p>
@@ -151,11 +181,11 @@ const ChangeProductDetailsPage: React.FC = () => {
           </div>
         )}
 
-        {/* ✅ Feedback Message */}
+        {/* Feedback message displayed after an action is performed */}
         {message && <p className="mt-4 text-blue-500 font-semibold">{message}</p>}
       </main>
 
-      {/* ✅ Footer */}
+      {/* Footer component for consistency across pages */}
       <Footer />
     </div>
   );
