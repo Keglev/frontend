@@ -1,27 +1,51 @@
 /* styles/login.css */
-@import './tailwindCustom.css'; /* ✅ Import Global Styles */
 
-/* ✅ Login Page Container */
+/* Import global Tailwind styles for consistency */
+@import './tailwindCustom.css'; 
+
+/* 
+   Login Page Styles 
+   - Defines the layout and design for the login page.
+   - Ensures consistency with global styles for buttons and input fields.
+*/
+
+/* Login Page Container 
+   - Centers the login form vertically and horizontally.
+   - Uses a light background in light mode and dark background in dark mode.
+*/
 .login-container {
     @apply flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900;
 }
 
-/* ✅ Login Page Header */
+/* Login Page Header 
+   - Applies a bold, large text for the login title.
+   - Adjusts the text color for dark mode compatibility.
+*/
 .login-header {
     @apply text-2xl font-bold mb-6 dark:text-white;
 }
 
-/* ✅ Use the global .input-field class */
+/* Login Input Field 
+   - Uses the globally defined input-field class for consistency.
+   - Ensures consistent styling for username and password fields.
+*/
 .login-input {
     @apply input-field;
 }
 
-/* ✅ Use the global .button-primary class */
+/* Login Button 
+   - Uses the globally defined button-primary class for consistency.
+   - Ensures consistent button styling across the application.
+*/
 .login-button {
     @apply button-primary;
 }
 
-/* ✅ Add a proper shadow effect to the login box */
+/* Login Box 
+   - Adds a shadow and rounded corners for a polished look.
+   - Applies background colors based on light or dark mode.
+   - Provides padding for proper spacing inside the container.
+*/
 .login-box {
     @apply shadow-lg rounded-lg bg-white dark:bg-gray-800 p-6;
 }

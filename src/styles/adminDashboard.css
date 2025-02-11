@@ -1,11 +1,26 @@
-/* src/styles/adminDashboard.css */
+/* 
+  Styles for Admin Dashboard Page 
+  This file defines styles for the dashboard header and content layout.
+  Ensures a clean, structured appearance for the admin interface.
+*/
+
+/* Dashboard Header 
+   - Sets a light background color for contrast.
+   - Adds padding for better spacing.
+   - Uses bold text for clear section titles.
+*/
 .dashboard-header {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    font-weight: bold;
-  }
-  
-  .dashboard-content {
-    margin: 2rem;
-  }
+  background-color: #f8f9fa; /* Light gray background for clarity */
+  padding: 1rem; /* Adds spacing for a balanced layout */
+  font-weight: bold; /* Emphasizes the header title */
+}
+
+/* Dashboard Content 
+   - Adds margin for spacing and a structured layout.
+   - Ensures content is not cramped.
+*/
+.dashboard-content {
+  margin: 2rem; /* Creates separation from the edges */
+}
+
   

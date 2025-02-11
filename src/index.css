@@ -1,4 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* src/index.css */
 
+/* 
+   Global Stylesheet for the Application
+   - Integrates Tailwind CSS for utility-first styling.
+   - Includes Tailwind’s base, component, and utility classes.
+   - Ensures consistent design across all components.
+*/
+
+/* Import Tailwind's base styles (resets & default styles) */
+@tailwind base;
+
+/* Import Tailwind's component classes (predefined reusable styles) */
+@tailwind components;
+
+/* Import Tailwind's utility classes (custom styling options) */
+@tailwind utilities;

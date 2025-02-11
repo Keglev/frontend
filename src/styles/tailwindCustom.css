@@ -1,9 +1,19 @@
-/* ✅ Import Tailwind Base Styles */
+/* src/styles/tailwindCustom.css */
+
+/* 
+   Import Tailwind Base Styles 
+   - Ensures Tailwind CSS utilities, components, and base styles are included.
+   - Provides global access to Tailwind's responsive and utility classes.
+*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ✅ GLOBAL COLOR VARIABLES */
+/* 
+   Global Color Variables 
+   - Defines primary colors for light and dark mode.
+   - Ensures consistent styling across the application.
+*/
 :root {
   --bg-color: #f9fafb; /* Light Gray */
   --text-color: #1f2937; /* Dark Text */
@@ -16,6 +26,10 @@
   --button-secondary-hover: #374151; /* Darker Gray */
 }
 
+/* 
+   Dark Mode Color Variables 
+   - Overrides default colors when dark mode is enabled.
+*/
 .dark {
   --bg-color: #1a202c; /* Dark Background */
   --text-color: #f7fafc; /* Light Text */
@@ -28,19 +42,25 @@
   --button-secondary-hover: #6b7280; /* Darker Gray */
 }
 
-/* ✅ APPLY DARK MODE STYLES */
+/* 
+   Body Styling 
+   - Applies background and text color based on selected theme.
+*/
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
 
-/* ✅ Ensure Dark Mode Applies Correctly */
+/* Ensure Dark Mode Applies Correctly */
 .dark body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
 
-/* ✅ FIX CONTAINERS & BACKGROUNDS */
+/* 
+   Dark Mode Overrides for Backgrounds and Text
+   - Ensures elements adapt correctly in dark mode.
+*/
 .dark .bg-gray-100 {
   background-color: var(--bg-color) !important;
 }
@@ -53,7 +73,10 @@ body {
   color: var(--text-color) !important;
 }
 
-/* ✅ HEADER & FOOTER */
+/* 
+   Header & Footer Styling 
+   - Provides consistent header/footer styling across pages.
+*/
 .header-container {
   @apply bg-white text-gray-900 shadow-md;
 }
@@ -68,23 +91,30 @@ body {
   @apply bg-gray-200 text-gray-700 text-center py-4;
 }
 
-/* ✅ INPUT FIELDS (With Effects) */
+/* 
+   Input Fields 
+   - Standardizes input field appearance with focus and hover effects.
+*/
 .input-field {
   @apply w-full px-4 py-2 border rounded transition-all duration-300 ease-in-out
       focus:outline-none focus:ring focus:ring-yellow-500
-      hover:bg-yellow-100 focus:bg-yellow-300
+      hover:bg-yellow-100 focus:bg-yellow-300;
 }
 
+/* Dark Mode Input Fields */
 .dark .input-field {
   @apply bg-gray-700 text-white border-gray-500
   focus:bg-gray-600 hover:bg-gray-600;
 }
 
-/* ✅ PRIMARY & SECONDARY BUTTONS */
+/* 
+   Primary & Secondary Buttons 
+   - Ensures consistent button styling across the app.
+*/
 .button-primary {
   @apply w-full px-4 py-2 rounded transition-all duration-200 ease-in-out
     active:scale-95 min-w-[120px]
-    bg-blue-500 text-white hover:bg-blue-600
+    bg-blue-500 text-white hover:bg-blue-600;
 }
 
 .dark .button-primary {
@@ -98,12 +128,15 @@ body {
     dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white;
 }
 
-/* ✅ CONFIRMATION BUTTONS */
+/* 
+   Confirmation Buttons 
+   - Used in confirmation dialogs (Yes/No prompts).
+*/
 .button-confirmation {
   @apply px-4 py-2 rounded transition-all duration-200 ease-in-out active:scale-95;
 }
 
-/* ✅ Yes Button (Green) */
+/* Yes Button (Green) */
 .button-confirmation-yes {
   @apply bg-green-600 text-white font-semibold rounded-lg px-4 py-2 
     hover:bg-green-700 active:scale-95;
@@ -113,7 +146,7 @@ body {
   @apply bg-green-500 hover:bg-green-400;
 }
 
-/* ✅ No Button (Red) */
+/* No Button (Red) */
 .button-confirmation-no {
   @apply bg-red-600 text-white font-semibold rounded-lg px-4 py-2
     hover:bg-red-700 active:scale-95;
@@ -123,7 +156,10 @@ body {
   @apply bg-red-500 hover:bg-red-400;
 }
 
-/* ✅ LOGOUT & DASHBOARD BUTTON */
+/* 
+   Logout & Dashboard Buttons 
+   - Defines styles for navigation buttons.
+*/
 .logout-button {
   @apply px-4 py-2 text-sm rounded-md transition-all duration-200 ease-in-out active:scale-95;
   background-color: #ef4444;
@@ -142,7 +178,10 @@ body {
   background-color: #b91c1c !important;
 }
 
-/* ✅ HELP BUTTON */
+/* 
+   Help & Language Buttons 
+   - Provides UI consistency for help and language selection.
+*/
 .button-help {
   @apply px-4 py-2 rounded transition-all duration-200 ease-in-out 
   active:scale-95 min-w-[120px] 
@@ -150,18 +189,20 @@ body {
   dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600;
 }
 
-/* ✅ LANGUAGE BUTTON */
 .language-button {
   @apply px-4 py-2 text-sm rounded-md transition-all
     active:scale-95
-    bg-gray-100 text-black hover:bg-gray-300 /* Light Mode */
+    bg-gray-100 text-black hover:bg-gray-300;
 }
 
 .dark .language-button {
-  @apply bg-blue-500 text-white hover:bg-blue-400; /* Dark Mode */
+  @apply bg-blue-500 text-white hover:bg-blue-400;
 }
 
-/* ✅ MODAL STYLES */
+/* 
+   Modal Styling 
+   - Used for help and confirmation modals.
+*/
 .help-modal {
   @apply bg-white shadow-lg rounded-lg p-6;
 }
@@ -176,12 +217,14 @@ body {
   @apply text-gray-800;
 }
 
-/* Dark Mode Help Modal*/
 .dark .help-modal-title {
   color: var(--text-color) !important;
 }
 
-/* ✅ TEXT STYLES */
+/* 
+   Text Styles 
+   - Standardizes text appearance throughout the app.
+*/
 .text-dark {
   @apply text-gray-900;
 }
@@ -198,36 +241,36 @@ body {
   color: var(--text-color) !important;
 }
 
-/* ✅ DARK MODE TOGGLE BUTTON */
+/* 
+   Dark Mode Toggle Button 
+   - Used for switching between light and dark mode.
+*/
 .dark-mode-button {
   @apply p-2 rounded-md transition-all active:scale-95;
   background-color: #696a6b;
   color: var(--text-color);
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease-in-out, transform 0.2s;
 }
 
-/* ✅ Light Mode: Sun Icon - Light Yellow */
+/* Light Mode: Sun Icon */
 .dark-mode-button svg {
-  color: #facc15; /* Light yellow for sun icon */
+  color: #facc15;
 }
 
-/* ✅ Dark Mode: Moon Icon - White */
+/* Dark Mode: Moon Icon */
 .dark .dark-mode-button svg {
-  color: #f8fafc; /* White for moon icon */
+  color: #f8fafc;
 }
 
-/* ✅ Hover Effect - Works in Both Modes */
+/* Hover Effect */
 .dark-mode-button:hover {
   background-color: var(--button-secondary-hover);
   transform: scale(1.1);
 }
 
-/* ✅ ADMIN & USER DASHBOARD BUTTONS */
+/* 
+   Admin & User Dashboard Buttons 
+   - Standardizes buttons used in dashboards.
+*/
 .button-add {
   @apply bg-green-600 text-white rounded-lg px-5 py-2 transition-all
     hover:bg-green-700 active:scale-95;
@@ -264,39 +307,17 @@ body {
   @apply bg-yellow-500 hover:bg-yellow-400;
 }
 
-
-/* ✅ FOOTER & SOCIAL MEDIA ICONS */
-.dark .footer-container a {
-  color: var(--text-color) !important;
-}
-
-.dark .footer-container a:hover {
-  color: #facc15 !important; /* Yellow */
-}
-
-/* ✅ LIST STOCK - Product Cards */
+/* 
+   List Stock - Product Cards 
+   - Defines styles for inventory display.
+*/
 .product-card {
   @apply p-4 border rounded shadow transition-all duration-200;
   background-color: var(--card-bg);
   color: var(--text-color);
 }
 
-/* ✅ Hover Effect for Light Mode */
-.product-card:hover {
-  background-color: #f3f4f6; /* Lighter Gray */
-}
-
-/* ✅ Fix Hover Effect for Dark Mode */
-.dark .product-card {
-  background-color: var(--card-bg) !important;
-  color: var(--text-color) !important;
-}
-
-.dark .product-card:hover {
-  background-color: #374151 !important; /* Darker Hover Effect */
-}
-
-/* ✅ Highlight Selected Product */
+/* Highlight Selected Product */
 .selected-product {
   @apply bg-blue-200 border-blue-500 text-blue-900 font-semibold;
 }
@@ -305,30 +326,15 @@ body {
   @apply bg-blue-600 border-blue-400 text-white;
 }
 
-/* ✅ Fix Confirmation Message Box */
-.confirmation-box {
-  @apply p-4 border rounded shadow-md bg-gray-200 text-black;
-}
-
-/* ✅ Dark Mode */
-.dark .confirmation-box {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
-
-/* ✅ Skeleton Loader Container */
+/* 
+   Skeleton Loader Styles 
+   - Used during data fetching.
+*/
 .skeleton-loader-container {
   @apply fixed inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900;
 }
 
-/* ✅ Skeleton Box (Smaller & Centered) */
-.skeleton-box {
-  @apply p-6 rounded-lg shadow-lg bg-white dark:bg-gray-800;
-}
-
-/* ✅ Skeleton Loading Text */
+/* Skeleton Loading Text */
 .skeleton-text {
   @apply text-lg font-semibold text-gray-700 dark:text-white animate-pulse;
 }
-

@@ -4,10 +4,18 @@ import ProductService from '../api/ProductService';
 import { Product } from '../types/Product';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
-import '../styles/tailwindCustom.css'; // ✅ Import Tailwind styles
-import Header from '../components/Header'; // ✅ Consistent Header Component
+import '../styles/tailwindCustom.css';
+import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+/**
+ * ListStockPage Component
+ *
+ * This component displays the stock inventory, allowing users to:
+ * - View paginated product stock details.
+ * - Download stock data as a CSV file.
+ * - Navigate back to their respective dashboards.
+ */
 const ListStockPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,10 +25,12 @@ const ListStockPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const pageSize = 10;
+  const pageSize = 10; // Number of products displayed per page
   const navigate = useNavigate();
 
-  // Role-based navigation
+  /**
+   * Navigates the user to the correct dashboard based on their role.
+   */
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
     if (role === 'ROLE_ADMIN') navigate('/admin');
@@ -28,6 +38,9 @@ const ListStockPage: React.FC = () => {
     else navigate('/login');
   };
 
+  /**
+   * Fetches paginated product data from the backend.
+   */
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -53,6 +66,9 @@ const ListStockPage: React.FC = () => {
     fetchProducts();
   }, [currentPage, t]);
 
+  /**
+   * Handles changes in language selection to re-render the help button correctly.
+   */
   useEffect(() => {
     const handleLanguageChange = () => {
       setIsHelpOpen((prev) => prev);
@@ -64,12 +80,19 @@ const ListStockPage: React.FC = () => {
     };
   }, [i18n]);
 
+  /**
+   * Handles pagination by updating the current page state.
+   * @param newPage - The new page number to navigate to.
+   */
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage);
     }
   };
 
+  /**
+   * Generates and downloads stock data as a CSV file.
+   */
   const downloadCSV = () => {
     if (products.length === 0) {
       alert(t('listStock.alert.noProducts'));
@@ -97,10 +120,10 @@ const ListStockPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* ✅ Consistent Header */}
+      {/* Header with language selection and logout option */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* ✅ Help Button - Centered in Header */}
+      {/* Help Button placed at the center */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -111,10 +134,10 @@ const ListStockPage: React.FC = () => {
         </button>
       </div>
 
-      {/* ✅ Help Modal */}
+      {/* Help Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="listStock" />
 
-      {/* ✅ Main Section */}
+      {/* Main stock list section */}
       <main className="w-full max-w-4xl p-6 bg-white shadow-lg rounded mx-auto mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{t('listStock.totalStock')}</h2>
@@ -123,6 +146,7 @@ const ListStockPage: React.FC = () => {
           </button>
         </div>
 
+        {/* Display the list of products if available */}
         {products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {products.map((product) => (
@@ -143,7 +167,7 @@ const ListStockPage: React.FC = () => {
           <p className="text-center text-gray-500">{t('listStock.noProducts')}</p>
         )}
 
-        {/* ✅ Pagination Buttons */}
+        {/* Pagination controls */}
         <div className="mt-6 flex justify-center gap-4">
           <button
             className="button-secondary"
@@ -165,14 +189,14 @@ const ListStockPage: React.FC = () => {
         </div>
       </main>
 
-      {/* ✅ Back to Dashboard Button */}
+      {/* Navigation back to dashboard */}
       <div className="mt-6 flex justify-center">
         <button className="logout-button" onClick={navigateToDashboard}>
           {t('listStock.backToDashboard')}
         </button>
       </div>
 
-      {/* ✅ Footer */}
+      {/* Footer component */}
       <Footer />
     </div>
   );

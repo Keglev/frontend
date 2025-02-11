@@ -3,11 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
-import Header from '../components/Header'; // ✅ Use the correct Header component
+import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+/**
+ * DeleteProductPage Component
+ * Allows administrators to search for and delete products from the inventory.
+ * 
+ * Features:
+ * - Search functionality with real-time product suggestions.
+ * - Two-step confirmation process before deleting a product.
+ * - Role-based navigation and language support.
+ */
 const DeleteProductPage: React.FC = () => {
-  const { t, i18n } = useTranslation(['translation', 'help']); // ✅ Use correct namespaces
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
@@ -16,10 +25,12 @@ const DeleteProductPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // ✅ Ensure Help Button updates when language changes
+  /**
+   * Updates the state when the user changes the application language.
+   */
   useEffect(() => {
     const handleLanguageChange = () => {
-      setIsHelpOpen((prev) => prev); // ✅ Forces re-render
+      setIsHelpOpen((prev) => prev);
     };
 
     i18n.on('languageChanged', handleLanguageChange);
@@ -28,7 +39,10 @@ const DeleteProductPage: React.FC = () => {
     };
   }, [i18n]);
 
-  // ✅ Handle Product Search
+  /**
+   * Handles searching for products by name.
+   * Only triggers search if at least three characters are entered.
+   */
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -55,14 +69,20 @@ const DeleteProductPage: React.FC = () => {
     }
   };
 
-  // ✅ Handle Product Selection
+  /**
+   * Sets the selected product when the user clicks on a product from the search results.
+   * Opens the first confirmation step before deletion.
+   */
   const handleProductClick = (product: { id: number; name: string }) => {
     setSelectedProduct(product);
     setConfirmation('first');
     setMessage('');
   };
 
-  // ✅ Handle Product Deletion
+  /**
+   * Deletes the selected product after confirmation.
+   * Removes the product from the list and updates the UI accordingly.
+   */
   const handleDelete = async () => {
     if (!selectedProduct) return;
 
@@ -78,7 +98,9 @@ const DeleteProductPage: React.FC = () => {
     }
   };
 
-  // ✅ Cancel Confirmation
+  /**
+   * Cancels the deletion process and resets the confirmation state.
+   */
   const cancelOperation = () => {
     setConfirmation(null);
     setMessage(t('deleteProduct.messages.canceled'));
@@ -86,10 +108,10 @@ const DeleteProductPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* ✅ Ensures uniform Header with language buttons */}
+      {/* Page header with logout functionality */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* ✅ Help Button - Placed inside the Header section but remains part of this page */}
+      {/* Help button positioned at the top center of the page */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -100,13 +122,14 @@ const DeleteProductPage: React.FC = () => {
         </button>
       </div>
 
-      {/* ✅ Help Modal */}
+      {/* Help modal for guidance */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="deleteProduct" />
 
+      {/* Main content section */}
       <main className="flex flex-col items-center justify-center w-full max-w-2xl p-6 mt-6 bg-white shadow-lg rounded mx-auto">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">{t('deleteProduct.findProduct')}</h2>
 
-        {/* ✅ Search Input Field */}
+        {/* Search input for finding products */}
         <input
           type="text"
           placeholder={t('deleteProduct.searchPlaceholder')}
@@ -115,15 +138,16 @@ const DeleteProductPage: React.FC = () => {
           className="input-field"
         />
 
+        {/* Display message if applicable */}
         {message && <p className="text-gray-500 text-center mt-4">{message}</p>}
 
-        {/* ✅ List of Products Found */}
+        {/* List of products matching the search query */}
         <ul className="w-full mt-4 space-y-2">
           {products.map((product) => (
             <li
               key={product.id}
               className={`p-2 border rounded hover:bg-gray-200 cursor-pointer ${
-                selectedProduct?.id === product.id ? 'selected-product' : 'be-gray-100'
+                selectedProduct?.id === product.id ? 'selected-product' : 'bg-gray-100'
               }`}
               onClick={() => handleProductClick(product)}
             >
@@ -132,7 +156,7 @@ const DeleteProductPage: React.FC = () => {
           ))}
         </ul>
 
-        {/* ✅ Confirmation Step 1 */}
+        {/* First confirmation step before deletion */}
         {confirmation === 'first' && selectedProduct && (
           <div className="mt-6 p-4 bg-gray-100 border rounded shadow-md">
             <p>{t('deleteProduct.confirmation.first')}</p>
@@ -153,7 +177,7 @@ const DeleteProductPage: React.FC = () => {
           </div>
         )}
 
-        {/* ✅ Confirmation Step 2 */}
+        {/* Second confirmation step before final deletion */}
         {confirmation === 'second' && (
           <div className="mt-6 p-4 bg-gray-100 border rounded shadow-md">
             <p>{t('deleteProduct.confirmation.second')}</p>
@@ -175,6 +199,7 @@ const DeleteProductPage: React.FC = () => {
         )}
       </main>
 
+      {/* Footer component for consistency */}
       <Footer />
     </div>
   );

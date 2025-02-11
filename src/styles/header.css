@@ -1,21 +1,41 @@
-@import './tailwindCustom.css'; /* ✅ Import Global Styles */
+@import './tailwindCustom.css'; /* Import global Tailwind styles for consistency */
 
-/* ✅ Header Styling */
+/* 
+  Header Styling 
+  - Defines the layout and appearance of the header section.
+  - Ensures consistent spacing, colors, and typography.
+*/
+
+/* Header Container
+   - Uses flexbox for a balanced layout.
+   - Applies a blue background with white text for visibility.
+   - Adds padding and shadow for a structured look.
+*/
 .header-container {
     @apply flex justify-between items-center bg-blue-600 text-white px-6 py-4 shadow-md h-16;
 }
 
-/* ✅ Header Title */
+/* Header Title
+   - Sets a larger font size for emphasis.
+   - Applies bold styling for readability.
+   - Uses tracking-wide for a slight spacing effect.
+*/
 .header-title {
     @apply text-2xl font-bold tracking-wide;
 }
 
-/* ✅ Header Subtitle */
+/* Header Subtitle
+   - Uses a smaller font size for a subtle secondary text.
+   - Applies opacity for a softer appearance.
+*/
 .header-subtitle {
     @apply text-sm opacity-80;
 }
 
-/* ✅ Header Buttons Container */
+/* Header Buttons Container
+   - Aligns buttons horizontally with spacing.
+   - Ensures consistent positioning for UI elements.
+*/
 .header-buttons {
     @apply flex items-center space-x-2;
 }

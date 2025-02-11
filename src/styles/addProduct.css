@@ -1,27 +1,47 @@
-/* src/styles/addProduct.css */
-/* Product Form Container */
+/* 
+  Styles for Add Product Page 
+  This file defines styles for the product form container, input fields, and labels. 
+  It also ensures proper dark mode support.
+*/
+
+/* Product Form Container 
+   - Provides spacing, background color, and a border for the form.
+   - Includes a subtle shadow for a clean UI appearance.
+*/
 .product-form-container {
   padding: 2rem;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
+  background-color: var(--card-bg); /* Uses global variable for consistency */
+  border-radius: 8px; /* Smooth rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  border: 1px solid var(--border-color); /* Consistent border styling */
 }
 
-/* ✅ Ensure Text is Readable in Dark Mode */
+/* Dark Mode Support 
+   - Ensures the form background and text adapt to dark mode settings.
+*/
 .dark .product-form-container {
   background-color: var(--card-bg);
   color: var(--text-color);
 }
+
+/* Label Styles 
+   - Makes labels bold for better readability.
+   - Adds spacing for a structured form layout.
+*/
 .product-form label {
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
-  
+
+/* Input Field Styles 
+   - Adds padding for better usability.
+   - Uses a border with rounded corners for a clean design.
+*/
 .product-form input {
-  margin-bottom: 1rem;
+  margin-bottom: 1rem; /* Adds spacing between inputs */
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #ccc; /* Neutral gray border for clarity */
+  border-radius: 4px; /* Slightly rounded corners */
 }
+
   
