@@ -44,9 +44,10 @@ const UserDashboard: React.FC = () => {
    */
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setLoading(true);
-      setError(null);
       try {
+        setLoading(true);
+        setError(null);
+      
         const { stockValue, lowStock } = await DashboardLogic.fetchDashboardData();
         setStockValue(stockValue);
         setLowStockProducts(lowStock);

@@ -17,17 +17,19 @@ const DashboardLogic = {
     lowStock: Product[];
   }> {
     try {
-      // ✅ Fetch total stock value from the API
-      const stockValueResponse = await apiClient.get('/products/total-stock-value');
-      const stockValueData = stockValueResponse.data; // Extract response data
+      // Use `Promise.all` to fetch stock value and low-stock products in parallel
+      const [stockValueResponse, lowStockResponse] = await Promise.all([
+        apiClient.get('/products/total-stock-value'),
+        apiClient.get('/products/low-stock'),
+      ]);
 
-      // ✅ Fetch low-stock products from the API
-      const lowStockResponse = await apiClient.get('/products/low-stock');
-      const lowStockData = lowStockResponse.data; // Extract response data
+      // Extract response data
+      const stockValueData = stockValueResponse.data?.data || 0; // Default to 0 if undefined
+      const lowStockData = Array.isArray(lowStockResponse.data) ? lowStockResponse.data as Product[] : [];
 
       return {
-        stockValue: stockValueData.data || 0, // Ensure a default value of 0 if data is missing
-        lowStock: Array.isArray(lowStockData) ? (lowStockData as Product[]) : [], // Ensure an array is returned
+        stockValue: stockValueData,
+        lowStock: lowStockData,
       };
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

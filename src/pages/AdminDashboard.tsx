@@ -43,9 +43,10 @@ const AdminDashboard: React.FC = () => {
    */
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setLoading(true);
-      setError(null);
       try {
+        setLoading(true);
+        setError(null);
+        // Fetch dashboard data using optimized logic
         const { stockValue, lowStock } = await DashboardLogic.fetchDashboardData();
         setStockValue(stockValue);
         setLowStockProducts(lowStock);
