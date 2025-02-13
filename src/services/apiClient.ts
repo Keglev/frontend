@@ -10,7 +10,8 @@ import axios from 'axios';
  * - Handle errors, including automatic token removal on unauthorized access.
  */
 const apiClient = axios.create({
-  baseURL: 'https://stockease-0uii.onrender.com/api', // Base URL for backend API requests
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api', // Base URL for backend API requests
+  timeout: 30000, // Wait 30 seconds before timing out
 });
 
 /**
