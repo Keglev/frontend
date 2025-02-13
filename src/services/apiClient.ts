@@ -10,7 +10,7 @@ import axios from 'axios';
  * - Handle errors, including automatic token removal on unauthorized access.
  */
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8081/api', // Base URL for backend API requests
+  baseURL: 'https://stockease-0uii.onrender.com/api', // Base URL for backend API requests
 });
 
 /**
