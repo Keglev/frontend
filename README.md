@@ -27,12 +27,17 @@ StockEase is a frontend application built with React and TypeScript to provide a
 ## 🖼️ Screenshots
 Here are some screenshots showcasing StockEase UI:
 
-- **Admin Dashboard:**
+  **Admin Dashboard:**
+  
   <img src="./src/assets/imgs/project-image.png" alt="Admin Dashboard" width="600" height="300"/>
+  
 - **German Version:**
+- 
   <img src="./src/assets/imgs/german-version.png" alt="Admin Dashboard German" width="600" height="300"/>
+  
 - **Dark Mode Enabled:**
-  <img src="./src/assets/imgs/dark-mode" alt="Dark Mode" width="600" height="300"/>
+- 
+  <img src="./src/assets/imgs/dark-mode.png" alt="Dark Mode" width="600" height="300"/>
 
 ## 🛠️ Installation
 ### 1. Clone the Repository
