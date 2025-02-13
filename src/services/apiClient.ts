@@ -11,7 +11,7 @@ import axios from 'axios';
  */
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api', // Base URL for backend API requests
-  timeout: 30000, // Wait 30 seconds before timing out
+  timeout: 120000, // Wait 2 minutes seconds before timing out
 });
 
 /**
