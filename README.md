@@ -81,14 +81,14 @@ npm run lint        # Runs ESLint for code linting
 ```
 
 ## Technologies ⚙️
-- **React** (Frontend Framework)
-- **TypeScript** (Strongly Typed JavaScript)
+- *React (Frontend Framework)
+- *TypeScript (Strongly Typed JavaScript)
 - **React Router** (Client-side Routing)
-- **Tailwind CSS** (Utility-first Styling)
+- *Tailwind CSS (Utility-first Styling)
 - **Vite** (Lightning-fast Development Server)
-- **Axios** (API Requests Handling)
-- **i18next** (Internationalization - English & German)
-- **JWT Authentication** (Token-based Authentication)
+- *Axios (API Requests Handling)
+- *i18next (Internationalization - English & German)
+- *JWT Authentication (Token-based Authentication)
 - **React Hook Form** (Form Validation)
 - **Zod** (Schema Validation)
 - **React Query** (Efficient Data Fetching)
