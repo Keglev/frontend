@@ -80,7 +80,7 @@ npm run preview     # Previews the production build
 npm run lint        # Runs ESLint for code linting
 ```
 
-## ⚙️ Technologies
+## Technologies ⚙️
 - **React** (Frontend Framework)
 - **TypeScript** (Strongly Typed JavaScript)
 - **React Router** (Client-side Routing)
