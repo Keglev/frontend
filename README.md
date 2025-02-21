@@ -81,18 +81,17 @@ npm run lint        # Runs ESLint for code linting
 ```
 
 ## Technologies ⚙️
-- *React (Frontend Framework)
-- *TypeScript (Strongly Typed JavaScript)
-- **React Router** (Client-side Routing)
-- *Tailwind CSS (Utility-first Styling)
-- **Vite** (Lightning-fast Development Server)
-- *Axios (API Requests Handling)
-- *i18next (Internationalization - English & German)
-- *JWT Authentication (Token-based Authentication)
-- **React Hook Form** (Form Validation)
-- **Zod** (Schema Validation)
-- **React Query** (Efficient Data Fetching)
-- **ShadCN UI** (Modern UI Components)
+- *React 
+- *TypeScript 
+- React Router 
+- *Tailwind CSS 
+- *Vite 
+- *Axios 
+- *i18next 
+- *JWT Authentication 
+- React Hook Form
+- React Query 
+- ShadCN UI 
 
 ## 🔗 API Integration
 This frontend communicates with the **StockEase Backend**, which provides RESTful API endpoints for managing stock data.
