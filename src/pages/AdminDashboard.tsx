@@ -11,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const AdminDashboard: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
   const [stockValue, setStockValue] = useState<number>(0);
-  const [lowStockProducts, setLowStockProducts] = useState<{ id: number; name: string; quantity: number }[]>([]);
+  const [lowStockProducts, setLowStockProducts] = useState<{ id: number; name: string; quantity: number; price: number }[]>([]);
   const navigate = useNavigate();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -58,10 +58,13 @@ const AdminDashboard: React.FC = () => {
             <h3 className="text-lg font-semibold">{t('adminDashboard.stockComparison')}</h3>
             <div className="flex-grow">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={[{ name: t('adminDashboard.totalStock'), value: stockValue }]}>
+                <BarChart data={lowStockProducts.map(product => ({
+                  name: product.name,
+                  value: ((product.price * product.quantity) / stockValue) * 100, // Percentage of total stock value
+                }))}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis />
+                  <YAxis unit="%" />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="value" fill="#82ca9d" />
