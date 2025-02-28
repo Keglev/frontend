@@ -49,7 +49,8 @@
     "subtitle": "Manage your products and stock efficiently",
     "stockValue": "Total Stock Value",
     "lowStock": "Low Stock Products",
-    "sufficientStock": "All products are sufficiently stocked"
+    "sufficientStock": "All products are sufficiently stocked",
+     "lowStockContribution": "Low-Stock Contribution to Total Stock Value"
   },
   "buttons": {
     "addProduct": "Add Product",

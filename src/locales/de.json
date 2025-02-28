@@ -50,7 +50,8 @@
     "stockValue": "Gesamtbestandwert",
     "lowStock": "Produkte mit niedrigem Bestand",
     "sufficientStock": "Alle Produkte sind ausreichend auf Lager",
-    "error": "Fehler beim Laden der Dashboard-Daten. Bitte versuchen Sie es erneut."
+    "error": "Fehler beim Laden der Dashboard-Daten. Bitte versuchen Sie es erneut.",
+   "lowStockContribution": "Beitrag von Produkten mit niedrigem Bestand zum Gesamtwert"
   },
   "buttons": {
     "addProduct": "Produkt hinzufügen",

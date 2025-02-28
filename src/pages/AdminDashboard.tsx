@@ -55,7 +55,7 @@ const AdminDashboard: React.FC = () => {
         <Sidebar stockValue={stockValue} lowStockProducts={lowStockProducts} />
         
           <div className="flex-1 bg-white shadow p-6 rounded min-h-[500px] flex flex-col">
-            <h3 className="text-lg font-semibold">{t('adminDashboard.stockComparison')}</h3>
+            <h3 className="text-lg font-semibold">{t('adminDashboard.lowStockContribution')}</h3>
             <div className="flex-grow">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={lowStockProducts.map(product => ({
