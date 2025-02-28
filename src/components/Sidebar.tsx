@@ -11,7 +11,7 @@ const Sidebar: React.FC<SidebarProps> = ({ stockValue, lowStockProducts }) => {
   const { t } = useTranslation();
 
   return (
-    <aside className="w-1/3 bg-white shadow p-4 rounded flex flex-col space-y-6 min-h-[500px]">
+    <aside className="w-2/5 bg-white shadow p-4 rounded flex flex-col space-y-6 min-h-[500px]">
       <div>
         <h3 className="text-lg font-semibold">{t('adminDashboard.stockValue')}</h3>
         <p className="text-xl text-blue-600 font-bold">${stockValue.toFixed(2)}</p>

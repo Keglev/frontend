@@ -44,7 +44,12 @@ const AdminDashboard: React.FC = () => {
           {t('button', { ns: 'help' })}
         </button>
       </div>
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="adminDashboard" />
+
+      {isHelpOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="adminDashboard" />
+        </div>
+      )}
 
       <div className="flex flex-row p-6 space-x-6">
         <Sidebar stockValue={stockValue} lowStockProducts={lowStockProducts} />
@@ -52,7 +57,7 @@ const AdminDashboard: React.FC = () => {
           <div className="flex-1 bg-white shadow p-6 rounded min-h-[500px] flex flex-col">
             <h3 className="text-lg font-semibold">{t('adminDashboard.stockComparison')}</h3>
             <div className="flex-grow">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={[{ name: t('adminDashboard.totalStock'), value: stockValue }]}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
