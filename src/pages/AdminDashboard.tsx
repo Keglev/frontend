@@ -36,36 +36,35 @@ const AdminDashboard: React.FC = () => {
   }, [t]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 relative">
       <Header isLoggedIn={true} onLogout={() => { localStorage.clear(); navigate('/login'); }} />
 
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
         <button onClick={() => setIsHelpOpen(true)} className="dashboard-button button-help" key={i18n.language}>
           {t('button', { ns: 'help' })}
         </button>
       </div>
-
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="adminDashboard" />
 
       <div className="flex flex-row p-6 space-x-6">
         <Sidebar stockValue={stockValue} lowStockProducts={lowStockProducts} />
         
-        <div className="flex-1 space-y-6">
-          <div className="bg-white shadow p-4 rounded">
+          <div className="flex-1 bg-white shadow p-6 rounded min-h-[500px] flex flex-col">
             <h3 className="text-lg font-semibold">{t('adminDashboard.stockComparison')}</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[{ name: t('adminDashboard.totalStock'), value: stockValue }]}> 
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-grow">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[{ name: t('adminDashboard.totalStock'), value: stockValue }]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
-      </div>
       <Footer />
     </div>
   );
