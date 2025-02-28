@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api/auth';
-import SkeletonLoader from '../components/SkeletonLoader';
+import { login } from '../../api/auth';
+import SkeletonLoader from '../../components/SkeletonLoader';
 import axios from 'axios';
-import '../styles/login.css'; 
-import '../styles/tailwindCustom.css'; 
-import ErrorBoundary from '../components/ErrorBoundary';
+import '../styles/login.css';
+import '../styles/tailwindCustom.css';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/Header';
-import HelpModal from '../components/HelpModal';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import HelpModal from '../../components/HelpModal';
+import Footer from '../../components/Footer';
 
 /**
  * LoginPage Component

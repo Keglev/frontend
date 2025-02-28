@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Buttons from '../components/Buttons';
-import DashboardLogic from '../logic/DashboardLogic';
-import Header from '../components/Header';
-import HelpModal from '../components/HelpModal';
+import Buttons from '../../components/Buttons';
+import DashboardLogic from '../../logic/DashboardLogic';
+import Header from '../../components/Header';
+import HelpModal from '../../components/HelpModal';
 import { useTranslation } from 'react-i18next';
-import Footer from '../components/Footer';
+import Footer from '../../components/Footer';
 
 /**
  * AdminDashboard Component
  * Displays an overview of the inventory for administrators.
- * 
+ *
  * Features:
  * - Shows total stock value.
  * - Lists low-stock products.

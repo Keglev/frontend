@@ -10,10 +10,10 @@ const SkeletonLoader: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true); // State to control visibility of the loader
 
   useEffect(() => {
-    // Automatically hide the skeleton loader after a delay (8 seconds)
+    // Automatically hide the skeleton loader after a delay (10 seconds)
     const timeout = setTimeout(() => {
       setIsVisible(false);
-    }, 8000); // Adjust timing if necessary (1000ms = 8 seconds)
+    }, 10000); // Adjust timing if necessary (1000ms = 1 seconds)
 
     // Cleanup function to clear the timeout if the component unmounts early
     return () => clearTimeout(timeout);
