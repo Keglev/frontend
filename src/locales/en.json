@@ -18,6 +18,7 @@
     "password": "Password",
     "button": "Login",
     "backToHome": "Back to Home",
+    "defaultCredentials": "Default login: admin / admin123",
     "error": {
       "emptyFields": "Please fill in all fields",
       "invalidCredentials": "Invalid username or password",

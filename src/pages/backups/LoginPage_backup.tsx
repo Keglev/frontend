@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import SkeletonLoader from '../components/SkeletonLoader';
 import axios from 'axios';
-import '../styles/login.css';
-import '../styles/tailwindCustom.css';
+import '../styles/login.css'; 
+import '../styles/tailwindCustom.css'; 
 import ErrorBoundary from '../components/ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
@@ -99,8 +99,6 @@ const LoginPage: React.FC = () => {
       {/* Main Login Form Section */}
       <div className="login-container">
         <h1 className="login-header">{t('login.title')}</h1>
-        {/*Display default credentials for testing purposes */}
-        <p className="text-blue-500 mb-2">{t('login.defaultCredentials')}</p>
 
         <div className="login-box w-64">
           {/* Username Input */}
