@@ -1,7 +1,7 @@
 # StockEase Frontend
 
 ## About
-StockEase is a frontend application built with React and TypeScript to provide an intuitive user interface for managing stock-related data. It integrates seamlessly with the **StockEase Backend**, offering authentication, role-based access control, and CRUD operations for products. This project is part of a portfolio to demonstrate frontend development skills with React and API integration.
+StockEase is a React + TypeScript application for efficient stock and inventory management. It integrates with the StockEase backend to provide authentication, role-based access control, and complete CRUD operations for products.
 
 ## 📖 Table of Contents
 - 📌 About
