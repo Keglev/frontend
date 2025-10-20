@@ -81,17 +81,17 @@ npm run lint        # Runs ESLint for code linting
 ```
 
 ## Technologies ⚙️
-- *React 
-- *TypeScript 
-- React Router 
-- *Tailwind CSS 
-- *Vite 
-- *Axios 
-- *i18next 
-- *JWT Authentication 
+- **React** 
+- **TypeScript** 
+- **React Router** 
+- **Tailwind CSS** 
+- **Vite** 
+- **Axios** 
+- **i18next** 
+- **JWT Authentication** 
 - React Hook Form
 - React Query 
-- ShadCN UI 
+- **ShadCN UI** 
 
 ## 🔗 API Integration
 This frontend communicates with the **StockEase Backend**, which provides RESTful API endpoints for managing stock data.
