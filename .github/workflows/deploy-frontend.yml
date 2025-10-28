@@ -31,15 +31,15 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        working-directory: frontend
+        working-directory: .
         run: npm ci
 
       - name: Lint
-        working-directory: frontend
+        working-directory: .
         run: npm run lint
 
       - name: Build
-        working-directory: frontend
+        working-directory: .
         run: |
           # Provide Vite build with VITE_API_BASE_URL from secrets so the static build contains the correct API endpoint
           if [ -n "${{ secrets.FRONTEND_API_BASE_URL }}" ]; then
@@ -50,16 +50,16 @@ jobs:
 
       - name: Build frontend Docker image (verify Dockerfile)
         run: |
-          # Build the Docker image using the frontend folder as context so ops/nginx is included
+          # Build the Docker image using the repository root as context so ops/nginx is included
           # Pass the VITE_API_BASE_URL as a build-arg so the builder stage has the same env
           if [ -n "${{ secrets.FRONTEND_API_BASE_URL }}" ]; then
-            docker build --build-arg VITE_API_BASE_URL="${{ secrets.FRONTEND_API_BASE_URL }}" -f frontend/Dockerfile -t stockease-frontend-ci:latest frontend
+            docker build --build-arg VITE_API_BASE_URL="${{ secrets.FRONTEND_API_BASE_URL }}" -f Dockerfile -t stockease-frontend-ci:latest .
           else
-            docker build -f frontend/Dockerfile -t stockease-frontend-ci:latest frontend
+            docker build -f Dockerfile -t stockease-frontend-ci:latest .
           fi
 
       - name: Deploy to Vercel (use frontend Dockerfile)
-        working-directory: frontend
+        working-directory: .
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           FRONTEND_API_BASE_URL: ${{ secrets.FRONTEND_API_BASE_URL }}
