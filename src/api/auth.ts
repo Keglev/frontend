@@ -31,7 +31,7 @@ export const login = async (
 
     // Send a POST request to the backend authentication endpoint
     const response = await apiClient.post<LoginResponse>(
-      '/auth/login',
+      '/api/auth/login',
       { username, password }
     );
 
