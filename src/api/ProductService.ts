@@ -11,7 +11,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the list of products.
    */
   fetchProducts: async () => {
-    const response = await apiClient.get('/products');
+    const response = await apiClient.get('/api/products');
     return response.data;
   },
 
@@ -25,7 +25,7 @@ const ProductService = {
    */
   fetchPagedProducts: async (page: number, size: number) => {
     try {
-      const response = await apiClient.get('/products/paged', {
+      const response = await apiClient.get('/api/products/paged', {
         params: { page, size },
       });
 
@@ -47,7 +47,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the added product response.
    */
   addProduct: async (product: { name: string; quantity: number; price: number }) => {
-    return apiClient.post('/products', product);
+    return apiClient.post('/api/products', product);
   },
 
   /**
@@ -57,7 +57,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the deletion confirmation response.
    */
   deleteProduct: async (id: number) => {
-    const response = await apiClient.delete(`/products/${id}`);
+    const response = await apiClient.delete(`/api/products/${id}`);
     return response.data;
   },
 
@@ -70,7 +70,7 @@ const ProductService = {
    */
   searchProductsByName: async (name: string) => {
     try {
-      const response = await apiClient.get(`/products/search`, {
+      const response = await apiClient.get(`/api/products/search`, {
         params: { name },
       });
 
@@ -93,7 +93,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the product data.
    */
   getProductById: async (id: number) => {
-    const response = await apiClient.get(`/products/${id}`);
+    const response = await apiClient.get(`/api/products/${id}`);
     return response.data.data; // Adjust based on API response structure
   },
 
@@ -105,7 +105,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the update confirmation response.
    */
   updateProductQuantity: async (id: number, quantity: number) => {
-    return apiClient.put(`/products/${id}/quantity`, { quantity });
+    return apiClient.put(`/api/products/${id}/quantity`, { quantity });
   },
 
   /**
@@ -116,7 +116,7 @@ const ProductService = {
    * @returns {Promise<any>} - A promise resolving to the update confirmation response.
    */
   updateProductPrice: async (id: number, price: number) => {
-    return apiClient.put(`/products/${id}/price`, { price });
+    return apiClient.put(`/api/products/${id}/price`, { price });
   },
 };
 

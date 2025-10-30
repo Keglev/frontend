@@ -19,8 +19,8 @@ const DashboardLogic = {
     try {
       // Use `Promise.all` to fetch stock value and low-stock products in parallel
       const [stockValueResponse, lowStockResponse] = await Promise.all([
-        apiClient.get('/products/total-stock-value'),
-        apiClient.get('/products/low-stock'),
+        apiClient.get('/api/products/total-stock-value'),
+        apiClient.get('/api/products/low-stock'),
       ]);
 
       // Extract response data
