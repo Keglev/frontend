@@ -210,7 +210,10 @@ Deployment Highlights:
 
 - ✅ Connected Backend for real-time product management
 
-Live Site: 🌐[StockEase Frontend](https://stockeasefrontend.vercel.app/)
+### Live Application:
+
+🌐**Production URL**: [StockEase Frontend](https://stockeasefrontend.vercel.app/)
+
 ---
 
 <a id="contributing"></a>
