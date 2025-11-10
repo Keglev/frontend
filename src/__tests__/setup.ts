@@ -47,6 +47,16 @@ global.IntersectionObserver = class IntersectionObserver {
 } as unknown as typeof IntersectionObserver;
 
 /**
+ * Mock ResizeObserver (required for recharts)
+ */
+global.ResizeObserver = class ResizeObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+} as unknown as typeof ResizeObserver;
+
+/**
  * Mock localStorage
  */
 const localStorageMock = {
