@@ -35,15 +35,17 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: npm test -- --run --reporter=verbose 2>&1 | tee test-output.log
+        run: npm test 2>&1 | tee test-output.log
 
       - name: Check test results
         run: |
-          if grep -q "PASS\|Tests.*passed" test-output.log; then
+          if grep -q "Test Files.*passed\|Tests.*passed" test-output.log; then
             echo "✓ Tests completed successfully"
+            grep "Test Files\|Tests.*passed" test-output.log || true
             exit 0
           else
             echo "✗ Tests failed or did not complete"
+            cat test-output.log
             exit 1
           fi
 
