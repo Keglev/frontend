@@ -10,8 +10,18 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 COPY package.json package-lock.json* ./
 RUN npm ci --silent
 
-# Copy source and build
-COPY . .
+# Copy only source files (exclude docs, tests, and other non-essential files)
+# Using .dockerignore to exclude unnecessary files
+COPY src/ src/
+COPY public/ public/
+COPY index.html index.html
+COPY vite.config.ts vite.config.ts
+COPY tsconfig.json tsconfig.json
+COPY tsconfig.app.json tsconfig.app.json
+COPY tsconfig.node.json tsconfig.node.json
+COPY tailwind.config.js tailwind.config.js
+COPY postcss.config.cjs postcss.config.cjs
+
 # Ensure the build sees VITE_API_BASE_URL
 RUN npm run build
 

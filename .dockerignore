@@ -1,0 +1,46 @@
+# Exclude test files
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/vitest.config.ts
+**/jest.config.js
+
+# Exclude documentation
+docs/
+*.md
+README.md
+TESTING_ANALYSIS.md
+ANALYSIS_SUMMARY.md
+PHASE_1_COMPLETION_REPORT.md
+
+# Exclude development files
+.git
+.gitignore
+.github/
+.vscode/
+.env
+.env.local
+.env.*.local
+*.log
+
+# Exclude package manager files
+.npmrc
+package-lock.json (unless needed)
+
+# Exclude build artifacts
+dist/
+build/
+node_modules/
+.next/
+
+# Exclude editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Exclude GitHub Actions
+.github/workflows/
