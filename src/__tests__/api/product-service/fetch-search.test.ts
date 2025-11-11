@@ -35,7 +35,9 @@ describe('ProductService - Search & ID-based Fetch Operations', () => {
       const result = await ProductService.searchProductsByName('apple');
 
       expect(result).toEqual(mockResults);
-      expect(apiClient.get).toHaveBeenCalledWith('/api/products/search/apple');
+      expect(apiClient.get).toHaveBeenCalledWith('/api/products/search', {
+        params: { name: 'apple' },
+      });
     });
 
     // Test empty response (204 No Content)
@@ -104,7 +106,7 @@ describe('ProductService - Search & ID-based Fetch Operations', () => {
       const mockProduct = { id: 1, name: 'Test Product', price: 15.99 };
 
       vi.mocked(apiClient.get).mockResolvedValueOnce({
-        data: mockProduct,
+        data: { data: mockProduct },
       });
 
       const result = await ProductService.getProductById(1);
@@ -131,7 +133,7 @@ describe('ProductService - Search & ID-based Fetch Operations', () => {
     // Test correct ID in URL path
     it('should include correct ID in URL', async () => {
       vi.mocked(apiClient.get).mockResolvedValueOnce({
-        data: { id: 42, name: 'Product' },
+        data: { data: { id: 42, name: 'Product' } },
       });
 
       await ProductService.getProductById(42);

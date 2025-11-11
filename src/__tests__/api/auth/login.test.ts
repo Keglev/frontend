@@ -129,8 +129,8 @@ describe('Authentication - Login Function (Successful Cases)', () => {
   });
 
   describe('Logging & Security', () => {
-    // Verify that login attempt is logged for debugging without exposing password
-    it('should log username for debugging (but not password)', async () => {
+    // Verify that password is never exposed in function parameters
+    it('should not expose password in authentication flow', async () => {
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiJ9.signature';
       const mockResponse = {
         data: {
@@ -142,10 +142,18 @@ describe('Authentication - Login Function (Successful Cases)', () => {
 
       vi.mocked(apiClient.post).mockResolvedValueOnce(mockResponse);
 
-      await login('testuser', 'secretpassword');
+      const result = await login('testuser', 'secretpassword');
 
-      // Verify logging occurred
-      expect(console.log).toHaveBeenCalled();
+      // Verify API was called with credentials
+      expect(apiClient.post).toHaveBeenCalledWith('/api/auth/login', {
+        username: 'testuser',
+        password: 'secretpassword',
+      });
+      
+      // Verify password is not returned in result
+      expect(result).not.toHaveProperty('password');
+      expect(result.token).toBeDefined();
+      expect(result.role).toBeDefined();
     });
   });
 });

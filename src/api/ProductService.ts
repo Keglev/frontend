@@ -60,7 +60,8 @@ const ProductService = {
    * @returns {Promise<any>} Created product response
    */
   addProduct: async (product: { name: string; quantity: number; price: number }) => {
-    return apiClient.post('/api/products', product);
+    const response = await apiClient.post('/api/products', product);
+    return response.data;
   },
 
   /**
