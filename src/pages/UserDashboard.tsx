@@ -1,3 +1,25 @@
+/**
+ * @file UserDashboard.tsx
+ * @description
+ * User dashboard for viewing inventory and stock information.
+ *
+ * **Features:**
+ * - Total stock value display
+ * - Low-stock products alert list
+ * - Welcome message (role-specific)
+ * - Navigation to inventory actions
+ * - Loading and error states
+ * - Help modal with guidance
+ * - Multi-language support
+ *
+ * **Data Displayed:**
+ * - Welcome message based on user role
+ * - Total stock value across all products
+ * - Products with low stock quantities
+ *
+ * @component
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -8,12 +30,9 @@ import { useTranslation } from 'react-i18next';
 import Footer from '../components/Footer';
 
 /**
- * UserDashboard Component
- *
- * This component represents the user dashboard where users can:
- * - View the total stock value.
- * - Check for low-stock products.
- * - Navigate through inventory-related functionalities.
+ * User dashboard component
+ * @component
+ * @returns {JSX.Element} Dashboard with stock information and navigation
  */
 const UserDashboard: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -27,9 +46,7 @@ const UserDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  /**
-   * Sets the welcome message based on the user's role.
-   */
+  // Set welcome message based on user role
   useEffect(() => {
     const role = localStorage.getItem('role');
     if (role === 'ROLE_ADMIN') {
