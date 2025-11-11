@@ -1,31 +1,50 @@
-// src/components/Buttons.tsx
-// This component renders a set of navigation buttons for managing product-related actions in the admin dashboard.
+/**
+ * @file Buttons.tsx
+ * @description
+ * Navigation buttons component for product management actions.
+ *
+ * **Functionality:**
+ * - Add Product - Navigates to product creation page
+ * - Delete Product - Navigates to product deletion page (admin-only)
+ * - Search Product - Navigates to product search page
+ * - List Stock - Navigates to inventory listing page
+ *
+ * **Props:**
+ * - `hideAdminButtons` - Controls visibility of admin-specific buttons
+ *
+ * @component
+ * @example
+ * const [hideAdmin, setHideAdmin] = useState(false);
+ * return <Buttons hideAdminButtons={hideAdmin} />;
+ */
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-// Define the expected props for the Buttons component
+/**
+ * Props for Buttons component
+ * @interface ButtonsProps
+ */
 interface ButtonsProps {
-  hideAdminButtons?: boolean; // If true, hides admin-specific buttons (Add & Delete Product)
+  /** Hide admin-specific buttons (Add & Delete Product) */
+  hideAdminButtons?: boolean;
 }
 
 /**
- * Buttons Component - Provides navigation buttons for product-related actions.
- * 
- * @param {boolean} hideAdminButtons - Determines whether admin-only buttons (Add & Delete Product) should be displayed.
- * @returns {JSX.Element} - A set of buttons for product management actions.
+ * Navigation buttons for product-related actions
+ * @component
+ * @param {ButtonsProps} props - Component props
+ * @returns {JSX.Element} Navigation button group
  */
 const Buttons: React.FC<ButtonsProps> = ({ hideAdminButtons = false }) => {
-  const navigate = useNavigate(); // Hook for programmatic navigation
-  const { t } = useTranslation(); // Hook for internationalization (i18n)
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-wrap gap-4">
-      {/* Render admin-specific buttons only if hideAdminButtons is false */}
       {!hideAdminButtons && (
         <>
-          {/* Button: Navigate to Add Product Page */}
           <button
             className="dashboard-button button-add"
             onClick={() => navigate('/add-product')}
@@ -33,7 +52,6 @@ const Buttons: React.FC<ButtonsProps> = ({ hideAdminButtons = false }) => {
             {t('buttons.addProduct')}
           </button>
 
-          {/* Button: Navigate to Delete Product Page */}
           <button
             className="dashboard-button button-delete"
             onClick={() => navigate('/delete-product')}
@@ -43,7 +61,6 @@ const Buttons: React.FC<ButtonsProps> = ({ hideAdminButtons = false }) => {
         </>
       )}
 
-      {/* Button: Navigate to Search Product Page */}
       <button
         className="dashboard-button button-search"
         onClick={() => navigate('/search-product')}
@@ -51,7 +68,6 @@ const Buttons: React.FC<ButtonsProps> = ({ hideAdminButtons = false }) => {
         {t('buttons.searchProduct')}
       </button>
 
-      {/* Button: Navigate to List Stock Page */}
       <button
         className="dashboard-button button-stock"
         onClick={() => navigate('/list-stock')}
@@ -62,5 +78,4 @@ const Buttons: React.FC<ButtonsProps> = ({ hideAdminButtons = false }) => {
   );
 };
 
-// Export the component for use in other parts of the application
 export default Buttons;

@@ -1,12 +1,41 @@
+/**
+ * @file Sidebar.tsx
+ * @description
+ * Dashboard sidebar component displaying inventory metrics and navigation buttons.
+ *
+ * **Displays:**
+ * - Total stock value in USD
+ * - Low stock product list
+ * - Product management navigation buttons
+ *
+ * **Props:**
+ * - `stockValue` - Total inventory value
+ * - `lowStockProducts` - Products with insufficient stock
+ *
+ * @component
+ */
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Buttons from './Buttons';
 
+/**
+ * Sidebar component props
+ * @interface SidebarProps
+ */
 interface SidebarProps {
+  /** Total value of all products in stock */
   stockValue: number;
+  /** List of products with low stock levels */
   lowStockProducts: { id: number; name: string; quantity: number }[];
 }
 
+/**
+ * Dashboard sidebar with inventory metrics
+ * @component
+ * @param {SidebarProps} props - Component props
+ * @returns {JSX.Element} Sidebar with stats and controls
+ */
 const Sidebar: React.FC<SidebarProps> = ({ stockValue, lowStockProducts }) => {
   const { t } = useTranslation();
 
@@ -16,6 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ stockValue, lowStockProducts }) => {
         <h3 className="text-lg font-semibold">{t('adminDashboard.stockValue')}</h3>
         <p className="text-xl text-blue-600 font-bold">${stockValue.toFixed(2)}</p>
       </div>
+
       <div>
         <h3 className="text-lg font-semibold">{t('adminDashboard.lowStock')}</h3>
         {lowStockProducts.length > 0 ? (
@@ -30,6 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ stockValue, lowStockProducts }) => {
           <p className="text-gray-500 mt-2">{t('adminDashboard.sufficientStock')}</p>
         )}
       </div>
+
       <div className="mt-auto">
         <Buttons />
       </div>

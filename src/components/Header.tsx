@@ -1,25 +1,43 @@
-// src/components/Header.tsx
-// This component represents the application's main header, providing:
-// - A dynamic title based on user role and page context
-// - A dark mode toggle button
-// - Language selection buttons
-// - A logout/back navigation button (conditionally displayed)
+/**
+ * @file Header.tsx
+ * @description
+ * Main application header with navigation, language, and theme controls.
+ *
+ * **Features:**
+ * - Dynamic page titles based on user role
+ * - Dark mode toggle with localStorage persistence
+ * - Language switcher (English/Deutsch)
+ * - Logout/back navigation button
+ * - Responsive design with Tailwind CSS
+ *
+ * **Props:**
+ * - `isLoggedIn` - User authentication state
+ * - `onLogout` - Custom logout handler (optional)
+ * - `hideBackButton` - Hide navigation/logout button
+ *
+ * @component
+ */
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaMoon, FaSun } from 'react-icons/fa';
-import '../styles/header.css'; // Import custom styles for additional customization
+import '../styles/header.css';
 
-// Define props for the Header component
 interface HeaderProps {
-  isLoggedIn: boolean; // Indicates whether the user is logged in
-  onLogout?: () => void; // Optional function to handle user logout
-  hideBackButton?: boolean; // If true, hides the back button
+  isLoggedIn: boolean;
+  onLogout?: () => void;
+  hideBackButton?: boolean;
 }
 
+/**
+ * Application header component
+ * @component
+ * @param {HeaderProps} props - Component props
+ * @returns {JSX.Element} Header with controls
+ */
 const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = false }) => {
-  const { t, i18n } = useTranslation(['translation', 'help']); // Multi-language support
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const location = useLocation();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -27,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     localStorage.getItem('darkMode') === 'enabled'
   );
 
-  // Toggle dark mode and update local storage
+  // Toggle dark mode and update document class
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
@@ -35,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     document.documentElement.classList.toggle('dark', newMode);
   };
 
-  // Apply stored dark mode setting on page load
+  // Apply dark mode on component mount/change
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -44,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     }
   }, [darkMode]);
 
-  // Change application language and persist selection in local storage
+  // Change language and persist in localStorage
   const changeLanguage = (lng: string) => {
     if (i18n.language !== lng) {
       localStorage.setItem('language', lng);
@@ -52,21 +70,27 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     }
   };
 
-  // Determine the page key for translation purposes
+  // Map route to translation key
   const getPageKey = () => {
     const path = location.pathname;
-    if (path.startsWith('/admin')) return 'adminDashboard';
-    if (path.startsWith('/user')) return 'userDashboard';
-    if (path.startsWith('/login')) return 'login';
-    if (path.startsWith('/add-product')) return 'addProduct';
-    if (path.startsWith('/delete-product')) return 'deleteProduct';
+    const pathMap: Record<string, string> = {
+      '/admin': 'adminDashboard',
+      '/user': 'userDashboard',
+      '/login': 'login',
+      '/add-product': 'addProduct',
+      '/delete-product': 'deleteProduct',
+      '/list-stock': 'listStock',
+      '/search-product': 'searchProduct',
+    };
+    
+    // Check exact matches first, then path prefixes for dynamic routes
+    if (pathMap[path]) return pathMap[path];
+    // Product edit route uses dynamic ID in path (e.g., /product/123/edit)
     if (path.startsWith('/product/')) return 'changeProduct';
-    if (path.startsWith('/list-stock')) return 'listStock';
-    if (path.startsWith('/search-product')) return 'searchProduct';
     return 'default';
   };
 
-  // Set page title based on user role or current location
+  // Set title based on user role
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     if (i18n.language !== savedLanguage) {
@@ -83,18 +107,16 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
     }
   }, [i18n, i18n.language, location.pathname, t]);
 
-  // Determine if the current page is a dashboard
   const isDashboard = location.pathname === '/admin' || location.pathname === '/user';
   const buttonLabel = isDashboard ? t('header.logout') : t(`${getPageKey()}.backToDashboard`);
 
-  // Handle logout or navigate back to the dashboard
   const handleButtonClick = () => {
     if (isDashboard) {
       if (onLogout) {
-        onLogout(); // Execute provided logout function
+        onLogout();
       } else {
-        localStorage.clear(); // Clear session storage
-        navigate('/login', { replace: true }); // Redirect to login page
+        localStorage.clear();
+        navigate('/login', { replace: true });
       }
     } else {
       const role = localStorage.getItem('role');
@@ -105,18 +127,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
   return (
     <header className="header-container">
       <div>
-        {/* Page Title and Subtitle */}
         <h1 className="header-title">{title}</h1>
         <p className="header-subtitle">{t('header.subtitle')}</p>
       </div>
 
       <div className="header-buttons">
-        {/* Dark Mode Toggle Button */}
         <button className="dark-mode-button" onClick={toggleDarkMode}>
           {darkMode ? <FaMoon size={20} /> : <FaSun size={20} />}
         </button>
 
-        {/* Language Selection Buttons */}
         <button className="language-button" onClick={() => changeLanguage('en')}>
           🇬🇧 English
         </button>
@@ -124,7 +143,6 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLogout, hideBackButton = 
           🇩🇪 Deutsch
         </button>
 
-        {/* Logout / Back Button (only displayed when logged in and not explicitly hidden) */}
         {isLoggedIn && !hideBackButton && (
           <button onClick={handleButtonClick} className="logout-button">
             {buttonLabel}

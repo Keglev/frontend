@@ -1,31 +1,37 @@
-// src/components/Footer.tsx
-// This component represents the footer of the application, containing copyright information and social media links.
+/**
+ * @file Footer.tsx
+ * @description
+ * Application footer with copyright notice and social media links.
+ *
+ * **Content:**
+ * - Copyright year and application name
+ * - GitHub profile link
+ * - LinkedIn profile link
+ * - Dark mode styling support
+ *
+ * **Localization:**
+ * - Copyright text uses i18n for localization
+ *
+ * @component
+ */
 
 import React from 'react';
-import { FaGithub, FaLinkedin } from 'react-icons/fa'; // Import social media icons
-import { useTranslation } from 'react-i18next'; // Import translation hook
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 /**
- * Footer Component - Displays the application's footer with copyright notice and social media links.
- * 
- * The footer includes:
- * - A dynamic copyright message with internationalization (i18n)
- * - Links to the developer's GitHub and LinkedIn profiles
- * - Proper styling for light and dark modes
- * 
- * @returns {JSX.Element} - The footer component containing the copyright and social links.
+ * Application footer component
+ * @component
+ * @returns {JSX.Element} Footer with copyright and social links
  */
 const Footer: React.FC = () => {
-  const { t } = useTranslation(); // Access translation function for multi-language support
+  const { t } = useTranslation();
 
   return (
     <footer className="footer-container w-full text-center py-4 mt-6 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white">
-      {/* Copyright Notice - Dynamically Translated */}
       <p className="text-sm">© 2025 StockEase. {t('footer.rights')}</p>
 
-      {/* Social Media Links */}
       <div className="flex justify-center space-x-6 mt-2">
-        {/* GitHub Link */}
         <a
           href="https://github.com/Keglev"
           target="_blank"
@@ -36,7 +42,6 @@ const Footer: React.FC = () => {
           <FaGithub size={20} /> <span>GitHub</span>
         </a>
 
-        {/* LinkedIn Link */}
         <a
           href="https://linkedin.com/in/carloskeglevich"
           target="_blank"
@@ -51,5 +56,4 @@ const Footer: React.FC = () => {
   );
 };
 
-// Export the Footer component for use in the application layout
 export default Footer;

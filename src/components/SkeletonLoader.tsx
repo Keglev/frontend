@@ -1,25 +1,38 @@
-// src/components/SkeletonLoader.tsx
-// This component provides a loading animation while fetching data or processing user actions.
-// It displays a temporary "Loading..." message that disappears after a set duration.
+/**
+ * @file SkeletonLoader.tsx
+ * @description
+ * Loading spinner component displayed during data fetching operations.
+ *
+ * **Behavior:**
+ * - Shows loading message for 10 seconds maximum
+ * - Auto-hides after duration expires
+ * - Supports light and dark modes
+ * - Responsive full-screen overlay
+ *
+ * @component
+ */
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Skeleton loading component with auto-hide timeout
+ * @component
+ * @returns {JSX.Element|null} Loading overlay or null if timeout expired
+ */
 const SkeletonLoader: React.FC = () => {
-  const { t } = useTranslation(); // Load translations for "Loading..." message
-  const [isVisible, setIsVisible] = useState(true); // State to control visibility of the loader
+  const { t } = useTranslation();
+  const [isVisible, setIsVisible] = useState(true);
 
+  // Auto-hide loader after 10 seconds timeout
   useEffect(() => {
-    // Automatically hide the skeleton loader after a delay (10 seconds)
     const timeout = setTimeout(() => {
       setIsVisible(false);
-    }, 10000); // Adjust timing if necessary (1000ms = 1 seconds)
+    }, 10000);
 
-    // Cleanup function to clear the timeout if the component unmounts early
     return () => clearTimeout(timeout);
   }, []);
 
-  // If the loader has completed its duration, remove it from the UI
   if (!isVisible) return null;
 
   return (
