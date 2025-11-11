@@ -1,21 +1,39 @@
+/**
+ * @file ChangeProductDetailsPage.tsx
+ * @description
+ * Edit interface for updating product details (quantity and price).
+ *
+ * **Features:**
+ * - Load product details from API
+ * - Edit quantity and price fields
+ * - Two-step confirmation (preview + confirmation)
+ * - Auto-redirect to dashboard after successful update
+ * - Language-aware help modal
+ * - Role-based dashboard navigation
+ *
+ * **Workflow:**
+ * 1. Load product by ID from URL params
+ * 2. Display current quantity and price
+ * 3. Allow editing both fields
+ * 4. Confirm changes before submitting
+ * 5. Redirect to dashboard after success
+ *
+ * @component
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import HelpModal from '../components/HelpModal';
 import Header from '../components/Header';
-import '../styles/tailwindCustom.css';
 import Footer from '../components/Footer';
+import '../styles/tailwindCustom.css';
 
 /**
- * ChangeProductDetailsPage Component
- * Allows users to update the quantity and price of a specific product.
- * 
- * Features:
- * - Fetches and displays product details.
- * - Enables input fields for modifying product attributes.
- * - Provides confirmation before saving changes.
- * - Supports role-based navigation after updates.
+ * Edit product details page component
+ * @component
+ * @returns {JSX.Element} Product edit form
  */
 const ChangeProductDetailsPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -29,8 +47,8 @@ const ChangeProductDetailsPage: React.FC = () => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   /**
-   * Redirects the user back to the appropriate dashboard based on role.
-   * If the role is undefined, the user is redirected to the login page.
+   * Navigate to role-appropriate dashboard
+   * Admin -> /admin, User -> /user, others -> /login
    */
   const navigateToDashboard = () => {
     const role = localStorage.getItem('role');
@@ -39,10 +57,7 @@ const ChangeProductDetailsPage: React.FC = () => {
     else navigate('/login');
   };
 
-  /**
-   * Fetches the product details based on the product ID from the URL.
-   * Updates the state with the retrieved product data.
-   */
+  // Load product details on component mount
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -59,9 +74,7 @@ const ChangeProductDetailsPage: React.FC = () => {
     fetchProductDetails();
   }, [productId, t]);
 
-  /**
-   * Ensures that the help button updates properly when the language is changed.
-   */
+  // Re-render help button on language changes
   useEffect(() => {
     const handleLanguageChange = () => {
       setIsHelpOpen((prev) => prev);
@@ -74,8 +87,9 @@ const ChangeProductDetailsPage: React.FC = () => {
   }, [i18n]);
 
   /**
-   * Handles the process of saving updated product details.
-   * Sends API requests to update the product's quantity and/or price.
+   * Submit product updates to API
+   * Sends separate requests for quantity and price changes
+   * Auto-redirects to dashboard after 1.5s on success
    */
   const handleSaveChanges = async () => {
     setMessage('');
@@ -88,7 +102,6 @@ const ChangeProductDetailsPage: React.FC = () => {
       }
       setMessage(t('changeProduct.successMessage'));
 
-      // Redirects the user back to the dashboard after a short delay.
       setTimeout(() => navigateToDashboard(), 1500);
     } catch (error) {
       console.error(t('changeProduct.error.update'), error);
@@ -98,7 +111,7 @@ const ChangeProductDetailsPage: React.FC = () => {
   };
 
   /**
-   * Resets the input fields and cancels any pending updates.
+   * Reset form to original product values and cancel
    */
   const handleCancel = () => {
     setNewQuantity(product?.quantity || 0);
@@ -107,15 +120,12 @@ const ChangeProductDetailsPage: React.FC = () => {
     setMessage(t('changeProduct.cancelMessage'));
   };
 
-  // Displays a loading message if the product data has not been retrieved yet.
   if (!product) return <p>{t('loading')}</p>;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Page header with logout functionality */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* Help button positioned in the center of the header */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -126,14 +136,11 @@ const ChangeProductDetailsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Help modal for guidance */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="changeProduct" />
 
-      {/* Main section containing product details and input fields */}
       <main className="w-full max-w-2xl p-6 bg-white shadow-lg rounded mx-auto mt-6">
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
 
-        {/* Input field for updating product quantity */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.quantityLabel')}</label>
           <input
@@ -144,7 +151,6 @@ const ChangeProductDetailsPage: React.FC = () => {
           />
         </div>
 
-        {/* Input field for updating product price */}
         <div className="mb-4">
           <label className="block font-medium mb-2">{t('changeProduct.priceLabel')}</label>
           <input
@@ -156,7 +162,6 @@ const ChangeProductDetailsPage: React.FC = () => {
           />
         </div>
 
-        {/* Action buttons for canceling or saving changes */}
         <div className="flex justify-between space-x-4">
           <button className="button-confirmation button-confirmation-no" onClick={handleCancel}>
             {t('changeProduct.cancelButton')}
@@ -166,12 +171,14 @@ const ChangeProductDetailsPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Confirmation popup before saving changes */}
         {confirmation && (
           <div className="confirmation-box mt-4">
             <p>{t('changeProduct.confirmationMessage')}</p>
             <div className="flex justify-between space-x-4">
-              <button className="button-confirmation button-confirmation-yes" onClick={handleSaveChanges}>
+              <button
+                className="button-confirmation button-confirmation-yes"
+                onClick={handleSaveChanges}
+              >
                 {t('changeProduct.confirmYes')}
               </button>
               <button className="button-confirmation button-confirmation-no" onClick={handleCancel}>
@@ -181,11 +188,9 @@ const ChangeProductDetailsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Feedback message displayed after an action is performed */}
         {message && <p className="mt-4 text-blue-500 font-semibold">{message}</p>}
       </main>
 
-      {/* Footer component for consistency across pages */}
       <Footer />
     </div>
   );
