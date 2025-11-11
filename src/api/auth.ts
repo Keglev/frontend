@@ -1,65 +1,68 @@
-// src/api/auth.ts
-// This module handles user authentication requests, specifically the login process.
-// It communicates with the backend API to verify credentials and retrieve a JWT token.
+/**
+ * @file auth.ts
+ * @description
+ * Authentication API service for user login and JWT token handling.
+ *
+ * **Responsibilities:**
+ * - Handle user login requests to the backend
+ * - Extract and decode JWT tokens from responses
+ * - Parse user role from JWT payload
+ * - Error handling and validation
+ *
+ * **Security Notes:**
+ * - JWT tokens are decoded client-side (payload only, signature verification via backend)
+ * - Passwords are never logged or stored locally
+ * - Token should be stored securely (HttpOnly cookies preferred, localStorage fallback)
+ *
+ * @module auth
+ * @requires ../services/apiClient
+ */
 
 import apiClient from '../services/apiClient';
 
+/**
+ * Login API response structure from backend
+ * @interface LoginResponse
+ */
 interface LoginResponse {
-  success: boolean; // Indicates whether the login request was successful
-  message: string; // Message from the server (e.g., error details or success confirmation)
-  data: string; // JWT Token returned upon successful authentication
+  success: boolean;
+  message: string;
+  data: string;
 }
 
 /**
- * Logs in the user by sending credentials to the authentication API.
- * If successful, returns the JWT token and the user's role.
+ * Authenticates user with credentials and returns JWT token with role.
  *
- * @param {string} username - The username entered by the user.
- * @param {string} password - The corresponding password.
- * @returns {Promise<{ token: string; role: string }>} - The JWT token and user role.
- * @throws {Error} - Throws an error if login fails or if the response is invalid.
+ * @async
+ * @function login
+ * @param {string} username - User's login username
+ * @param {string} password - User's login password
+ * @returns {Promise<{token: string, role: string}>} JWT token and user role
+ * @throws {Error} Authentication failed, invalid credentials, or malformed response
+ *
+ * **Process:**
+ * 1. Send POST request with credentials to /api/auth/login
+ * 2. Validate response success flag
+ * 3. Extract JWT token from response.data
+ * 4. Decode JWT payload to extract user role
+ * 5. Return token and role for application storage
  */
 export const login = async (
   username: string,
   password: string
 ): Promise<{ token: string; role: string }> => {
-  try {
-    console.log('Initiating login request...');
+  const response = await apiClient.post<LoginResponse>(
+    '/api/auth/login',
+    { username, password }
+  );
 
-    // Log the username for debugging purposes (DO NOT log passwords for security reasons)
-    console.log('Username:', username);
-
-    // Send a POST request to the backend authentication endpoint
-    const response = await apiClient.post<LoginResponse>(
-      '/api/auth/login',
-      { username, password }
-    );
-
-    console.log('Server response received:', response.data);
-
-    // Validate the response to check if authentication was successful
-    if (!response.data.success) {
-      console.log('Login failed on server:', response.data.message);
-      throw new Error(response.data.message || 'Login failed');
-    }
-
-    // Extract JWT token from the response data
-    const token = response.data.data;
-    console.log('Token extracted:', token);
-
-    // Decode the JWT token to extract user role
-    // JWT consists of three parts: header.payload.signature
-    const decodedPayload = JSON.parse(atob(token.split('.')[1])); // Decode base64 payload
-    console.log('Decoded JWT payload:', decodedPayload);
-
-    // Retrieve the user's role from the decoded token payload
-    const role = decodedPayload.role;
-    console.log('Role extracted from token:', role);
-
-    // Return the extracted token and role to be used in authentication handling
-    return { token, role };
-  } catch (error) {
-    console.error('Error during login process:', error);
-    throw error; // Propagate error for higher-level handling
+  if (!response.data.success) {
+    throw new Error(response.data.message || 'Login failed');
   }
+
+  const token = response.data.data;
+  const decodedPayload = JSON.parse(atob(token.split('.')[1]));
+  const role = decodedPayload.role;
+
+  return { token, role };
 };
