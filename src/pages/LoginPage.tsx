@@ -1,37 +1,57 @@
+/**
+ * @file LoginPage.tsx
+ * @description
+ * User authentication page with login form and credential validation.
+ *
+ * **Features:**
+ * - Username and password input fields
+ * - Login API integration with error handling
+ * - Role-based dashboard redirection
+ * - Loading states and error messages
+ * - Help modal with contextual information
+ * - Automatic redirect for already logged-in users
+ *
+ * **Authentication Flow:**
+ * 1. Validate input fields (not empty)
+ * 2. Send credentials to backend login API
+ * 3. Store token and role in localStorage
+ * 4. Redirect to admin or user dashboard based on role
+ *
+ * **Error Handling:**
+ * - 401 Unauthorized: Invalid credentials
+ * - Network errors: Unexpected error messages
+ *
+ * @component
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import SkeletonLoader from '../components/SkeletonLoader';
-import axios from 'axios';
-import '../styles/login.css';
-import '../styles/tailwindCustom.css';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
 import Footer from '../components/Footer';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import '../styles/login.css';
+import '../styles/tailwindCustom.css';
 
 /**
- * LoginPage Component
- *
- * This component handles user authentication, including:
- * - Input fields for username and password.
- * - Login logic with API request handling.
- * - Error messaging and loading states.
- * - Navigation logic to the appropriate dashboard based on user role.
+ * Login page component
+ * @component
+ * @returns {JSX.Element} Login form with authentication
  */
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  /**
-   * Redirects logged-in users to their respective dashboards.
-   */
+  // Redirect already logged-in users to appropriate dashboard
   useEffect(() => {
     const role = localStorage.getItem('role');
     if (role) {
@@ -40,10 +60,11 @@ const LoginPage: React.FC = () => {
   }, [navigate]);
 
   /**
-   * Handles user login by sending credentials to the backend.
-   * If successful, stores the token and redirects the user.
+   * Handle login submission with validation and API call
+   * Stores token/role in localStorage and redirects based on user role
    */
   const handleLogin = async () => {
+    // Validate required fields are filled
     if (!username || !password) {
       setError(t('login.error.emptyFields'));
       return;
@@ -56,15 +77,16 @@ const LoginPage: React.FC = () => {
       const response = await login(username, password);
       const { token, role } = response;
 
-      // Store authentication data in local storage
+      // Persist authentication data for session management
       localStorage.setItem('token', token);
       localStorage.setItem('username', username);
       localStorage.setItem('role', role);
 
-      // Redirect user based on role
+      // Redirect based on user role (admin or user dashboard)
       navigate(role === 'ROLE_ADMIN' ? '/admin' : '/user', { replace: true });
     } catch (err) {
       setLoading(false);
+      // Differentiate between authentication failures and network errors
       if (axios.isAxiosError(err)) {
         setError(
           err.response?.status === 401
@@ -79,10 +101,8 @@ const LoginPage: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      {/* Header without the back button for the login page */}
       <Header isLoggedIn={false} hideBackButton={true} />
 
-      {/* Help Button - Positioned at the top center */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -93,17 +113,13 @@ const LoginPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Help Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="login" />
 
-      {/* Main Login Form Section */}
       <div className="login-container">
         <h1 className="login-header">{t('login.title')}</h1>
-        {/*Display default credentials for testing purposes */}
         <p className="text-blue-500 mb-2">{t('login.defaultCredentials')}</p>
 
         <div className="login-box w-64">
-          {/* Username Input */}
           <label htmlFor="username" className="text-sm font-medium mb-2">
             {t('login.username')}
           </label>
@@ -116,7 +132,6 @@ const LoginPage: React.FC = () => {
             required
           />
 
-          {/* Password Input */}
           <label htmlFor="password" className="text-sm font-medium mb-2">
             {t('login.password')}
           </label>
@@ -130,31 +145,23 @@ const LoginPage: React.FC = () => {
             autoComplete="current-password"
           />
 
-          {/* Show loading indicator while processing login */}
           {loading ? (
             <SkeletonLoader />
           ) : (
             <>
-              {/* Login Button */}
               <button onClick={handleLogin} className="login-button mt-4">
                 {t('login.button')}
               </button>
 
-              {/* Back to Home Button */}
-              <button
-                onClick={() => navigate('/')}
-                className="button-secondary mt-4"
-              >
+              <button onClick={() => navigate('/')} className="button-secondary mt-4">
                 {t('login.backToHome')}
               </button>
             </>
           )}
 
-          {/* Display Error Messages */}
           {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
 
-        {/* Footer Section */}
         <Footer />
       </div>
     </ErrorBoundary>
