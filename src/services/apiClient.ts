@@ -1,43 +1,60 @@
+/**
+ * @file apiClient.ts
+ * @description
+ * Configured Axios HTTP client with authentication and error handling.
+ *
+ * **Features:**
+ * - Base URL configuration via environment variable
+ * - Automatic JWT token attachment from localStorage
+ * - Request/response logging for debugging
+ * - 401 Unauthorized token cleanup
+ * - 2-minute request timeout
+ *
+ * **Interceptors:**
+ * - Request: Attaches Bearer token to Authorization header
+ * - Response: Logs responses, handles 401 by removing token
+ *
+ * **Error Handling:**
+ * - Logs all API errors
+ * - Clears token on 401 responses
+ * - Propagates errors to ErrorBoundary
+ *
+ * @module
+ */
+
 import axios from 'axios';
 
 /**
- * Axios instance for handling API requests.
- * 
- * This client is configured to:
- * - Use a base URL for all API requests.
- * - Attach a JWT token from local storage for authentication.
- * - Log requests and responses for debugging.
- * - Handle errors, including automatic token removal on unauthorized access.
+ * Configured Axios instance for API requests
+ * @type {import('axios').AxiosInstance}
  */
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api', // Base URL for backend API requests
-  timeout: 120000, // Wait 2 minutes seconds before timing out
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api',
+  timeout: 120000,
 });
 
 /**
- * Request Interceptor:
- * - Attaches the Authorization header if a token is found in local storage.
- * - Logs the request configuration for debugging.
+ * Request interceptor: Attach JWT token from localStorage
+ * Logs request for debugging
  */
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Attach JWT token to request headers
+      config.headers.Authorization = `Bearer ${token}`;
     }
     console.log('API Request:', config);
     return config;
   },
   (error) => {
     console.error('Request Error:', error);
-    throw error; // Allow ErrorBoundary to handle the error
+    throw error;
   }
 );
 
 /**
- * Response Interceptor:
- * - Logs successful API responses for debugging.
- * - Handles errors, removing the token if the response status is 401 (Unauthorized).
+ * Response interceptor: Log responses and handle 401 Unauthorized
+ * Removes token on 401 and propagates error
  */
 apiClient.interceptors.response.use(
   (response) => {
@@ -47,13 +64,13 @@ apiClient.interceptors.response.use(
   (error) => {
     console.error('API Error:', error.response?.data || error.message);
 
-    // If the response indicates an unauthorized request, remove the token and log the event.
+    // Clear token on unauthorized access
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       console.warn('Unauthorized access - redirecting to login');
     }
 
-    throw error; // Pass the error to be handled by ErrorBoundary
+    throw error;
   }
 );
 
