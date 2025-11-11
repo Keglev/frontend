@@ -1,59 +1,75 @@
-// src/i18n.ts
-
 /**
- * Initializes internationalization (i18n) for the application.
- * - Uses `i18next` for handling translations.
- * - Detects the user's preferred language via `i18next-browser-languagedetector`.
- * - Stores language preferences in `localStorage` for persistence.
+ * @file i18n.ts
+ * @description
+ * Internationalization (i18n) configuration and initialization.
+ *
+ * **Features:**
+ * - Multi-language support (English, German)
+ * - Automatic language detection from browser/localStorage
+ * - Persistent language preference storage
+ * - Namespace-based translation organization
+ * - Debug access via window.i18next
+ *
+ * **Namespaces:**
+ * - `translation` - General application translations
+ * - `help` - Help modal and documentation
+ *
+ * **Supported Languages:**
+ * - `en` - English (fallback)
+ * - `de` - Deutsch (German)
+ *
+ * **Detection Order:**
+ * 1. localStorage (persisted user preference)
+ * 2. Browser language settings (navigator)
+ *
+ * @module i18n
+ * @requires i18next
+ * @requires react-i18next
+ * @requires i18next-browser-languagedetector
  */
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// Import translation files
 import en from './locales/en.json';
 import de from './locales/de.json';
 import helpEn from './locales/help_en.json';
 import helpDe from './locales/help_de.json';
 
-// Extend global `window` object for debugging purposes
 declare global {
   interface Window {
     i18next: typeof i18n;
   }
 }
 
-// Define available translation resources
 const resources = {
   en: { translation: en, help: helpEn },
   de: { translation: de, help: helpDe },
 };
 
 i18n
-  .use(LanguageDetector) // Detect user's language from browser or localStorage
-  .use(initReactI18next) // Integrate with React
+  .use(LanguageDetector)
+  .use(initReactI18next)
   .init({
-    resources, // Load available translations
-    fallbackLng: 'en', // Default language if no preference is found
-    ns: ['translation', 'help'], // Define namespaces for translations
-    defaultNS: 'translation', // Default namespace for general translations
+    resources,
+    fallbackLng: 'en',
+    ns: ['translation', 'help'],
+    defaultNS: 'translation',
     interpolation: {
-      escapeValue: false, // Prevents escaping HTML entities (not needed for React)
+      escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'], // Check `localStorage` first, then browser settings
-      caches: ['localStorage'], // Persist selected language in `localStorage`
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
     },
   });
 
-// Ensure `localStorage` contains the correct language setting
 const storedLanguage = localStorage.getItem('language') || 'en';
 if (i18n.language !== storedLanguage) {
   i18n.changeLanguage(storedLanguage);
 }
 
-// Attach `i18next` instance to `window` for debugging in the console
 window.i18next = i18n;
 
 export default i18n;

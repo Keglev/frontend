@@ -1,17 +1,24 @@
-/* src/index.css */
+/**
+ * @file index.css
+ * @description
+ * Global stylesheet for the StockEase application.
+ *
+ * **Purpose:**
+ * - Initializes Tailwind CSS framework
+ * - Provides utility-first CSS approach for component styling
+ * - Ensures consistent design system across all pages
+ *
+ * **Tailwind Layers:**
+ * - `base`: Browser resets and default HTML element styles
+ * - `components`: Reusable component class definitions
+ * - `utilities`: Single-purpose utility classes for quick styling
+ *
+ * **Note:** All component-specific styles are defined in Tailwind utility classes
+ * or component-scoped CSS modules. This file contains only framework initialization.
+ *
+ * @see tailwindcss.config.js - Tailwind configuration
+ */
 
-/* 
-   Global Stylesheet for the Application
-   - Integrates Tailwind CSS for utility-first styling.
-   - Includes Tailwind’s base, component, and utility classes.
-   - Ensures consistent design across all components.
-*/
-
-/* Import Tailwind's base styles (resets & default styles) */
 @tailwind base;
-
-/* Import Tailwind's component classes (predefined reusable styles) */
 @tailwind components;
-
-/* Import Tailwind's utility classes (custom styling options) */
 @tailwind utilities;

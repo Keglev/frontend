@@ -1,26 +1,39 @@
-// src/main.tsx
-
-/*
-   Entry Point of the Application
-   - Initializes the React app and attaches it to the DOM.
-   - Loads essential configurations, including internationalization and global styles.
-   - Uses React's StrictMode for enhanced debugging and best practices.
-*/
+/**
+ * @file main.tsx
+ * @description
+ * Application entry point that initializes and renders the React application.
+ *
+ * **Responsibilities:**
+ * - Bootstraps the React application using React 18's `createRoot`
+ * - Enables React StrictMode for development and debugging
+ * - Loads internationalization (i18n) configuration
+ * - Imports global styles and Tailwind CSS
+ * - Mounts the application to the DOM root element
+ *
+ * **Dependencies:**
+ * - React (StrictMode, createRoot)
+ * - App component (main application root)
+ * - i18n.ts (internationalization setup)
+ * - Tailwind CSS and global styles
+ *
+ * @module main
+ * @requires react
+ * @requires react-dom/client
+ */
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Import i18n configuration for multi-language support
 import './i18n';
-
-// Import global styles including Tailwind CSS
 import './index.css';
-
-// Import the main App component
 import App from './App.tsx';
 
-// Select the root element in the DOM and render the application
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element with id "root" not found in DOM');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <App />
   </StrictMode>,

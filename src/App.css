@@ -1,3 +1,28 @@
+/**
+ * @file App.css
+ * @description
+ * Application root component styles.
+ *
+ * **Styling Scope:**
+ * - Root container layout (max-width: 1280px, centered)
+ * - Logo animations and transitions
+ * - Responsive design adjustments
+ * - Card and utility classes
+ *
+ * **Classes:**
+ * - `.logo` - Logo element with hover and animation effects
+ * - `.logo.react` - React logo specific hover state
+ * - `.card` - Card component container
+ * - `.read-the-docs` - Documentation link styling
+ *
+ * **Animations:**
+ * - `logo-spin` - 360° rotation animation (20s infinite)
+ * - Respects `prefers-reduced-motion` for accessibility
+ *
+ * **Note:** Primary styling uses Tailwind CSS. This file contains only
+ * legacy or animation-specific styles that benefit from scoped CSS.
+ */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -11,9 +36,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
