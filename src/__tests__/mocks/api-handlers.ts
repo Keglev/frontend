@@ -12,6 +12,8 @@
  * npm install --save-dev msw
  */
 
+/// <reference types="node" />
+
 /**
  * Mock fetch patterns for API testing
  */
