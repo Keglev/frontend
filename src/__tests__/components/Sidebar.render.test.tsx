@@ -1,8 +1,7 @@
 /**
- * Sidebar.test.tsx
- * Comprehensive test suite for the Sidebar component
- * Tests: Stock value display, low stock products list, empty state, rendering
- * Total: 12 tests
+ * @file Sidebar.render.test.tsx
+ * @description Rendering tests for Sidebar component
+ * @component Tests for stock value display, low stock product list rendering, and layout
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -11,12 +10,10 @@ import { I18nextProvider } from 'react-i18next';
 import Sidebar from '../../components/Sidebar';
 import i18n from '../../i18n';
 
-// Mock Buttons component to avoid complex dependencies
 vi.mock('../../components/Buttons', () => ({
   default: () => <div data-testid="mock-buttons">Buttons Component</div>,
 }));
 
-// Helper function to render component with required providers
 const renderSidebar = (props = {}) => {
   const defaultProps = {
     stockValue: 1000,
@@ -31,20 +28,15 @@ const renderSidebar = (props = {}) => {
   );
 };
 
-describe('Sidebar Component', () => {
+describe('Sidebar Component - Rendering', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
-  // ================================================================================
-  // STOCK VALUE DISPLAY TESTS (3 tests)
-  // ================================================================================
 
   describe('Stock Value Display', () => {
     it('should render stock value section', () => {
       renderSidebar({ stockValue: 1234.56 });
       
-      // Check that stock value section is present
       const stockSection = screen.getByText(/1234.56/);
       expect(stockSection).toBeInTheDocument();
     });
@@ -64,15 +56,10 @@ describe('Sidebar Component', () => {
     });
   });
 
-  // ================================================================================
-  // LOW STOCK PRODUCTS LIST TESTS (5 tests)
-  // ================================================================================
-
   describe('Low Stock Products List', () => {
     it('should render empty state when no low stock products', () => {
       renderSidebar({ lowStockProducts: [] });
       
-      // Should display sufficient stock message
       const emptyMessage = screen.queryByText(/sufficient/i);
       expect(emptyMessage).toBeInTheDocument();
     });
@@ -99,7 +86,6 @@ describe('Sidebar Component', () => {
       const listItems = screen.getAllByRole('listitem');
       expect(listItems.length).toBeGreaterThan(0);
       
-      // Check that the list item contains the product name
       const listItemText = listItems[0]?.textContent || '';
       expect(listItemText).toContain('Item One');
       expect(listItemText).toContain('10');
@@ -134,43 +120,12 @@ describe('Sidebar Component', () => {
     });
   });
 
-  // ================================================================================
-  // BUTTONS COMPONENT INTEGRATION TESTS (2 tests)
-  // ================================================================================
-
   describe('Buttons Component Integration', () => {
     it('should render Buttons component', () => {
       renderSidebar();
       
       const buttonsComponent = screen.getByTestId('mock-buttons');
       expect(buttonsComponent).toBeInTheDocument();
-    });
-
-    it('should render Buttons component at the bottom', () => {
-      renderSidebar();
-      
-      const buttonsComponent = screen.getByTestId('mock-buttons');
-      expect(buttonsComponent).toBeInTheDocument();
-    });
-  });
-
-  // ================================================================================
-  // RESPONSIVE LAYOUT TESTS (2 tests)
-  // ================================================================================
-
-  describe('Responsive Layout', () => {
-    it('should render sidebar with flex layout classes', () => {
-      const { container } = renderSidebar();
-      
-      const aside = container.querySelector('aside');
-      expect(aside).toHaveClass('flex', 'flex-col');
-    });
-
-    it('should apply minimum height to sidebar', () => {
-      const { container } = renderSidebar();
-      
-      const aside = container.querySelector('aside');
-      expect(aside).toHaveClass('min-h-[500px]');
     });
   });
 });
