@@ -1,8 +1,15 @@
 /**
- * AddProductPage.test.tsx
- * Comprehensive test suite for the AddProductPage component
- * Tests: Form rendering, input handling, submission, validation
- * Total: 7 tests
+ * @file AddProductPage.test.tsx
+ * @description Tests for AddProductPage component including form rendering, validation, and submission
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Product form rendering with all input fields
+ * - Form input handling and state management
+ * - Form validation rules and error messages
+ * - Successful product submission
+ * - Navigation after successful submission
+ * - API error handling
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

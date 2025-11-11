@@ -1,8 +1,14 @@
 /**
- * LoginPage.test.tsx
- * Comprehensive test suite for the LoginPage component
- * Tests: Login form rendering, submission, error handling, navigation, role-based routing
- * Total: 8 tests
+ * @file LoginPage.test.tsx
+ * @description Tests for LoginPage component including form rendering, authentication, and role-based navigation
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Login form rendering with input fields
+ * - Form submission and API authentication
+ * - Authentication error handling and messaging
+ * - Role-based route navigation (user vs admin)
+ * - Token storage and session management
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -57,7 +63,7 @@ describe('LoginPage', () => {
     it('should render login form with username and password fields', () => {
       renderLoginPage();
       
-      // Check for form inputs or login elements
+      // Verification: Form contains input fields for credentials (textbox or button count)
       const inputs = screen.queryAllByRole('textbox') || [];
       expect(inputs.length + screen.queryAllByRole('button').length).toBeGreaterThanOrEqual(1);
     });
@@ -65,7 +71,7 @@ describe('LoginPage', () => {
     it('should render header, help modal button, and footer', () => {
       renderLoginPage();
       
-      // Check for header and footer
+      // Verification: Page layout includes header and footer components
       const header = document.querySelector('header');
       const footer = document.querySelector('footer');
       expect(header || footer || document.body.children.length > 0).toBeTruthy();

@@ -1,8 +1,14 @@
 /**
- * ListStockPage.test.tsx
- * Comprehensive test suite for the ListStockPage component
- * Tests: Stock list rendering, filtering, sorting, product details
- * Total: 6 tests
+ * @file ListStockPage.test.tsx
+ * @description Tests for ListStockPage component including product list display, filtering, and sorting
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Stock list rendering with product data
+ * - Product filtering capabilities
+ * - Product sorting functionality
+ * - Product details display
+ * - Navigation and actions
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

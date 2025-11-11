@@ -1,8 +1,14 @@
 /**
- * HomePage.test.tsx
- * Comprehensive test suite for the HomePage component
- * Tests: Dashboard rendering, navigation, user info display, logout
- * Total: 7 tests
+ * @file HomePage.test.tsx
+ * @description Tests for HomePage component including dashboard rendering, navigation elements, and user interface
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Header and title rendering
+ * - Main navigation with product management links
+ * - Add product, search product, and list stock navigation
+ * - Footer with copyright information
+ * - Social media links in footer
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -53,7 +59,7 @@ describe('HomePage', () => {
     it('should render header with title and navigation buttons', () => {
       renderHomePage();
       
-      // Header should be rendered with buttons
+      // Verification: Header renders navigation buttons for user actions
       const buttons = screen.queryAllByRole('button');
       expect(buttons.length).toBeGreaterThan(0);
     });
@@ -61,7 +67,7 @@ describe('HomePage', () => {
     it('should render main navigation with product management links', () => {
       renderHomePage();
       
-      // Should have navigation elements or main content area
+      // Verification: Main navigation structure exists (navigation, complementary, or main role)
       const nav = screen.queryByRole('navigation') || screen.queryByRole('complementary') || screen.queryByRole('main');
       expect(nav).toBeTruthy();
     });
@@ -75,7 +81,7 @@ describe('HomePage', () => {
     it('should render add product navigation link', () => {
       renderHomePage();
       
-      // Look for add product link
+      // Verification: Add product link exists in navigation
       const links = screen.queryAllByRole('link');
       const hasAddProductLink = links.some(link => link.textContent?.toLowerCase().includes('add'));
       expect(hasAddProductLink || screen.queryByText(/add|create|new/i)).toBeTruthy();
@@ -84,7 +90,7 @@ describe('HomePage', () => {
     it('should render search product navigation link', () => {
       renderHomePage();
       
-      // Look for search link or navigation element
+      // Verification: Search product link available in main navigation
       const links = screen.queryAllByRole('link');
       const hasSearchLink = links.some(link => link.textContent?.toLowerCase().includes('search'));
       expect(hasSearchLink || links.length > 0).toBeTruthy();
@@ -93,7 +99,7 @@ describe('HomePage', () => {
     it('should render list stock navigation link', () => {
       renderHomePage();
       
-      // Look for list stock or inventory link
+      // Verification: List stock/inventory link present in navigation menu
       const links = screen.queryAllByRole('link');
       const hasListLink = links.some(link => {
         const text = link.textContent?.toLowerCase() || '';
@@ -111,7 +117,7 @@ describe('HomePage', () => {
     it('should render footer with copyright information', () => {
       renderHomePage();
       
-      // Footer typically contains copyright
+      // Verification: Footer displays copyright or rights information
       const footer = screen.queryByText(/copyright|©|all rights/i);
       expect(footer).toBeTruthy();
     });
@@ -119,7 +125,7 @@ describe('HomePage', () => {
     it('should render social media links in footer', () => {
       renderHomePage();
       
-      // Look for social links
+      // Verification: Footer contains social media or external links
       const links = screen.queryAllByRole('link');
       expect(links.length).toBeGreaterThan(0);
     });

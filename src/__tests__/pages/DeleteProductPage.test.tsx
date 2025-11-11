@@ -1,8 +1,14 @@
 /**
- * DeleteProductPage.test.tsx
- * Comprehensive test suite for the DeleteProductPage component
- * Tests: Product selection, deletion confirmation, error handling
- * Total: 6 tests
+ * @file DeleteProductPage.test.tsx
+ * @description Tests for DeleteProductPage component including product selection and deletion workflow
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Product selection interface
+ * - Deletion confirmation dialog
+ * - Deletion confirmation actions
+ * - API error handling
+ * - Navigation after successful deletion
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

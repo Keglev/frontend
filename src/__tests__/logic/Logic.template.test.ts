@@ -1,6 +1,14 @@
 /**
- * Service/Logic Test Template
- * Example test structure for business logic and utility functions
+ * @file Logic.template.test.ts
+ * @description Template for service/logic test structures covering data transformation and validation
+ * @domain business-logic
+ * 
+ * Enterprise-grade test pattern:
+ * - Data transformation and normalization
+ * - Validation rules and constraints
+ * - Error handling and recovery
+ * - Edge case management
+ * - Performance characteristics
  */
 
 /**

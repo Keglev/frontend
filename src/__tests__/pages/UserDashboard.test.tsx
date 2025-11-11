@@ -1,8 +1,14 @@
 /**
- * UserDashboard.test.tsx
- * Comprehensive test suite for the UserDashboard component
- * Tests: User dashboard rendering, low stock alerts, product management links
- * Total: 6 tests
+ * @file UserDashboard.test.tsx
+ * @description Tests for UserDashboard component including dashboard display, low stock alerts, and product management
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - User dashboard rendering and layout
+ * - Low stock alerts and notifications
+ * - Product management action links
+ * - User-specific features and permissions
+ * - Navigation and page interactions
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

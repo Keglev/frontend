@@ -1,8 +1,15 @@
 /**
- * ChangeProductDetailsPage.test.tsx
- * Comprehensive test suite for the ChangeProductDetailsPage component
- * Tests: Product selection, edit form rendering, update handling, validation
- * Total: 7 tests
+ * @file ChangeProductDetailsPage.test.tsx
+ * @description Tests for ChangeProductDetailsPage component including product selection and edit form
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Product selection and loading
+ * - Edit form rendering with product details
+ * - Form input handling and validation
+ * - Product update submission
+ * - Successful update navigation
+ * - API error handling
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

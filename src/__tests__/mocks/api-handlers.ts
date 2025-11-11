@@ -1,7 +1,14 @@
 /**
- * API Mock Handlers
- * Handlers for mocking API responses during tests
- * Note: Install msw (Mock Service Worker) to use advanced patterns:
+ * @file api-handlers.ts
+ * @description Mock handlers for API testing including fetch patterns and storage objects
+ * @domain test-utilities
+ * 
+ * Enterprise-grade mock utilities:
+ * - Mock fetch handlers for successful/failed product operations
+ * - Network error simulation
+ * - localStorage and sessionStorage mocks
+ * 
+ * Note: Install msw (Mock Service Worker) for advanced patterns:
  * npm install --save-dev msw
  */
 
@@ -11,6 +18,8 @@
 export const mockFetchHandlers = {
   /**
    * Mock successful product list fetch
+   * 
+   * Verification: Returns 200 status with JSON response
    */
   getProductsSuccess: (data: unknown) => {
     global.fetch = (() =>
@@ -24,6 +33,8 @@ export const mockFetchHandlers = {
 
   /**
    * Mock failed product list fetch
+   * 
+   * Verification: Returns error status with error message
    */
   getProductsError: (status: number = 500, message: string = 'Server error') => {
     global.fetch = (() =>
@@ -37,6 +48,8 @@ export const mockFetchHandlers = {
 
   /**
    * Mock network error
+   * 
+   * Verification: Rejects promise with network error
    */
   networkError: () => {
     global.fetch = (() => Promise.reject(new Error('Network error'))) as typeof fetch;
@@ -49,6 +62,8 @@ export const mockFetchHandlers = {
 export const mockStorageHandlers = {
   /**
    * Mock localStorage
+   * 
+   * Verification: Provides in-memory storage interface compatible with browser API
    */
   localStorage: {
     getItem: () => null,
@@ -61,6 +76,8 @@ export const mockStorageHandlers = {
 
   /**
    * Mock sessionStorage
+   * 
+   * Verification: Provides in-memory session storage interface compatible with browser API
    */
   sessionStorage: {
     getItem: () => null,

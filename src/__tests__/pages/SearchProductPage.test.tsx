@@ -1,8 +1,14 @@
 /**
- * SearchProductPage.test.tsx
- * Comprehensive test suite for the SearchProductPage component
- * Tests: Search form rendering, input handling, search results, filtering
- * Total: 6 tests
+ * @file SearchProductPage.test.tsx
+ * @description Tests for SearchProductPage component including search functionality and result filtering
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Search form rendering with input fields
+ * - Search input handling and submission
+ * - Search results display
+ * - Result filtering and refinement
+ * - Search error handling
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

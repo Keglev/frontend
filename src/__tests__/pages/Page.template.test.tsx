@@ -1,6 +1,14 @@
 /**
- * Page Component Test Template
- * Example test structure for page components
+ * @file Page.template.test.tsx
+ * @description Template for page component test structures with routing and state management
+ * @domain page-integration
+ * 
+ * Enterprise-grade test pattern:
+ * - Page initialization and data loading
+ * - Loading state and skeleton display
+ * - Navigation and routing
+ * - Form submission and validation
+ * - Error handling and user feedback
  */
 
 /**

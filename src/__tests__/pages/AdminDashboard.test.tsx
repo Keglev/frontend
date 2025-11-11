@@ -1,8 +1,14 @@
 /**
- * AdminDashboard.test.tsx
- * Comprehensive test suite for the AdminDashboard component
- * Tests: Dashboard rendering, data display, admin-specific features, navigation
- * Total: 6 tests
+ * @file AdminDashboard.test.tsx
+ * @description Tests for AdminDashboard component including admin features, statistics, and management tools
+ * @domain page-integration
+ * 
+ * Enterprise-grade test coverage:
+ * - Admin dashboard rendering and layout
+ * - Admin-specific features and statistics
+ * - User management navigation links
+ * - Footer with copyright information
+ * - Role-based access and permissions
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

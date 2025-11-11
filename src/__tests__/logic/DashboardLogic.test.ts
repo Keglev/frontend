@@ -1,8 +1,14 @@
 /**
- * DashboardLogic.test.ts
- * Comprehensive test suite for the DashboardLogic utility
- * Tests: Data fetching, API calls, error handling, data transformation, caching, parallel requests
- * Total: 7 tests
+ * @file DashboardLogic.test.ts
+ * @description Tests for DashboardLogic utility covering data aggregation, parallel API requests, and error handling
+ * @domain business-logic
+ * 
+ * Enterprise-grade test coverage:
+ * - Parallel data fetching (stock value + low stock alerts)
+ * - Error propagation and recovery
+ * - Data transformation and normalization
+ * - Edge case handling (empty arrays, undefined values, null responses)
+ * - API response validation
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -51,6 +57,7 @@ describe('DashboardLogic', () => {
 
       const result = await DashboardLogic.fetchDashboardData();
 
+      // Verification: Both API endpoints return aggregated dashboard data
       expect(result.stockValue).toBe(mockStockValue);
       expect(result.lowStock).toEqual(mockLowStock);
     });
@@ -72,6 +79,7 @@ describe('DashboardLogic', () => {
 
       const result = await DashboardLogic.fetchDashboardData();
 
+      // Verification: Empty low stock array handled gracefully
       expect(result.stockValue).toBe(mockStockValue);
       expect(result.lowStock).toEqual([]);
     });
@@ -94,6 +102,7 @@ describe('DashboardLogic', () => {
 
       vi.spyOn(apiClient, 'get').mockImplementation(getImplementation);
 
+      // Verification: API error propagates to caller when stock value fetch fails
       await expect(DashboardLogic.fetchDashboardData()).rejects.toThrow('API Error');
     });
 
@@ -112,6 +121,7 @@ describe('DashboardLogic', () => {
 
       vi.spyOn(apiClient, 'get').mockImplementation(getImplementation);
 
+      // Verification: API error propagates even when first API succeeds
       await expect(DashboardLogic.fetchDashboardData()).rejects.toThrow('API Error');
     });
   });
@@ -136,6 +146,7 @@ describe('DashboardLogic', () => {
 
       const result = await DashboardLogic.fetchDashboardData();
 
+      // Edge case: Missing data field defaults to 0
       expect(result.stockValue).toBe(0);
     });
 
@@ -154,6 +165,7 @@ describe('DashboardLogic', () => {
 
       const result = await DashboardLogic.fetchDashboardData();
 
+      // Edge case: null response normalized to empty array
       expect(result.lowStock).toEqual([]);
       expect(Array.isArray(result.lowStock)).toBe(true);
     });
@@ -182,7 +194,7 @@ describe('DashboardLogic', () => {
 
       await DashboardLogic.fetchDashboardData();
 
-      // Verify both API calls were made
+      // Verification: Both API endpoints called exactly once using Promise.all for parallelism
       expect(apiClient.get).toHaveBeenCalledWith('/api/products/total-stock-value');
       expect(apiClient.get).toHaveBeenCalledWith('/api/products/low-stock');
       expect(apiClient.get).toHaveBeenCalledTimes(2);
