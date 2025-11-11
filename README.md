@@ -121,6 +121,8 @@ Planned topics include component structure, routing flow, state management, and 
 
 Future updates will include diagrams showing data flow between the frontend and backend APIs.
 
+- **Backend Architecture & API Docs:** [View Backend Docs](https://keglev.github.io/stockease/)
+
 <a id="testing-code-quality"></a>
 
 ## 🧪 Testing & Code Quality
