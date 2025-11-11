@@ -1,11 +1,29 @@
-/**
- * Test Setup File
- * Initializes test environment with testing libraries and global configurations
- */
-
 import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+
+/**
+ * Mock localStorage with real storage behavior
+ */
+const localStorageStore: Record<string, string> = {};
+
+const localStorageMock = {
+  getItem: (key: string) => {
+    return key in localStorageStore ? localStorageStore[key] : null;
+  },
+  setItem: (key: string, value: string) => {
+    localStorageStore[key] = String(value);
+  },
+  removeItem: (key: string) => {
+    delete localStorageStore[key];
+  },
+  clear: () => {
+    Object.keys(localStorageStore).forEach(key => {
+      delete localStorageStore[key];
+    });
+  },
+};
+global.localStorage = localStorageMock as unknown as Storage;
 
 /**
  * Cleanup after each test
@@ -14,6 +32,7 @@ import { cleanup } from '@testing-library/react';
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  localStorageMock.clear(); // Clear localStorage between tests
 });
 
 /**
@@ -55,17 +74,6 @@ global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
 } as unknown as typeof ResizeObserver;
-
-/**
- * Mock localStorage
- */
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-global.localStorage = localStorageMock as unknown as Storage;
 
 /**
  * Suppress console errors in test output (optional)
