@@ -1,3 +1,25 @@
+/**
+ * @file DeleteProductPage.tsx
+ * @description
+ * Product deletion interface with two-step confirmation.
+ *
+ * **Features:**
+ * - Search products by name (3+ characters)
+ * - Click to select from search results
+ * - Two-step confirmation process
+ * - Real-time search suggestions
+ * - Success/error messaging
+ * - Help modal support
+ *
+ * **Deletion Workflow:**
+ * 1. Search and select product
+ * 2. First confirmation (are you sure?)
+ * 3. Second confirmation (final check)
+ * 4. Delete product from API
+ *
+ * @component
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductService from '../api/ProductService';
@@ -7,13 +29,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 /**
- * DeleteProductPage Component
- * Allows administrators to search for and delete products from the inventory.
- * 
- * Features:
- * - Search functionality with real-time product suggestions.
- * - Two-step confirmation process before deleting a product.
- * - Role-based navigation and language support.
+ * Delete product page component
+ * @component
+ * @returns {JSX.Element} Product deletion interface
  */
 const DeleteProductPage: React.FC = () => {
   const { t, i18n } = useTranslation(['translation', 'help']);
@@ -25,9 +43,7 @@ const DeleteProductPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  /**
-   * Updates the state when the user changes the application language.
-   */
+  // Re-render help button on language changes
   useEffect(() => {
     const handleLanguageChange = () => {
       setIsHelpOpen((prev) => prev);
@@ -40,8 +56,7 @@ const DeleteProductPage: React.FC = () => {
   }, [i18n]);
 
   /**
-   * Handles searching for products by name.
-   * Only triggers search if at least three characters are entered.
+   * Search products by name (minimum 3 characters)
    */
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -70,8 +85,7 @@ const DeleteProductPage: React.FC = () => {
   };
 
   /**
-   * Sets the selected product when the user clicks on a product from the search results.
-   * Opens the first confirmation step before deletion.
+   * Select product and open first confirmation dialog
    */
   const handleProductClick = (product: { id: number; name: string }) => {
     setSelectedProduct(product);
@@ -80,8 +94,8 @@ const DeleteProductPage: React.FC = () => {
   };
 
   /**
-   * Deletes the selected product after confirmation.
-   * Removes the product from the list and updates the UI accordingly.
+   * Delete product after two-step confirmation
+   * Remove from products list on success
    */
   const handleDelete = async () => {
     if (!selectedProduct) return;
@@ -99,7 +113,7 @@ const DeleteProductPage: React.FC = () => {
   };
 
   /**
-   * Cancels the deletion process and resets the confirmation state.
+   * Cancel deletion and reset confirmation state
    */
   const cancelOperation = () => {
     setConfirmation(null);
@@ -156,7 +170,6 @@ const DeleteProductPage: React.FC = () => {
           ))}
         </ul>
 
-        {/* First confirmation step before deletion */}
         {confirmation === 'first' && selectedProduct && (
           <div className="mt-6 p-4 bg-gray-100 border rounded shadow-md">
             <p>{t('deleteProduct.confirmation.first')}</p>
@@ -177,7 +190,6 @@ const DeleteProductPage: React.FC = () => {
           </div>
         )}
 
-        {/* Second confirmation step before final deletion */}
         {confirmation === 'second' && (
           <div className="mt-6 p-4 bg-gray-100 border rounded shadow-md">
             <p>{t('deleteProduct.confirmation.second')}</p>
@@ -199,7 +211,6 @@ const DeleteProductPage: React.FC = () => {
         )}
       </main>
 
-      {/* Footer component for consistency */}
       <Footer />
     </div>
   );
