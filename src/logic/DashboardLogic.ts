@@ -1,30 +1,45 @@
-import apiClient from '../services/apiClient'; 
+/**
+ * @file DashboardLogic.ts
+ * @description
+ * Business logic for dashboard data retrieval and aggregation.
+ *
+ * **Features:**
+ * - Parallel fetching of stock value and low-stock products
+ * - Type-safe data response with fallback defaults
+ * - Centralized error handling
+ *
+ * **API Endpoints:**
+ * - GET /api/products/total-stock-value - Total inventory value
+ * - GET /api/products/low-stock - Products with low quantities
+ *
+ * @module
+ */
+
+import apiClient from '../services/apiClient';
 import { Product } from '../types/Product';
 
 /**
- * DashboardLogic handles data fetching for the dashboard.
- * It retrieves the total stock value and a list of low-stock products.
+ * Dashboard data retrieval service
+ * Fetches aggregated inventory metrics for dashboard display
  */
 const DashboardLogic = {
   /**
-   * Fetches dashboard data including total stock value and low-stock products.
-   * @returns {Promise<{ stockValue: number; lowStock: Product[] }>} 
-   *          A promise resolving to an object containing stock value and low-stock products.
-   * @throws Will throw an error if fetching data fails.
+   * Fetch total stock value and low-stock products in parallel
+   * @returns {Promise<{stockValue: number, lowStock: Product[]}>} Stock metrics
+   * @throws Will propagate API errors to caller
    */
   async fetchDashboardData(): Promise<{
     stockValue: number;
     lowStock: Product[];
   }> {
     try {
-      // Use `Promise.all` to fetch stock value and low-stock products in parallel
+      // Fetch both metrics in parallel for performance
       const [stockValueResponse, lowStockResponse] = await Promise.all([
         apiClient.get('/api/products/total-stock-value'),
         apiClient.get('/api/products/low-stock'),
       ]);
 
-      // Extract response data
-      const stockValueData = stockValueResponse.data?.data || 0; // Default to 0 if undefined
+      const stockValueData = stockValueResponse.data?.data || 0;
       const lowStockData = Array.isArray(lowStockResponse.data) ? lowStockResponse.data as Product[] : [];
 
       return {
@@ -33,12 +48,9 @@ const DashboardLogic = {
       };
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      throw error; // Propagate the error for handling at the caller level
+      throw error;
     }
   },
 };
 
 export default DashboardLogic;
-
-
-  
