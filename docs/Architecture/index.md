@@ -5,10 +5,10 @@ This page provides a high-level overview and links to detailed architecture topi
 
 ## Architecture Areas
 
-- [Frontend Architecture](./architecture/index.md)
-  - [Overview](./architecture/overview.md)
-  - [Pipeline](./architecture/pipeline.md)
-  - [Patterns](./architecture/patterns/overview.md)
+- [Frontend Architecture](./index.md)
+  - [Overview](./overview.md)
+  - [Übersicht Architektur Deutsch](overview.de.md)
+  - [Pipeline](./pipeline/overview.md)
 - [API Layer](./api/overview.md)
 - [Components](./components/overview.md)
 - [Docker Setup](./docker_structure/overview.md)
