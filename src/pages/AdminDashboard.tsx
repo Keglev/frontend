@@ -1,3 +1,24 @@
+/**
+ * @file AdminDashboard.tsx
+ * @description
+ * Administrative dashboard for inventory management and analytics.
+ *
+ * **Features:**
+ * - Total stock value display
+ * - Low-stock products monitoring
+ * - Bar chart visualization of low-stock products
+ * - Inventory action sidebar
+ * - Multi-language support
+ * - Help modal with guidance
+ *
+ * **Data Displayed:**
+ * - Total stock value (sum of all products)
+ * - Low-stock products list (quantity-based alerts)
+ * - Chart showing value distribution of low-stock items
+ *
+ * @component
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLogic from '../logic/DashboardLogic';
@@ -9,28 +30,15 @@ import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 /**
- * AdminDashboard Component
- *
- * This component provides an administrative dashboard for managing stock inventory.
- * It displays total stock value, low-stock products, and a bar chart showing the
- * contribution of low-stock products to the total stock value.
- * It includes a sidebar for inventory actions and a help modal for guidance.
+ * Admin dashboard component
+ * @component
+ * @returns {JSX.Element} Dashboard with inventory analytics and controls
  */
-
 const AdminDashboard: React.FC = () => {
-  // Initialize translation hook for multi-language support
   const { t, i18n } = useTranslation(['translation', 'help']);
-  
-  // State to store total stock value
   const [stockValue, setStockValue] = useState<number>(0);
-  
-  // State to store list of low stock products with name, quantity, and price
   const [lowStockProducts, setLowStockProducts] = useState<{ id: number; name: string; quantity: number; price: number }[]>([]);
-  
-  // Navigation hook for redirecting users
   const navigate = useNavigate();
-  
-  // State to control the visibility of the help modal
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Effect to ensure the selected language persists across sessions
