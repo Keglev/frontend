@@ -1,34 +1,24 @@
-// src/types/Product.ts
+/**
+ * @file Product.ts
+ * @description
+ * Product entity interface and type definitions.
+ *
+ * @module
+ */
 
 /**
- * Interface representing a Product entity.
- * This defines the structure of a product object used across the application.
+ * Product inventory item
+ * @interface Product
+ * @property {number} id - Unique product identifier
+ * @property {string} name - Product name
+ * @property {number} quantity - Available stock quantity
+ * @property {number} price - Unit price
+ * @property {number} totalValue - Total stock value (quantity × price)
  */
 export interface Product {
-  /**
-   * Unique identifier for the product.
-   */
   id: number;
-
-  /**
-   * Name of the product.
-   */
   name: string;
-
-  /**
-   * Available quantity of the product in stock.
-   */
   quantity: number;
-
-  /**
-   * Price per unit of the product.
-   */
   price: number;
-
-  /**
-   * Total value of the product stock (calculated as quantity * price).
-   */
   totalValue: number;
 }
-
-  
