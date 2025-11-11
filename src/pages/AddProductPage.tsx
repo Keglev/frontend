@@ -1,35 +1,51 @@
+/**
+ * @file AddProductPage.tsx
+ * @description
+ * Admin interface for adding new products to the inventory.
+ *
+ * **Features:**
+ * - Input fields for product name, quantity, and price
+ * - Two-step confirmation (preview + confirmation)
+ * - API integration for product creation
+ * - Success/error messaging
+ * - Help modal with guidance
+ *
+ * **Workflow:**
+ * 1. Fill in product name, quantity, and price
+ * 2. Click "Add" to confirm details
+ * 3. Submit confirmation dialog
+ * 4. API saves product or shows error
+ *
+ * @component
+ */
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/addProduct.css';
 import ProductService from '../api/ProductService';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import HelpModal from '../components/HelpModal';
 import Footer from '../components/Footer';
+import '../styles/addProduct.css';
 import '../styles/tailwindCustom.css';
 
 /**
- * AddProductPage Component
- * Allows an admin user to add a new product by providing product details.
- * 
- * Features:
- * - Takes user input for name, quantity, and price.
- * - Provides a confirmation step before submission.
- * - Displays success or error messages based on API response.
- * - Includes a help modal for guidance.
+ * Add product page component
+ * @component
+ * @returns {JSX.Element} Product creation form
  */
 const AddProductPage: React.FC = () => {
-  const { t, i18n } = useTranslation(['translation', 'help']); // Load translations
+  const { t, i18n } = useTranslation(['translation', 'help']);
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [confirmation, setConfirmation] = useState(false);
   const [message, setMessage] = useState('');
-  const navigate = useNavigate();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const navigate = useNavigate();
 
   /**
-   * Resets all input fields after submission or cancellation.
+   * Reset form fields to initial state
    */
   const resetFields = () => {
     setName('');
@@ -38,29 +54,28 @@ const AddProductPage: React.FC = () => {
   };
 
   /**
-   * Handles adding a new product.
-   * Calls the ProductService API to create a new product.
-   * Displays success or error messages accordingly.
+   * Submit new product to API with type conversion
+   * Convert string inputs to appropriate numeric types
    */
   const handleAddProduct = async () => {
     setMessage('');
     try {
       await ProductService.addProduct({
         name,
-        quantity: parseInt(quantity, 10), // Convert input to an integer
-        price: parseFloat(price), // Convert input to a float
+        quantity: parseInt(quantity, 10),
+        price: parseFloat(price),
       });
-      setMessage(t('addProduct.successMessage')); // Display success message
+      setMessage(t('addProduct.successMessage'));
       resetFields();
     } catch (error) {
-      setMessage(t('addProduct.errorMessage')); // Display error message
+      setMessage(t('addProduct.errorMessage'));
       console.error(t('addProduct.errorLog'), error);
     }
     setConfirmation(false);
   };
 
   /**
-   * Cancels the current operation, resets fields, and provides feedback.
+   * Cancel operation and reset form state
    */
   const handleCancel = () => {
     resetFields();
@@ -70,10 +85,8 @@ const AddProductPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Header with Logout Functionality */}
       <Header isLoggedIn={true} onLogout={() => navigate('/login')} />
 
-      {/* Help Button (Accessible for Guidance) */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={() => setIsHelpOpen(true)}
@@ -84,15 +97,12 @@ const AddProductPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Help Modal for User Assistance */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} pageKey="addProduct" />
 
-      {/* Main Content */}
       <main className="flex flex-col items-center justify-center flex-grow">
         <div className="w-96 box-shadow mt-6">
           <h2 className="text-lg font-semibold mb-4">{t('addProduct.detailsTitle')}</h2>
 
-          {/* Product Name Input */}
           <div className="mb-4">
             <label htmlFor="name" className="block font-medium mb-2">
               {t('addProduct.nameLabel')}
@@ -106,7 +116,6 @@ const AddProductPage: React.FC = () => {
             />
           </div>
 
-          {/* Quantity Input */}
           <div className="mb-4">
             <label htmlFor="quantity" className="block font-medium mb-2">
               {t('addProduct.quantityLabel')}
@@ -120,7 +129,6 @@ const AddProductPage: React.FC = () => {
             />
           </div>
 
-          {/* Price Input */}
           <div className="mb-4">
             <label htmlFor="price" className="block font-medium mb-2">
               {t('addProduct.priceLabel')}
@@ -134,12 +142,8 @@ const AddProductPage: React.FC = () => {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-between mt-6">
-            <button
-              className="button-confirmation-no"
-              onClick={handleCancel}
-            >
+            <button className="button-confirmation-no" onClick={handleCancel}>
               {t('addProduct.cancelButton')}
             </button>
             <button
@@ -150,7 +154,6 @@ const AddProductPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Confirmation Popup */}
           {confirmation && (
             <div className="confirmation-box mt-4">
               <p>{t('addProduct.confirmationMessage')}</p>
@@ -161,24 +164,19 @@ const AddProductPage: React.FC = () => {
                 >
                   {t('addProduct.confirmYes')}
                 </button>
-                <button
-                  className="button-confirmation-no"
-                  onClick={handleCancel}
-                >
+                <button className="button-confirmation-no" onClick={handleCancel}>
                   {t('addProduct.confirmNo')}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Feedback Message Display */}
           {message && (
             <p className="mt-4 text-center text-blue-500 font-semibold">{message}</p>
           )}
         </div>
       </main>
 
-      {/* Footer for Consistency */}
       <Footer />
     </div>
   );
