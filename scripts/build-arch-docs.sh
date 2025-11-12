@@ -23,6 +23,7 @@ if [ -f "docs/index.md" ]; then
     --standalone \
     --from gfm \
     --to html \
+    --css=templates/frontend-docs.css \
     --output public-docs/index.html
 else
   echo "⚠️  docs/index.md not found — skipping landing page generation"
@@ -37,7 +38,8 @@ for md in "$ARCH_MD_DIR"/*.md; do
     --metadata title="$base" \
     --standalone \
     --from gfm \
-    --template="$TEMPLATE" \
+    --to html \
+    --css=../templates/frontend-docs.css \
     --toc \
     --output "$ARCH_OUT_DIR/$base.html"
 done
@@ -50,11 +52,16 @@ find "$ARCH_MD_DIR" -mindepth 1 -type d | while read -r dir; do
   mkdir -p "$OUT"
   find "$dir" -maxdepth 1 -name '*.md' -type f | while read -r f; do
     base="$(basename "$f" .md)"
+    # Calculate CSS path based on depth
+    depth=$(echo "$REL" | tr -cd '/' | wc -c)
+    css_path=$(printf '../%.0s' $(seq 1 $((depth + 1))))
+    css_path="${css_path}templates/frontend-docs.css"
     pandoc "$f" \
       --metadata title="$base" \
       --standalone \
       --from gfm \
-      --template="$TEMPLATE" \
+      --to html \
+      --css="$css_path" \
       --toc \
       --output "$OUT/$base.html"
   done
