@@ -36,13 +36,25 @@
   </footer>
 
   <script>
-    // Determine how far we are from the site root (/frontend/)
+    // Return a relative path from the current doc to the site root (/frontend/)
     function getRootFrom(pathname) {
-      const seg = pathname.split('/').filter(Boolean);
-      const arch = seg.indexOf('architecture');
-      if (arch === -1) return './';            // root pages like /frontend/index.html
-      const depth = seg.length - arch - 2;     // after 'architecture' + filename
-      return depth <= 0 ? './' : '../'.repeat(depth);
+      const parts = pathname.split('/').filter(Boolean);
+      // Find the repo pages root marker ("frontend") and the "architecture" folder
+      const idxFrontend = parts.indexOf('frontend');       // e.g. ['keglev','github','io','frontend',...]
+      const idxArch = parts.indexOf('architecture');
+
+      // If we're at /frontend or /frontend/index.html
+      if (idxArch === -1) {
+        // path after /frontend
+        const afterFrontend = parts.slice(idxFrontend + 1);
+        // If we're exactly at /frontend/index.html (one segment after), go root './'
+        return afterFrontend.length <= 1 ? './' : '../'.repeat(afterFrontend.length - 1);
+      }
+
+      // We are under architecture/**
+      const afterArch = parts.slice(idxArch + 1); // e.g. ['src','components','overview.html']
+      const depth = Math.max(0, afterArch.length - 1); // exclude filename
+      return depth === 0 ? './' : '../'.repeat(depth);
     }
 
     (function initPaths(){
@@ -75,8 +87,8 @@
         { label: 'Testing', href: 'src/tests/overview.html' },
       ],
       'Generated': [
-        { label: 'TypeDoc (TS API)', href: '../typedoc/index.html', goUp: true },
-        { label: 'Coverage (Vitest)', href: '../coverage/index.html', goUp: true },
+        { label: 'TypeDoc (TS API)', href: '../frontend/typedoc/index.html', goUp: true },
+        { label: 'Coverage (Vitest)', href: '../frontend/coverage/index.html', goUp: true },
       ],
       'Backend (external)': [
         { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
