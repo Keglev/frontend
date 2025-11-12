@@ -22,8 +22,7 @@ if [ -f "docs/index.md" ]; then
     --metadata title="StockEase Frontend" \
     --standalone \
     --from gfm \
-    --template="$TEMPLATE" \
-    --toc \
+    --to html \
     --output public-docs/index.html
 else
   echo "⚠️  docs/index.md not found — skipping landing page generation"
