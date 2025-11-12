@@ -15,6 +15,14 @@ mkdir -p "$ARCH_OUT_DIR"
 mkdir -p "public-docs/templates"
 cp docs/templates/frontend-docs.css public-docs/templates/
 
+# Copy the HTML landing page to the site root
+if [ -f "docs/templates/frontend-landing.html" ]; then
+  echo "Copying frontend landing page → public-docs/index.html"
+  cp docs/templates/frontend-landing.html public-docs/index.html
+else
+  echo "⚠️  frontend-landing.html not found — falling back to Markdown index if available"
+fi
+
 # --- Landing Page Conversion ---
 if [ -f "docs/index.md" ]; then
   echo "Converting docs/index.md → public-docs/index.html"
@@ -23,6 +31,7 @@ if [ -f "docs/index.md" ]; then
     --standalone \
     --from gfm \
     --to html \
+    --template "$TEMPLATE" \
     --css=/frontend/templates/frontend-docs.css \
     --output public-docs/index.html
 else
@@ -39,6 +48,7 @@ for md in "$ARCH_MD_DIR"/*.md; do
     --standalone \
     --from gfm \
     --to html \
+    --template "$TEMPLATE" \
     --css=/frontend/templates/frontend-docs.css \
     --toc \
     --output "$ARCH_OUT_DIR/$base.html"
@@ -57,6 +67,7 @@ find "$ARCH_MD_DIR" -mindepth 1 -type d | while read -r dir; do
       --standalone \
       --from gfm \
       --to html \
+      --template "$TEMPLATE" \
       --css=/frontend/templates/frontend-docs.css \
       --toc \
       --output "$OUT/$base.html"
