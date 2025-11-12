@@ -119,7 +119,7 @@
           a.textContent = link.label;
 
           const current = window.location.pathname;
-          const linkPath = a.pathname.replace(/\.html$/, '');
+          const linkPath = a.pathname.replace(/\.html$$/, '');
           if (current.endsWith(a.pathname) || current.includes(linkPath)) {
             a.className = 'active';
           }
