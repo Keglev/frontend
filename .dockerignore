@@ -1,4 +1,13 @@
-# Exclude test files
+# ============================================================================
+# Docker Build Context Exclusion Rules
+# ============================================================================
+# Files and directories listed here are excluded from the Docker build context
+# Reduces build context size and speeds up Docker operations
+# See: https://docs.docker.com/engine/reference/builder/#dockerignore-file
+
+# ============================================================================
+# Test Files (not needed in production)
+# ============================================================================
 **/__tests__
 **/*.test.ts
 **/*.test.tsx
@@ -7,7 +16,9 @@
 **/vitest.config.ts
 **/jest.config.js
 
-# Exclude documentation
+# ============================================================================
+# Documentation (not needed in production)
+# ============================================================================
 docs/
 *.md
 README.md
@@ -15,7 +26,9 @@ TESTING_ANALYSIS.md
 ANALYSIS_SUMMARY.md
 PHASE_1_COMPLETION_REPORT.md
 
-# Exclude development files
+# ============================================================================
+# Development & Git Files
+# ============================================================================
 .git
 .gitignore
 .github/
@@ -23,24 +36,43 @@ PHASE_1_COMPLETION_REPORT.md
 .env
 .env.local
 .env.*.local
+.env.example
+
+# ============================================================================
+# Logs and Temporary Files
+# ============================================================================
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Exclude package manager files
+# ============================================================================
+# Package Manager Cache & Lock Files
+# ============================================================================
+# Note: package-lock.json is NOT excluded as it's needed for npm ci
 .npmrc
-package-lock.json (unless needed)
+node_modules/
 
-# Exclude build artifacts
+# ============================================================================
+# Build Artifacts (not needed as Docker performs its own build)
+# ============================================================================
 dist/
 build/
-node_modules/
 .next/
 
-# Exclude editor files
+# ============================================================================
+# Editor & System Files
+# ============================================================================
 .DS_Store
 Thumbs.db
 *.swp
 *.swo
 *~
+.vscode/
+.idea/
+*.iml
 
-# Exclude GitHub Actions
+# ============================================================================
+# CI/CD Workflow Files (not needed in production image)
+# ============================================================================
 .github/workflows/

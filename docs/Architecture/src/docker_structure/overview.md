@@ -153,7 +153,8 @@ graph TD
 - ⚙️ [Build Configuration](./configuration.md) - Build args, dockerignore, SPA routing
 - 🔧 [Running Locally](./local-usage.md) - Docker commands and docker-compose
 - 🛡️ [Security & Performance](./security-performance.md) - Optimization and best practices
-- 🐛 [Troubleshooting](./troubleshooting.md) - Common issues and solutions
+- � [CI/CD Pipeline](./ci-cd.md) - GitHub Actions workflow and automation
+- �🐛 [Troubleshooting](./troubleshooting.md) - Common issues and solutions
 
 ---
 

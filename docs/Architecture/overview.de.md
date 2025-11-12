@@ -389,6 +389,7 @@ Stage 2: Produktion
 - [Test-Strategie](./src/tests.md)
 - [CI/CD Pipeline](./pipeline.md)
 - [Deployment & Infrastructure](./src/dockerfile.md)
+- **Dokumentations-Pipeline** → [Wie Dokumentation generiert und veröffentlicht wird](./docs-pipeline/overview.md)
 - **Backend Architektur & API Docs** → [StockEase Backend Dokumentation](https://keglev.github.io/stockease/)
 
 ---

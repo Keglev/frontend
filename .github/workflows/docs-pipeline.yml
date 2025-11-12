@@ -1,0 +1,59 @@
+name: Build & Publish Docs to gh-pages
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'typedoc.json'
+      - 'vitest.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/docs-pipeline.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Make scripts executable
+        run: chmod +x scripts/build-arch-docs.sh
+
+      - name: Build all docs (arch html + typedoc + coverage + landing)
+        run: npm run docs:all
+
+      # Optional: add a 404.html for GitHub Pages SPA-friendly behavior
+      - name: Add 404.html that points to index
+        run: cp public-docs/index.html public-docs/404.html
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: public-docs
+          force_orphan: true
+          # If your project is published under a subpath like /stockease-frontend/,
+          # you don't need extra config here; just make sure your links are relative.

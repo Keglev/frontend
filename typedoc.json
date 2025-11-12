@@ -1,0 +1,19 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts", "src/**/*.ts", "src/**/*.tsx"],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+  "tsconfig": "tsconfig.json",
+  "out": "public-docs/typedoc",
+  "name": "StockEase Frontend API",
+  "hideGenerator": true,
+  "readme": "none",
+  "excludeInternal": true,
+  "categorizeByGroup": true,
+  "githubPages": false
+}

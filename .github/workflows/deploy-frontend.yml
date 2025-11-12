@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ master, main ]
 
+# ============================================================================
+# Permissions for GitHub Actions
+# ============================================================================
+# Minimal permissions following the principle of least privilege
 permissions:
   contents: read
   checks: write
@@ -13,8 +17,11 @@ permissions:
 
 jobs:
   # ============================================================================
-  # STAGE 1: Test - Run unit and integration tests on every commit/PR
+  # STAGE 1: Test Suite - Run on every commit and PR
   # ============================================================================
+  # Purpose: Validate code quality and functionality before deployment
+  # Runs: On all commits (push and pull requests)
+  # Fails pipeline if: Tests fail, linter issues found, or test coverage drops
   test:
     runs-on: ubuntu-latest
     name: Test Suite
@@ -22,7 +29,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -31,16 +38,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run linter
+      - name: Run linter (ESLint)
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit & integration tests (Vitest)
         run: npm test 2>&1 | tee test-output.log
 
-      - name: Check test results
+      - name: Verify test results
         run: |
           if grep -q "Test Files.*passed\|Tests.*passed" test-output.log; then
-            echo "✓ Tests completed successfully"
+            echo "✓ All tests passed"
             grep "Test Files\|Tests.*passed" test-output.log || true
             exit 0
           else
@@ -54,13 +61,17 @@ jobs:
         continue-on-error: true
 
   # ============================================================================
-  # STAGE 2: Build & Deploy - Only runs on push to master/main (skip on PR)
+  # STAGE 2: Build & Deploy - Only runs on push to master/main (not on PR)
   # ============================================================================
+  # Purpose: Build production bundle and deploy to Vercel
+  # Runs: Only on successful push to master or main branch
+  # Skips: Pull requests, other branches, and if Stage 1 (test) fails
+  # Deploys to: Production URL (https://stockease-frontend.vercel.app)
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
     name: Build & Deploy to Production
-    # Only run on push to master/main, not on PRs
+    # Only deploy on push to master/main (not on PRs or other branches)
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     env:
       FRONTEND_API_BASE_URL: ${{ secrets.FRONTEND_API_BASE_URL }}
@@ -68,7 +79,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -80,12 +91,12 @@ jobs:
       - name: Build production bundle
         run: |
           if [ -n "${{ secrets.FRONTEND_API_BASE_URL }}" ]; then
-            echo "Using VITE_API_BASE_URL from secrets"
+            echo "Using VITE_API_BASE_URL from repository secrets"
             export VITE_API_BASE_URL="${{ secrets.FRONTEND_API_BASE_URL }}"
           fi
           npm run build
 
-      - name: Verify production build (no tests, no docs)
+      - name: Verify production build
         run: bash scripts/verify-production-build.sh
 
       - name: Build Docker image (verify Dockerfile)
@@ -111,10 +122,11 @@ jobs:
           
           if [ -z "${VERCEL_TOKEN:-}" ]; then
             echo "✗ ERROR: VERCEL_TOKEN not set in repository secrets"
+            echo "   Please add VERCEL_TOKEN to GitHub repository secrets"
             exit 1
           fi
           
-          echo "Deploying to Vercel..."
+          echo "Deploying to Vercel production..."
           flags=()
           
           if [ -n "${FRONTEND_API_BASE_URL:-}" ]; then
@@ -138,11 +150,18 @@ jobs:
           echo "- Build successful ✓"
           echo "- Docker image verified ✓"
           echo "- Deployed to production ✓"
+          echo ""
+          echo "Frontend URL: https://stockease-frontend.vercel.app"
 
       - name: Notify on failure
         if: failure()
         run: |
           echo "✗ Pipeline failed!"
           echo "Please check the logs above for details."
+          echo ""
+          echo "Common issues:"
+          echo "1. Tests failed - check test output above"
+          echo "2. Build failed - verify npm scripts and dependencies"
+          echo "3. Deployment failed - verify VERCEL_TOKEN secret is set"
           exit 1
 
