@@ -76,8 +76,6 @@ navigation = {
 }
 ```
 
-**Note**: Verify actual folder names match (e.g., is it `docker_structure/` or `docker/`?)
-
 ---
 
 ## Final Verification Checklist

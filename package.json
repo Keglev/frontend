@@ -17,8 +17,7 @@
     "docs:arch": "bash ./scripts/build-arch-docs.sh",
     "docs:typedoc": "typedoc",
     "docs:coverage": "vitest run --coverage",
-    "docs:landing": "node ./scripts/build-landing.mjs",
-    "docs:all": "npm run docs:clean && npm run docs:arch && npm run docs:typedoc && npm run docs:coverage && npm run docs:landing"
+    "docs:all": "npm run docs:clean && npm run docs:arch && npm run docs:typedoc && npm run docs:coverage"
   },
   "eslintConfig": {
     "extends": [
