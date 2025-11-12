@@ -21,7 +21,7 @@ if [ -f "docs/index.md" ]; then
   pandoc docs/index.md \
     --metadata title="StockEase Frontend" \
     --standalone \
-    --from markdown+gfm \
+    --from gfm \
     --template="$TEMPLATE" \
     --toc \
     --output public-docs/index.html
@@ -37,7 +37,7 @@ for md in "$ARCH_MD_DIR"/*.md; do
   pandoc "$md" \
     --metadata title="$base" \
     --standalone \
-    --from markdown+gfm \
+    --from gfm \
     --template="$TEMPLATE" \
     --toc \
     --output "$ARCH_OUT_DIR/$base.html"
@@ -54,7 +54,7 @@ find "$ARCH_MD_DIR" -mindepth 1 -type d | while read -r dir; do
     pandoc "$f" \
       --metadata title="$base" \
       --standalone \
-      --from markdown+gfm \
+      --from gfm \
       --template="$TEMPLATE" \
       --toc \
       --output "$OUT/$base.html"
