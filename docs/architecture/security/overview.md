@@ -158,18 +158,60 @@ Practical, actionable security verification lists for code reviews and pre-relea
 
 ---
 
-### ✅ [Testing & Audits](./testing/overview.md)
+### ✅ [Security Testing](./testing/overview.md)
 
-Security testing strategies, penetration testing considerations, and audit procedures.
+Comprehensive security testing program covering static analysis, unit testing, integration testing, and dynamic security scanning.
 
-**Planned Sections:**
-- API security testing
-- CORS policy validation
-- Input validation testing
-- XSS payload testing
-- OWASP Top 10 testing
-- Dependency scanning
-- Security audit procedures
+**Subdirectories:**
+- **[Testing Strategy](./testing/strategy.md)** — Unit security testing, integration testing, scenario-based testing, and abuse case testing. Covers 15 test categories with 200+ security tests and comprehensive test organization
+- **[Static Application Security Testing (SAST)](./testing/sast.md)** — ESLint security patterns, dangerous code detection, type safety, and custom security rules. Covers eval(), innerHTML, dangerouslySetInnerHTML, dynamic imports, and other critical vulnerabilities
+- **[Dynamic Application Security Testing (DAST)](./testing/dast.md)** — OWASP ZAP scanning, API security testing, vulnerability detection, and CI/CD integration. Includes baseline and full scan configurations, reporting, and remediation workflows
+
+**Key Topics:**
+- **Unit Security Tests** (200+ tests across 15 test categories):
+  - Secrets & sensitive data protection (token storage, logging, env vars, build-time)
+  - XSS prevention (input escaping, DOM safety, React security)
+  - CSRF protection (token validation, state-changing requests)
+  - CSP compliance (directive validation, nonce validation)
+  - HTTP header security (CORS, security headers, caching)
+  - Component security (error boundaries, authorization checks)
+  - Authentication & authorization (RBAC, role validation)
+  - API integration (endpoint auth, error handling)
+
+- **Static Analysis (SAST)**:
+  - ESLint security rule enforcement (500+ active rules)
+  - Critical patterns: eval, innerHTML, dangerouslySetInnerHTML, dynamic code execution
+  - Type safety with TypeScript branded types
+  - Pre-commit and CI/CD integration
+  - Code review security checklist
+
+- **Dynamic Analysis (DAST)**:
+  - OWASP ZAP automated scanning (baseline: 5-10 min, full: 30-45 min)
+  - API endpoint security testing with payload fuzzing
+  - Authentication & authorization testing
+  - XSS payload testing in all input vectors
+  - CSRF protection verification
+  - Security header validation
+  - Vulnerability categorization (OWASP Top 10, CWE)
+
+- **Test Coverage & Metrics**:
+  - Security-critical code: ≥95% statement coverage
+  - Auth/authorization: ≥90% coverage
+  - General code: ≥80% coverage
+  - Automated coverage tracking in CI/CD
+
+**Testing Status:**
+- ✅ Unit Security Tests — 200+ tests across 6 security domains
+- ✅ SAST (ESLint) — Implemented with 500+ security rules
+- ✅ Testing Strategy — Documented with 15 test categories
+- ✅ CI/CD Integration — Automated in GitHub Actions
+- ✅ Coverage Tracking — v8 provider reporting to public-docs/coverage/
+- ⏳ DAST (OWASP ZAP) — Ready for preview/staging deployment
+- ⏳ Penetration Testing — Planned for Q2 2026
+
+---
+
+
 
 ---
 
@@ -404,6 +446,15 @@ StockEase Frontend aligns with:
 | | | - Pre-Release Security Checklist (10 categories, 60+ items for deployments) |
 | | | - Comprehensive checklist guide with selection criteria and templates |
 | | | - Integration examples and usage procedures |
+| 1.3.0 | Nov 14, 2025 | Added Comprehensive Security Testing documentation |
+| | | - Testing Strategy (unit, integration, scenario-based, abuse case testing) |
+| | | - 200+ security tests across 15 test categories with 6 security domains |
+| | | - Static Analysis (SAST) with ESLint security patterns (500+ rules) |
+| | | - Dynamic Analysis (DAST) with OWASP ZAP automated scanning |
+| | | - Dangerous code patterns: eval(), innerHTML, dangerouslySetInnerHTML, XSS |
+| | | - Type safety with TypeScript and branded types |
+| | | - CI/CD integration for automated security testing |
+| | | - Coverage tracking with v8 provider (≥85% target for security code) |
 
 ---
 
