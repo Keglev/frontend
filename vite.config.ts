@@ -42,5 +42,35 @@ export default defineConfig(({ mode }) => {
       globals: true,
       setupFiles: [],
     },
+
+    // Build configuration: adjust chunking to keep the main chunk smaller and
+    // improve caching of vendor libraries. We keep a warning limit slightly
+    // higher than default so the CI won't fail on the 500KB warning while
+    // still notifying the team when chunks are large.
+    build: {
+      // Increase or decrease depending on your tolerance (value in KB)
+      chunkSizeWarningLimit: 800,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // Put major libraries in their own chunks so they can be cached
+            // separately and to reduce the size of the application core bundle.
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'vendor-react';
+              }
+              if (id.includes('i18next')) {
+                return 'vendor-i18next';
+              }
+              if (id.includes('chart.js') || id.includes('echarts') || id.includes('@ant-design')) {
+                return 'vendor-charts';
+              }
+              // Default vendor chunk for everything else in node_modules
+              return 'vendor';
+            }
+          }
+        }
+      }
+    },
   };
 });

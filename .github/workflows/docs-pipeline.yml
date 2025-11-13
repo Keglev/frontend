@@ -1,54 +1,91 @@
 name: Build & Publish Docs to gh-pages
 
+# Enterprise-grade documentation pipeline
+# - Purpose: Builds static documentation (architecture HTML from markdown, TypeDoc API, test coverage)
+#   and publishes the generated site to the gh-pages branch for GitHub Pages hosting.
+# - Design requirements:
+#   * Deterministic, repeatable builds (use `npm ci` and package-lock.json)
+#   * Minimal surface area for runtime differences (explicit Node version)
+#   * Reproducible layout: assets and links should be relative or use repo-root absolute
+#   * Security: no secrets are written to logs and only the built site is pushed using the
+#     provided GITHUB_TOKEN.
+
 on:
   push:
+    # Trigger on changes to any content or build-related files so docs are kept in sync with code.
     branches: [ main, master ]
     paths:
-      - 'scripts/**'
-      - 'docs/**'
-      - 'src/**'
-      - 'typedoc.json'
-      - 'vitest.config.ts'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/docs-pipeline.yml'
-  workflow_dispatch: {}
+      - 'scripts/**'                # build scripts
+      - 'docs/**'                   # documentation Markdown and templates
+      - 'src/**'                    # sources referenced by typedoc or docs examples
+      - 'typedoc.json'              # typedoc configuration
+      - 'vitest.config.ts'          # coverage configuration
+      - 'package.json'              # dependencies and scripts
+      - 'package-lock.json'         # lockfile -> used by `npm ci` for reproducibility
+      - '.github/workflows/docs-pipeline.yml' # workflow changes trigger a rebuild
+  workflow_dispatch: {}            # allow manual runs from the Actions UI
 
+# The workflow needs write access to repository contents in order to push the gh-pages branch.
 permissions:
   contents: write
 
 jobs:
   docs:
+    # Use a current Ubuntu runner to have apt available for installing pandoc and other
+    # small utilities; the runner image is ephemeral and only used for the build step.
     runs-on: ubuntu-latest
 
     steps:
+      # 1) Checkout source. We use the default token when publishing, see publish step.
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2) Set up Node.js to a fixed major version. Locking the major version helps avoid
+      #    surprising runtime changes while taking advantage of security fixes.
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '20'     # pinned major version for predictable builds
+          cache: 'npm'           # enable npm caching to speed up repeated runs
 
+      # 3) Install dependencies using `npm ci` for deterministic installs based on package-lock.json.
+      #    NOTE: `npm ci` will fail if package.json and package-lock.json are out of sync — this is
+      #    intentional and prevents unreproducible builds. Update the lockfile locally with `npm i`
+      #    and commit if you see an EUSAGE error.
       - name: Install deps
         run: npm ci
 
+      # 4) Pandoc is used to convert Markdown -> HTML for the architecture docs. The runner image
+      #    doesn't always include pandoc; install it here. Keep install commands minimal and
+      #    idempotent. If you plan to scale, consider using a container image that includes pandoc.
       - name: Install Pandoc
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc
 
+      # 5) Make local scripts executable so we can run them reliably on the runner.
       - name: Make scripts executable
         run: chmod +x scripts/build-arch-docs.sh
 
+      # 6) Build documentation
+      #    This single npm script runs the full docs pipeline:
+      #      - generate architecture HTML from Markdown (pandoc)
+      #      - generate TypeDoc HTML (typedoc)
+      #      - run tests and produce coverage (vitest)
+      #    Keep the pipeline composed by scripts so local developers can reproduce it.
       - name: Build all docs (arch html + typedoc + coverage + landing)
         run: npm run docs:all
 
-      # Optional: add a 404.html for GitHub Pages SPA-friendly behavior
+      # 7) A 404.html that mirrors index.html improves GitHub Pages behavior for SPA-style sites
+      #    (so navigations to non-root paths can be handled client-side). This is optional but
+      #    low-risk, so we include it by copying the generated index.html.
       - name: Add 404.html that points to index
         run: cp public-docs/index.html public-docs/404.html
 
+      # 8) Publish the built static site to the `gh-pages` branch.
+      #    We use `peaceiris/actions-gh-pages`, a well-established action with support for
+      #    force_orphan to create a clean branch. The action takes care of committing and
+      #    pushing the generated files; we only provide the publish directory and token.
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -57,4 +94,5 @@ jobs:
           publish_dir: public-docs
           force_orphan: true
           # If your project is published under a subpath like /stockease-frontend/,
-          # you don't need extra config here; just make sure your links are relative.
+          # keep links relative in generated HTML or set a base path; the pipeline does not
+          # rewrite HTML links automatically.
