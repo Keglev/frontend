@@ -39,7 +39,12 @@ Comprehensive guide to secure API communication, JWT authentication, error handl
 
 Details on JWT-based authentication, token lifecycle, role-based access control (RBAC), and session management.
 
-**Planned Sections:**
+**Subdirectories:**
+- **[Authentication Flow & Implementation](./auth/authentication.md)** — Login process, LoginPage component, Auth service, JWT token handling, password security
+- **[JWT Token Handling & Authorization](./auth/jwt-tokens.md)** — JWT structure, token generation, storage options, token expiration, role-based access control
+- **[Authorization & Access Control](./auth/authorization.md)** — RBAC system, route protection, component-level authorization, permission matrix, error handling
+
+**Key Topics:**
 - JWT token flow (login, storage, refresh)
 - User roles and RBAC implementation
 - Protected routes and conditional rendering
