@@ -70,13 +70,13 @@ Here are some screenshots showcasing StockEase UI:
 
 - ✅ JWT authentication and multi-language support operational
 
-- 🚧 Frontend tests and coverage reports under construction
+- ✅ Frontend tests and coverage reports working
 
 ### 📚 Documentation Status
 
-- 🚧 Architecture documentation – Under development
+- ✅ Architecture documentation – done
 
-- 🚧 Testing documentation – Under construction
+- ✅ Testing documentation – done
 
 ---
 
@@ -103,7 +103,7 @@ StockEase Frontend enforces secure communication with the backend using JWT auth
 
 Role-based access ensures that users (Admin/User) interact only with authorized components. Protected routes, input validation, and conditional rendering safeguard user sessions.
 
-  📖 View Security Architecture Documentation (under construction)
+  📖 View Security Architecture Documentation 
 
 ---
 
