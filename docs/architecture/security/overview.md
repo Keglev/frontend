@@ -119,16 +119,33 @@ Operational procedures for security incident response, token management, and key
 
 ---
 
-### � [Security Checklists](./checklists/overview.md)
+### ✔️ [Security Checklists](./checklists/overview.md)
 
-Pre-deployment, code review, and security audit checklists.
+Practical, actionable security verification lists for code reviews and pre-release verification.
 
-**Planned Checklists:**
-- Pre-deployment security checklist
-- Code review security checklist
-- API communication security checklist
-- Dependency vulnerability checklist
-- Incident response checklist
+**Subdirectories:**
+- **[PR Security Review Checklist](./checklists/pr-security-review.md)** — Code reviewer checklist for pull requests (10 categories, 40+ items, ~5-15 min per PR)
+- **[Pre-Release Security Checklist](./checklists/pre-release-security.md)** — DevOps/SRE checklist for production releases (10 categories, 60+ items, ~30-60 min per release)
+
+**Key Topics:**
+- Authentication & authorization verification
+- Input validation & XSS prevention checks
+- API security and error handling validation
+- Data protection and logging verification
+- Dependency vulnerability assessment
+- Secrets management and configuration review
+- Code quality and best practices verification
+- Security test coverage validation
+- HTTPS/TLS and security headers verification
+- Deployment and infrastructure hardening
+- Post-deployment security validation
+- Rollback procedures and contingency planning
+
+**Checklist Status:**
+- ✅ PR Security Review — Implemented & ready to use
+- ✅ Pre-Release Security — Implemented & ready to use
+- ⏳ Incident Response Checklist — Planned for Q1 2026
+- ⏳ Dependency Vulnerability Checklist — Planned for Q1 2026
 
 ---
 
@@ -382,6 +399,11 @@ StockEase Frontend aligns with:
 | | | - OWASP Top 10 2021 coverage and mitigation strategies |
 | | | - Compliance overview with GDPR, PCI DSS, SOC 2 alignment |
 | | | - 47/52 security controls implemented (90% coverage) |
+| 1.2.0 | Nov 13, 2025 | Added Security Checklists documentation |
+| | | - PR Security Review Checklist (10 categories, 40+ items for code reviews) |
+| | | - Pre-Release Security Checklist (10 categories, 60+ items for deployments) |
+| | | - Comprehensive checklist guide with selection criteria and templates |
+| | | - Integration examples and usage procedures |
 
 ---
 
