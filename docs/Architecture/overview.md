@@ -383,6 +383,22 @@ Stage 2: Production
 
 ---
 
+## 🔒 Security Documentation
+
+Comprehensive security documentation covering authentication, authorization, API security, deployment security, testing strategies, and compliance.
+
+**📚 [Security Documentation](./security/overview.md)** — Complete security guide including:
+- **API Communication Security** — JWT authentication, error handling, CORS
+- **Authentication & Authorization** — RBAC, token lifecycle, session management
+- **Frontend Security** — XSS prevention, input sanitization, CSP
+- **Platform & Deployment Security** — CI/CD pipeline security, secrets management
+- **Security Testing** — Unit tests (200+), SAST/DAST analysis, testing strategies
+- **Compliance & Standards** — OWASP ASVS v4.0, GDPR, PCI DSS, SOC 2 alignment
+- **Security Checklists** — PR review and pre-release verification checklists
+- **Security Playbooks** — Token revocation, key rotation, incident response procedures
+
+---
+
 ## Related Documentation
 
 - [Component Architecture](./src/components.md)
@@ -391,6 +407,7 @@ Stage 2: Production
 - [Testing Strategy](./src/tests.md)
 - [CI/CD Pipeline](./pipeline.md)
 - [Deployment & Infrastructure](./src/dockerfile.md)
+- **Security Documentation** → [Comprehensive Security Guide](./security/overview.md)
 - **Documentation Pipeline** → [How Docs Are Generated & Published](./docs-pipeline/overview.md)
 - **Backend Architecture & API Docs** → [StockEase Backend Documentation](https://keglev.github.io/stockease/)
 

@@ -16,6 +16,7 @@ This page provides a high-level overview and links to detailed architecture topi
 - [Pages](./pages/overview.md)
 - [Services](./services/overview.md)
 - [Testing](./tests/overview.md)
+- [🔒 Security Documentation](./security/overview.md)
 
 ---
 
