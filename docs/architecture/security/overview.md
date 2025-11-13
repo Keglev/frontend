@@ -1,5 +1,7 @@
 # StockEase Frontend Security Documentation
 
+> **📍 Navigation:** [← Back to Architecture](../overview.md) | [← Zurück zur Architektur](../overview.de.md)
+
 ## Overview
 
 Welcome to the StockEase Frontend Security Documentation. This comprehensive guide covers security practices, threat mitigation, best practices, and operational procedures for the StockEase Frontend application.
@@ -484,8 +486,18 @@ StockEase Frontend implements industry-standard security practices including:
 
 ---
 
+---
+
 **Last Updated:** November 13, 2025  
 **Status:** Enterprise-Grade Security Documentation  
 **Maintained By:** StockEase Security Team  
 **Review Cycle:** Quarterly  
 **Classification:** Internal - Security Team & Developers
+
+---
+
+## 🔗 Back to Architecture
+
+- **[← Back to Architecture Overview](../overview.md)** — English architecture documentation
+- **[← Zurück zur Architektur-Übersicht](../overview.de.md)** — Deutsche Architekturdokumentation
+- **[Architecture Index](../index.md)** — Complete architecture documentation map
