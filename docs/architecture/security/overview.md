@@ -97,7 +97,29 @@ Deployment security, CI/CD pipeline protection, environment configuration, and p
 
 ---
 
-### 📋 [Security Checklists](./checklists/overview.md)
+### 🎯 [Security Playbooks](./playbooks/overview.md)
+
+Operational procedures for security incident response, token management, and key rotation.
+
+**Subdirectories:**
+- **[Token Revocation & Forced Logout](./playbooks/revoke-tokens.md)** — When to revoke tokens, implementation methods, batch revocation, emergency response
+- **[Key Rotation & Rollout](./playbooks/key-rotation.md)** — Scheduled rotation, immediate rotation, rollout strategies, rollback procedures, monitoring
+
+**Key Topics:**
+- Token revocation triggers and methods
+- Forced logout procedures
+- Server-side token blacklist implementation
+- Batch revocation for incidents
+- JWT signing key rotation strategies
+- Graceful vs. emergency rotation
+- Dual-key deployment and monitoring
+- Key rotation schedule and compliance
+- Incident response procedures
+- Monitoring and verification
+
+---
+
+### � [Security Checklists](./checklists/overview.md)
 
 Pre-deployment, code review, and security audit checklists.
 
@@ -109,10 +131,6 @@ Pre-deployment, code review, and security audit checklists.
 - Incident response checklist
 
 ---
-
-### 📖 [Security Playbooks](./playbooks/overview.md)
-
-Step-by-step procedures for handling security incidents and responding to vulnerabilities.
 
 **Planned Playbooks:**
 - API security incident response
