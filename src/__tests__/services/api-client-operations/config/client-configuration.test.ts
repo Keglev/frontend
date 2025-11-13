@@ -13,7 +13,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import apiClient from '../../../services/apiClient';
+import apiClient from '../../../../services/apiClient';
 
 describe('API Client Configuration', () => {
   // Mock localStorage for token management tests
