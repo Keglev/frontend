@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>error-logging - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="error-logging--monitoring">Error Logging &amp;
+        Monitoring</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Proper error logging and monitoring are critical for
+        security. This document describes how StockEase Frontend logs
+        API errors, handles different error scenarios, and protects
+        sensitive data during logging.</p>
+        <hr />
+        <h2 id="error-logging-strategy">Error Logging Strategy</h2>
+        <h3 id="current-implementation">Current Implementation</h3>
+        <p>The Axios API client logs all requests, responses, and
+        errors:</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Request logging</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">request</span><span class="op">.</span><span class="fu">use</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  (config) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> config)<span class="op">;</span>  <span class="co">// Logs full config including headers</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> config<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Response logging</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">response</span><span class="op">.</span><span class="fu">use</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  (response) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Response:&#39;</span><span class="op">,</span> response)<span class="op">;</span>  <span class="co">// Logs full response</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  (error) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;API Error:&#39;</span><span class="op">,</span> error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">data</span> <span class="op">||</span> error<span class="op">.</span><span class="at">message</span>)<span class="op">;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> error<span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="risk-sensitive-data-exposure">Risk: Sensitive Data
+        Exposure</h3>
+        <p><strong>Problem:</strong> Full request/response logging
+        includes sensitive information:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Logged to console:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  config<span class="op">:</span> {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    headers<span class="op">:</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      Authorization<span class="op">:</span> <span class="st">&#39;Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&#39;</span><span class="op">,</span>  <span class="co">// ⚠️ TOKEN EXPOSED</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;Content-Type&#39;</span><span class="op">:</span> <span class="st">&#39;application/json&#39;</span><span class="op">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      Cookie<span class="op">:</span> <span class="st">&#39;sessionId=abc123...&#39;</span><span class="op">,</span>  <span class="co">// ⚠️ SESSION EXPOSED</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    data<span class="op">:</span> {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      username<span class="op">:</span> <span class="st">&#39;admin&#39;</span><span class="op">,</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      password<span class="op">:</span> <span class="st">&#39;SecurePass123!&#39;</span><span class="op">,</span>  <span class="co">// ⚠️ PASSWORD EXPOSED</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Impact:</strong></p>
+        <ul>
+        <li>Token visible in browser dev tools</li>
+        <li>Password visible if logged before hashing</li>
+        <li>Session cookies visible in console</li>
+        <li>Exposed to browser extensions or malware</li>
+        </ul>
+        <hr />
+        <h2 id="secure-logging-implementation">Secure Logging
+        Implementation</h2>
+        <h3 id="1-filter-sensitive-headers">1. Filter Sensitive
+        Headers</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * Sanitizes config object for safe logging</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * Removes or redacts sensitive headers</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> sanitizeConfigForLogging <span class="op">=</span> (config<span class="op">:</span> <span class="dt">any</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sensitiveHeaders <span class="op">=</span> [<span class="st">&#39;Authorization&#39;</span><span class="op">,</span> <span class="st">&#39;Cookie&#39;</span><span class="op">,</span> <span class="st">&#39;X-API-Key&#39;</span><span class="op">,</span> <span class="st">&#39;X-Auth-Token&#39;</span>]<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> safeConfig <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(<span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(config))<span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  sensitiveHeaders<span class="op">.</span><span class="fu">forEach</span>((header) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (safeConfig<span class="op">.</span><span class="at">headers</span><span class="op">?.</span>[header]) {</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      safeConfig<span class="op">.</span><span class="at">headers</span>[header] <span class="op">=</span> <span class="st">&#39;[REDACTED]&#39;</span><span class="op">;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> safeConfig<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage in interceptor:</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">request</span><span class="op">.</span><span class="fu">use</span>(</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  (config) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> safeConfig <span class="op">=</span> <span class="fu">sanitizeConfigForLogging</span>(config)<span class="op">;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> safeConfig)<span class="op">;</span>  <span class="co">// ✅ Token is [REDACTED]</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> config<span class="op">;</span>  <span class="co">// Return original (with token) for actual request</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="2-filter-sensitive-request-data">2. Filter Sensitive
+        Request Data</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * Sanitizes request body for safe logging</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * Redacts passwords and sensitive fields</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> sanitizeRequestData <span class="op">=</span> (data<span class="op">:</span> <span class="dt">any</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>data) <span class="cf">return</span> data<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sensitiveFields <span class="op">=</span> [<span class="st">&#39;password&#39;</span><span class="op">,</span> <span class="st">&#39;pin&#39;</span><span class="op">,</span> <span class="st">&#39;secret&#39;</span><span class="op">,</span> <span class="st">&#39;apiKey&#39;</span><span class="op">,</span> <span class="st">&#39;token&#39;</span>]<span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sanitized <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(<span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(data))<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> redactField <span class="op">=</span> (obj<span class="op">:</span> <span class="dt">any</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Object</span><span class="op">.</span><span class="fu">keys</span>(obj)<span class="op">.</span><span class="fu">forEach</span>((key) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (sensitiveFields<span class="op">.</span><span class="fu">some</span>((field) <span class="kw">=&gt;</span> key<span class="op">.</span><span class="fu">toLowerCase</span>()<span class="op">.</span><span class="fu">includes</span>(field))) {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        obj[key] <span class="op">=</span> <span class="st">&#39;[REDACTED]&#39;</span><span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">typeof</span> obj[key] <span class="op">===</span> <span class="st">&#39;object&#39;</span> <span class="op">&amp;&amp;</span> obj[key] <span class="op">!==</span> <span class="kw">null</span>) {</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">redactField</span>(obj[key])<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">redactField</span>(sanitized)<span class="op">;</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sanitized<span class="op">;</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage:</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> safeData <span class="op">=</span> <span class="fu">sanitizeRequestData</span>(config<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Request Body:&#39;</span><span class="op">,</span> safeData)<span class="op">;</span>  <span class="co">// ✅ password is [REDACTED]</span></span></code></pre></div>
+        <h3 id="3-environment-based-logging">3. Environment-Based
+        Logging</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * Logs only in development environment</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * Disables logging in production</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isDevelopment <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;development&#39;</span><span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">request</span><span class="op">.</span><span class="fu">use</span>((config) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (isDevelopment) {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> safeConfig <span class="op">=</span> <span class="fu">sanitizeConfigForLogging</span>(config)<span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> safeConfig)<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> config<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">response</span><span class="op">.</span><span class="fu">use</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  (response) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (isDevelopment) {</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Response:&#39;</span><span class="op">,</span> response<span class="op">.</span><span class="at">status</span><span class="op">,</span> response<span class="op">.</span><span class="at">statusText</span>)<span class="op">;</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response<span class="op">;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  (error) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (isDevelopment) {</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;API Error:&#39;</span><span class="op">,</span> error<span class="op">.</span><span class="at">message</span>)<span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Always log errors to monitoring service in production</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">logToMonitoringService</span>(error)<span class="op">;</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> error<span class="op">;</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="error-types--handling">Error Types &amp; Handling</h2>
+        <h3 id="1-authentication-errors-401-unauthorized">1.
+        Authentication Errors (401 Unauthorized)</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>Token expired</li>
+        <li>Token invalid or tampered</li>
+        <li>User logged out</li>
+        <li>Credentials invalid</li>
+        </ul>
+        <p><strong>Current handling:</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">401</span>) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span>  <span class="co">// Clear session</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">warn</span>(<span class="st">&#39;Unauthorized access - redirecting to login&#39;</span>)<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Component level:</strong></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> handleLogin <span class="op">=</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">login</span>(username<span class="op">,</span> password)<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;token&#39;</span><span class="op">,</span> response<span class="op">.</span><span class="at">token</span>)<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">navigate</span>(<span class="st">&#39;/dashboard&#39;</span>)<span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (err) {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err) <span class="op">&amp;&amp;</span> err<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">401</span>) {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;login.error.invalidCredentials&#39;</span>))<span class="op">;</span>  <span class="co">// Show user message</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;login.error.unexpectedError&#39;</span>))<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>User Message:</strong></p>
+        <pre><code>❌ &quot;Invalid credentials or account locked&quot;</code></pre>
+        <p><strong>Never Show:</strong></p>
+        <pre><code>❌ &quot;Token expired&quot; (technical detail)
+❌ JWT decode error (technical detail)
+❌ Exact API error message (may leak info)</code></pre>
+        <h3 id="2-validation-errors-400-bad-request">2. Validation
+        Errors (400 Bad Request)</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>Invalid input data</li>
+        <li>Missing required fields</li>
+        <li>Data format mismatch</li>
+        </ul>
+        <p><strong>Handling:</strong></p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (err) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err) <span class="op">&amp;&amp;</span> err<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">400</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Backend returns field-specific errors</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> validationErrors <span class="op">=</span> err<span class="op">.</span><span class="at">response</span><span class="op">.</span><span class="at">data</span><span class="op">.</span><span class="at">errors</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Display field-level error messages to user</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">Object</span><span class="op">.</span><span class="fu">entries</span>(validationErrors)<span class="op">.</span><span class="fu">forEach</span>(([field<span class="op">,</span> message]) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setFieldError</span>(field<span class="op">,</span> message)<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="3-permission-errors-403-forbidden">3. Permission Errors
+        (403 Forbidden)</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>User lacks permission to access resource</li>
+        <li>Role-based access control (RBAC) violation</li>
+        <li>Attempting to delete another user's data</li>
+        </ul>
+        <p><strong>Handling:</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (err) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err) <span class="op">&amp;&amp;</span> err<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">403</span>) {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;error.forbidden&#39;</span>))<span class="op">;</span>  <span class="co">// &quot;You do not have permission to perform this action&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Optionally: Log to analytics</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">logSecurityEvent</span>(<span class="st">&#39;unauthorized_access_attempt&#39;</span><span class="op">,</span> { endpoint<span class="op">,</span> role })<span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="4-resource-not-found-404">4. Resource Not Found
+        (404)</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>Endpoint doesn't exist</li>
+        <li>Resource was deleted</li>
+        <li>Incorrect URL construction</li>
+        </ul>
+        <p><strong>Handling:</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (err) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err) <span class="op">&amp;&amp;</span> err<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">404</span>) {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;error.notFound&#39;</span>))<span class="op">;</span>  <span class="co">// &quot;Resource not found&quot;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Check if product was deleted by another user</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">navigate</span>(<span class="st">&#39;/products&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="5-server-errors-5xx">5. Server Errors (5xx)</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>Backend crash or unhandled exception</li>
+        <li>Database connection failure</li>
+        <li>Third-party service failure</li>
+        </ul>
+        <p><strong>Handling:</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (err) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err) <span class="op">&amp;&amp;</span> err<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">&gt;=</span> <span class="dv">500</span>) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;error.serverError&#39;</span>))<span class="op">;</span>  <span class="co">// &quot;Server error - please try again later&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Log to error tracking service for backend team</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">logToSentry</span>({</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      level<span class="op">:</span> <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      message<span class="op">:</span> <span class="st">&#39;Backend API error&#39;</span><span class="op">,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      statusCode<span class="op">:</span> err<span class="op">.</span><span class="at">response</span><span class="op">.</span><span class="at">status</span><span class="op">,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      endpoint<span class="op">:</span> err<span class="op">.</span><span class="at">config</span><span class="op">.</span><span class="at">url</span><span class="op">,</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>      timestamp<span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">,</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="6-network-errors">6. Network Errors</h3>
+        <p><strong>When it happens:</strong></p>
+        <ul>
+        <li>No internet connection</li>
+        <li>Request timeout</li>
+        <li>DNS failure</li>
+        <li>Network unreachable</li>
+        </ul>
+        <p><strong>Handling:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (err) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (axios<span class="op">.</span><span class="fu">isAxiosError</span>(err)) {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="op">!</span>err<span class="op">.</span><span class="at">response</span>) {</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Network error (no response from server)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (err<span class="op">.</span><span class="at">code</span> <span class="op">===</span> <span class="st">&#39;ECONNABORTED&#39;</span>) {</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;error.timeout&#39;</span>))<span class="op">;</span>  <span class="co">// &quot;Request timeout - please try again&quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">setError</span>(<span class="fu">t</span>(<span class="st">&#39;error.networkError&#39;</span>))<span class="op">;</span>  <span class="co">// &quot;Network connection failed&quot;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Try to reconnect after delay</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="pp">setTimeout</span>(() <span class="kw">=&gt;</span> <span class="fu">retry</span>()<span class="op">,</span> <span class="dv">3000</span>)<span class="op">;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="error-logging-service">Error Logging Service</h2>
+        <h3 id="centralized-error-logging">Centralized Error
+        Logging</h3>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"> * Centralized error logging service</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"> * Sends errors to monitoring service (Sentry, DataDog, etc.)</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ErrorLoggingService {</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">static</span> <span class="fu">logError</span>(error<span class="op">:</span> <span class="dt">any</span><span class="op">,</span> context<span class="op">:</span> <span class="dt">string</span>) {</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> errorData <span class="op">=</span> {</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      message<span class="op">:</span> error<span class="op">.</span><span class="at">message</span><span class="op">,</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>      context<span class="op">,</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>      timestamp<span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()<span class="op">,</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>      userAgent<span class="op">:</span> <span class="bu">navigator</span><span class="op">.</span><span class="at">userAgent</span><span class="op">,</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>      url<span class="op">:</span> <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span><span class="op">,</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      <span class="co">// API-specific data</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>(axios<span class="op">.</span><span class="fu">isAxiosError</span>(error) <span class="op">&amp;&amp;</span> {</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>        statusCode<span class="op">:</span> error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span><span class="op">,</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>        endpoint<span class="op">:</span> error<span class="op">.</span><span class="at">config</span><span class="op">?.</span><span class="at">url</span><span class="op">,</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        method<span class="op">:</span> error<span class="op">.</span><span class="at">config</span><span class="op">?.</span><span class="at">method</span><span class="op">,</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Log to console in development</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;development&#39;</span>) {</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;[ErrorLogging]&#39;</span><span class="op">,</span> errorData)<span class="op">;</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Send to monitoring service in production</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;production&#39;</span>) {</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Example: Send to Sentry</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>      Sentry<span class="op">.</span><span class="fu">captureException</span>(error<span class="op">,</span> {</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>        contexts<span class="op">:</span> {</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>          app<span class="op">:</span> errorData<span class="op">,</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>        }<span class="op">,</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="kw">static</span> <span class="fu">logSecurityEvent</span>(event<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> details<span class="op">:</span> <span class="dt">any</span>) {</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> eventData <span class="op">=</span> {</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>      <span class="bu">event</span><span class="op">,</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>      details<span class="op">,</span></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>      timestamp<span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()<span class="op">,</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>      user<span class="op">:</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;username&#39;</span>)<span class="op">,</span></span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Security events always logged</span></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">warn</span>(<span class="st">&#39;[Security Event]&#39;</span><span class="op">,</span> eventData)<span class="op">;</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Send to SIEM or security dashboard</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;production&#39;</span>) {</span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>      <span class="fu">fetch</span>(<span class="st">&#39;/api/security/events&#39;</span><span class="op">,</span> {</span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>        method<span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>        headers<span class="op">:</span> { <span class="st">&#39;Content-Type&#39;</span><span class="op">:</span> <span class="st">&#39;application/json&#39;</span> }<span class="op">,</span></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>        body<span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(eventData)<span class="op">,</span></span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage in components:</span></span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> apiClient<span class="op">.</span><span class="fu">delete</span>(<span class="vs">`/api/products/</span><span class="sc">${</span>id<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> (err) {</span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>  ErrorLoggingService<span class="op">.</span><span class="fu">logError</span>(err<span class="op">,</span> <span class="st">&#39;delete_product&#39;</span>)<span class="op">;</span></span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage in interceptor:</span></span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">401</span>) {</span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>  ErrorLoggingService<span class="op">.</span><span class="fu">logSecurityEvent</span>(<span class="st">&#39;unauthorized_access&#39;</span><span class="op">,</span> {</span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>    endpoint<span class="op">:</span> error<span class="op">.</span><span class="at">config</span><span class="op">.</span><span class="at">url</span><span class="op">,</span></span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a>    attempts<span class="op">:</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;loginAttempts&#39;</span>)<span class="op">,</span></span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="monitoring--alerts">Monitoring &amp; Alerts</h2>
+        <h3 id="metrics-to-track">Metrics to Track</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Metric</th>
+        <th>Purpose</th>
+        <th>Alert Threshold</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>401 Errors</td>
+        <td>Token issues, session expiration</td>
+        <td>&gt; 10 per minute</td>
+        </tr>
+        <tr class="even">
+        <td>403 Errors</td>
+        <td>Permission/RBAC issues</td>
+        <td>&gt; 5 per minute</td>
+        </tr>
+        <tr class="odd">
+        <td>500 Errors</td>
+        <td>Backend crashes</td>
+        <td>Any occurrence</td>
+        </tr>
+        <tr class="even">
+        <td>Network Errors</td>
+        <td>Connectivity issues</td>
+        <td>&gt; 50 per minute</td>
+        </tr>
+        <tr class="odd">
+        <td>Request Latency</td>
+        <td>Performance degradation</td>
+        <td>&gt; 5 seconds</td>
+        </tr>
+        <tr class="even">
+        <td>Failed Logins</td>
+        <td>Brute force attacks</td>
+        <td>&gt; 5 attempts / 15 min</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="example-monitoring-dashboard">Example Monitoring
+        Dashboard</h3>
+        <pre><code>Real-time API Health
+═════════════════════════════════════
+✅ Success Rate:     98.5%
+❌ Error Rate:       1.5%
+   ├─ 401 Errors:    0.3%
+   ├─ 403 Errors:    0.2%
+   ├─ 500 Errors:    0.4%
+   └─ Network:       0.6%
+
+📊 Request Volume:   12,450 req/min
+⏱️  Avg Latency:      245ms
+🚨 Alerts:           None active</code></pre>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="-do">✅ DO</h3>
+        <ul>
+        <li>✅ <strong>Filter sensitive data</strong> before
+        logging</li>
+        <li>✅ <strong>Log in development</strong>, disable in
+        production</li>
+        <li>✅ <strong>Use error tracking service</strong> (Sentry,
+        DataDog, etc.)</li>
+        <li>✅ <strong>Differentiate error types</strong> in user
+        messages</li>
+        <li>✅ <strong>Log security events</strong> separately</li>
+        <li>✅ <strong>Include context</strong> (user, endpoint,
+        timestamp)</li>
+        <li>✅ <strong>Monitor error rates</strong> for anomalies</li>
+        <li>✅ <strong>Implement retry logic</strong> for transient
+        errors</li>
+        </ul>
+        <h3 id="-dont">❌ DON'T</h3>
+        <ul>
+        <li>❌ <strong>Never log passwords</strong> or secrets</li>
+        <li>❌ <strong>Never expose tokens</strong> in console
+        output</li>
+        <li>❌ <strong>Never show technical errors</strong> to
+        users</li>
+        <li>❌ <strong>Never log in production</strong> without
+        filtering</li>
+        <li>❌ <strong>Never expose API implementation
+        details</strong></li>
+        <li>❌ <strong>Never ignore 401 errors</strong> (always clear
+        session)</li>
+        <li>❌ <strong>Never retry indefinitely</strong> (implement
+        backoff)</li>
+        </ul>
+        <hr />
+        <h2 id="troubleshooting-common-issues">Troubleshooting Common
+        Issues</h2>
+        <h3 id="problem-token-mysteriously-cleared">Problem: Token
+        Mysteriously Cleared</h3>
+        <pre><code>Symptom: User logged in, but suddenly redirected to login
+Cause: API returned 401, interceptor cleared token
+
+Debug:
+1. Open browser DevTools → Console
+2. Look for: &quot;API Error:&quot; logs showing 401
+3. Check if token is expired: https://jwt.io (paste token)
+4. Look for: &quot;Unauthorized access - redirecting to login&quot;</code></pre>
+        <h3 id="problem-network-error-message-too-frequent">Problem:
+        "Network Error" Message Too Frequent</h3>
+        <pre><code>Symptom: User sees network errors but connection is fine
+Cause: Backend slow or frontend timeout too short
+
+Debug:
+1. Check request latency: DevTools → Network tab
+2. If &gt; 120 seconds, increase timeout in apiClient.ts
+3. If network looks fine, check backend logs
+4. Check for DNS resolution issues: ping api.stockease.com</code></pre>
+        <h3
+        id="problem-api-endpoint-returns-403-but-user-has-permission">Problem:
+        API Endpoint Returns 403, But User Has Permission</h3>
+        <pre><code>Symptom: Permission denied error, but user is admin
+Cause: Token doesn&#39;t have correct role claim, or RBAC misconfigured
+
+Debug:
+1. Decode token: localStorage.getItem(&#39;token&#39;) → https://jwt.io
+2. Check &#39;role&#39; claim in payload
+3. Verify token matches stored role: localStorage.getItem(&#39;role&#39;)
+4. Check backend RBAC configuration
+5. Retry after re-login to refresh token</code></pre>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./api-security.html">API Security &amp;
+        Configuration</a></strong> — Axios setup and bearer tokens</li>
+        <li><strong><a href="./overview.html">Overview</a></strong> —
+        Complete API communication security guide</li>
+        <li><strong><a href="../../testing/api-security.html">Testing
+        &amp; Security Audits</a></strong> — How to test error
+        handling</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Production-Ready<br />
+        <strong>Review Cycle:</strong> Quarterly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

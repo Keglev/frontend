@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>language-detection - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="language-detection--selection">Language Detection &amp;
+        Selection</h1>
+        <h2 id="automatic-language-detection">Automatic Language
+        Detection</h2>
+        <h3 id="detection-priority">Detection Priority</h3>
+        <pre><code>1. localStorage[&#39;i18nextLng&#39;]
+   ↓ (User previously selected a language)
+2. navigator.language (Browser language)
+   ↓ (Browser&#39;s default language setting)
+3. fallbackLng: &#39;en&#39;
+   ↓ (Final fallback)
+English selected</code></pre>
+        <hr />
+        <h2 id="how-detection-works">How Detection Works</h2>
+        <h3 id="step-1-check-localstorage">Step 1: Check
+        localStorage</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// First boot: localStorage is empty</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;i18nextLng&#39;</span>)  <span class="co">// null</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// After user selects German</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;i18nextLng&#39;</span>)  <span class="co">// &#39;de&#39;</span></span></code></pre></div>
+        <p>When i18next initializes, it checks localStorage first for a
+        previously saved language.</p>
+        <h3 id="step-2-check-browser-language">Step 2: Check Browser
+        Language</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">navigator</span><span class="op">.</span><span class="at">language</span>  <span class="co">// &#39;de-DE&#39;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">navigator</span><span class="op">.</span><span class="at">language</span>  <span class="co">// &#39;en-US&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">navigator</span><span class="op">.</span><span class="at">language</span>  <span class="co">// &#39;fr-FR&#39;</span></span></code></pre></div>
+        <p>If localStorage is empty, i18next extracts the base language
+        code:</p>
+        <ul>
+        <li>'de-DE' → 'de'</li>
+        <li>'en-US' → 'en'</li>
+        <li>'fr-FR' → falls back to 'en' (not supported)</li>
+        </ul>
+        <h3 id="step-3-use-fallback">Step 3: Use Fallback</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// No localStorage, browser language not supported</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fallbackLng<span class="op">:</span> <span class="st">&#39;en&#39;</span>  <span class="co">// Default to English</span></span></code></pre></div>
+        <hr />
+        <h2 id="detection-flow-diagram">Detection Flow Diagram</h2>
+        <div class="mermaid">
+        sequenceDiagram
+            participant App as App Start
+            participant Detector as LanguageDetector
+            participant Storage as localStorage
+            participant Navigator as Browser
+            participant i18n as i18next
+
+            App->>Detector: Initialize language detection
+            
+            Detector->>Storage: Check i18nextLng
+            alt Found in localStorage
+                Storage-->>Detector: 'de'
+                Detector->>i18n: Use German
+            else Not found
+                Detector->>Navigator: Check browser language
+                Navigator-->>Detector: 'de-DE'
+                alt Language supported
+                    Detector->>i18n: Extract & use 'de'
+                else Not supported
+                    Detector->>i18n: Use fallback 'en'
+                end
+            end
+            
+            i18n->>App: Ready with language
+            App->>Storage: Save language to localStorage
+        </div>
+        <hr />
+        <h2 id="user-language-selection">User Language Selection</h2>
+        <h3 id="manual-language-change">Manual Language Change</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useTranslation } <span class="im">from</span> <span class="st">&#39;react-i18next&#39;</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> LanguageSwitcher <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>div<span class="op">&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>button onClick<span class="op">=</span>{() <span class="kw">=&gt;</span> i18n<span class="op">.</span><span class="fu">changeLanguage</span>(<span class="st">&#39;en&#39;</span>)}<span class="op">&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        English</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;/</span>button<span class="op">&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>button onClick<span class="op">=</span>{() <span class="kw">=&gt;</span> i18n<span class="op">.</span><span class="fu">changeLanguage</span>(<span class="st">&#39;de&#39;</span>)}<span class="op">&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        Deutsch</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;/</span>button<span class="op">&gt;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>div<span class="op">&gt;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <h3 id="automatic-persistence">Automatic Persistence</h3>
+        <p>When user changes language:</p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// User clicks German button</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>i18n<span class="op">.</span><span class="fu">changeLanguage</span>(<span class="st">&#39;de&#39;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Automatically:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Loads German translations</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Saves &#39;de&#39; to localStorage</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Updates all components with German text</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Persists across browser sessions</span></span></code></pre></div>
+        <hr />
+        <h2 id="supported-languages-configuration">Supported Languages
+        Configuration</h2>
+        <h3 id="define-supported-languages">Define Supported
+        Languages</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/i18n.ts</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">init</span>({</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  supportedLngs<span class="op">:</span> [<span class="st">&#39;en&#39;</span><span class="op">,</span> <span class="st">&#39;de&#39;</span>]<span class="op">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  fallbackLng<span class="op">:</span> <span class="st">&#39;en&#39;</span><span class="op">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+        <h3 id="what-gets-supported">What Gets Supported?</h3>
+        <ul>
+        <li><strong>en</strong> - English</li>
+        <li><strong>de</strong> - German (Deutsch)</li>
+        </ul>
+        <p>Users whose browser language is set to something else (e.g.,
+        'fr', 'es') will see English.</p>
+        <hr />
+        <h2 id="implementation-in-apptsx">Implementation in App.tsx</h2>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> i18n <span class="im">from</span> <span class="st">&#39;./i18n&#39;</span><span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { I18nextProvider } <span class="im">from</span> <span class="st">&#39;react-i18next&#39;</span><span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">App</span>() {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>I18nextProvider i18n<span class="op">=</span>{i18n}<span class="op">&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      {<span class="co">/* App content */</span>}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>I18nextProvider<span class="op">&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p>The <code>I18nextProvider</code> makes i18n available to all
+        child components.</p>
+        <hr />
+        <h2 id="getting-current-language">Getting Current Language</h2>
+        <h3 id="in-components">In Components</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Get current language</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(i18n<span class="op">.</span><span class="at">language</span>)<span class="op">;</span>  <span class="co">// &#39;en&#39; or &#39;de&#39;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Get all available languages</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(i18n<span class="op">.</span><span class="at">languages</span>)<span class="op">;</span> <span class="co">// [&#39;en&#39;, &#39;de&#39;]</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Check if specific language is active</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (i18n<span class="op">.</span><span class="at">language</span> <span class="op">===</span> <span class="st">&#39;de&#39;</span>) {</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// User is viewing German</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="example-display-flag-based-on-language">Example: Display
+        Flag Based on Language</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> LanguageFlag <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>img</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      src<span class="op">=</span>{</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        i18n<span class="op">.</span><span class="at">language</span> <span class="op">===</span> <span class="st">&#39;de&#39;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>          <span class="op">?</span> <span class="st">&#39;/flags/de.svg&#39;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>          <span class="op">:</span> <span class="st">&#39;/flags/en.svg&#39;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      alt<span class="op">=</span>{i18n<span class="op">.</span><span class="at">language</span>}</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">/&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="testing-language-detection">Testing Language
+        Detection</h2>
+        <h3 id="verify-localstorage">Verify localStorage</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Open browser DevTools Console</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">localStorage.getItem</span><span class="er">(</span><span class="st">&#39;i18nextLng&#39;</span><span class="kw">)</span>  <span class="ex">//</span> <span class="st">&#39;en&#39;</span> or <span class="st">&#39;de&#39;</span></span></code></pre></div>
+        <h3 id="simulate-browser-language">Simulate Browser
+        Language</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In DevTools Console</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Object</span><span class="op">.</span><span class="fu">defineProperty</span>(<span class="bu">navigator</span><span class="op">,</span> <span class="st">&#39;language&#39;</span><span class="op">,</span> {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="st">&#39;de-DE&#39;</span><span class="op">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">configurable</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Reload page</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>location<span class="op">.</span><span class="fu">reload</span>()<span class="op">;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">// German should load (if available in translation files)</span></span></code></pre></div>
+        <h3 id="clear-localstorage-to-reset">Clear localStorage to
+        Reset</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In DevTools Console</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;i18nextLng&#39;</span>)<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>location<span class="op">.</span><span class="fu">reload</span>()<span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Will detect from browser language again</span></span></code></pre></div>
+        <hr />
+        <h2 id="common-scenarios">Common Scenarios</h2>
+        <h3 id="first-time-user-fresh-browser">First-Time User (Fresh
+        Browser)</h3>
+        <pre><code>1. No localStorage entry
+2. Browser language: &#39;de-DE&#39;
+3. Extract: &#39;de&#39;
+4. Load German translations
+5. User sees German UI
+6. Save &#39;de&#39; to localStorage</code></pre>
+        <h3 id="returning-user">Returning User</h3>
+        <pre><code>1. localStorage[&#39;i18nextLng&#39;] = &#39;de&#39;
+2. Load saved language immediately
+3. User sees German UI
+4. Fast, no browser language check needed</code></pre>
+        <h3 id="user-changes-browser-language">User Changes Browser
+        Language</h3>
+        <pre><code>1. User changes OS language to French
+2. App still loads German (saved in localStorage)
+3. User must manually change app language
+4. Or clear localStorage to re-detect</code></pre>
+        <h3 id="user-changes-app-language">User Changes App
+        Language</h3>
+        <pre><code>1. User clicks German button
+2. i18n.changeLanguage(&#39;de&#39;)
+3. Saves to localStorage
+4. Persists across sessions
+5. Next login: Still German</code></pre>
+        <hr />
+        <h2 id="edge-cases">Edge Cases</h2>
+        <h3 id="unsupported-browser-language">Unsupported Browser
+        Language</h3>
+        <pre><code>Browser language: &#39;fr-FR&#39; (French)
+Supported: [&#39;en&#39;, &#39;de&#39;]
+Result: Falls back to &#39;en&#39; (English)</code></pre>
+        <h3 id="browser-language-not-set">Browser Language Not Set</h3>
+        <pre><code>navigator.language: undefined or empty
+Fallback to: &#39;en&#39; (English)</code></pre>
+        <h3 id="localstorage-disabled">localStorage Disabled</h3>
+        <pre><code>// i18next still works, but:
+// - Language resets on page reload
+// - No persistence
+// - Re-detects browser language each time</code></pre>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">i18n Overview</a></li>
+        <li><a href="./configuration.html">Configuration</a></li>
+        <li><a href="./translation-files.html">Translation
+        Files</a></li>
+        <li><a href="./component-patterns.html">Component
+        Patterns</a></li>
+        <li><a href="./testing.html">Testing i18n</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

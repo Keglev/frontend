@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="pages--routing-architecture-overview">Pages &amp;
+        Routing Architecture Overview</h1>
+        <h2 id="what-are-pages">What Are Pages?</h2>
+        <p>Pages in StockEase are <strong>route-connected
+        components</strong> that represent distinct sections of the
+        application. Each page is responsible for its own data fetching,
+        state management, and layout.</p>
+        <h3 id="key-principles">Key Principles</h3>
+        <ul>
+        <li><strong>Route-Based Organization</strong>: Each route has a
+        corresponding page component</li>
+        <li><strong>Layout Wrapper</strong>: Consistent header, sidebar,
+        and footer across pages</li>
+        <li><strong>Authentication Gating</strong>: Pages check user
+        authentication and roles</li>
+        <li><strong>Lazy Loading</strong>: Pages are code-split for
+        faster initial load</li>
+        <li><strong>Self-Contained</strong>: Each page manages its own
+        state and effects</li>
+        </ul>
+        <hr />
+        <h2 id="routing-architecture">Routing Architecture</h2>
+        <div class="mermaid">
+        graph TB
+            App["App.tsx<br/>(Router Setup)"]
+            
+            subgraph "Public Routes"
+                Home["/ → HomePage<br/>(Public)"]
+                Login["/login → LoginPage<br/>(Public)"]
+            end
+            
+            subgraph "Protected Routes"
+                User["/user → UserDashboard<br/>(Authenticated)"]
+                Search["/search-product → SearchProductPage<br/>(Authenticated)"]
+                List["/list-stock → ListStockPage<br/>(Authenticated)"]
+            end
+            
+            subgraph "Admin-Only Routes"
+                Admin["/admin → AdminDashboard<br/>(Admin)"]
+                Add["/add-product → AddProductPage<br/>(Admin)"]
+                Delete["/delete-product → DeleteProductPage<br/>(Admin)"]
+                Edit["/product/:id/edit → ChangeProductDetailsPage<br/>(Admin)"]
+            end
+            
+            App -->|"Route matching"| Home
+            App -->|"Route matching"| Login
+            App -->|"Route matching"| User
+            App -->|"Route matching"| Search
+            App -->|"Route matching"| List
+            App -->|"Route matching"| Admin
+            App -->|"Route matching"| Add
+            App -->|"Route matching"| Delete
+            App -->|"Route matching"| Edit
+        </div>
+        <hr />
+        <h2 id="route-configuration-in-apptsx">Route Configuration in
+        App.tsx</h2>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Routes<span class="op">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  {<span class="co">/* Public */</span>}</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>HomePage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/login&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>LoginPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  {<span class="co">/* Protected - All Authenticated Users */</span>}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/user&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>UserDashboard <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/search-product&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>SearchProductPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/list-stock&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>ListStockPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  {<span class="co">/* Admin-Only */</span>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/admin&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>AdminDashboard <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/add-product&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>AddProductPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/delete-product&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>DeleteProductPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Route path<span class="op">=</span><span class="st">&quot;/product/:productId/edit&quot;</span> element<span class="op">=</span>{<span class="op">&lt;</span>ChangeProductDetailsPage <span class="op">/&gt;</span>} <span class="op">/&gt;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Routes<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="page-summary-table">Page Summary Table</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Route</th>
+        <th>Page Component</th>
+        <th>Access</th>
+        <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>/</code></td>
+        <td>HomePage</td>
+        <td>Public</td>
+        <td>Landing page &amp; introduction</td>
+        </tr>
+        <tr class="even">
+        <td><code>/login</code></td>
+        <td>LoginPage</td>
+        <td>Public</td>
+        <td>User authentication</td>
+        </tr>
+        <tr class="odd">
+        <td><code>/user</code></td>
+        <td>UserDashboard</td>
+        <td>Authenticated</td>
+        <td>User inventory view</td>
+        </tr>
+        <tr class="even">
+        <td><code>/admin</code></td>
+        <td>AdminDashboard</td>
+        <td>Admin Only</td>
+        <td>Admin control panel</td>
+        </tr>
+        <tr class="odd">
+        <td><code>/add-product</code></td>
+        <td>AddProductPage</td>
+        <td>Admin Only</td>
+        <td>Create new product</td>
+        </tr>
+        <tr class="even">
+        <td><code>/delete-product</code></td>
+        <td>DeleteProductPage</td>
+        <td>Admin Only</td>
+        <td>Delete product</td>
+        </tr>
+        <tr class="odd">
+        <td><code>/product/:id/edit</code></td>
+        <td>ChangeProductDetailsPage</td>
+        <td>Admin Only</td>
+        <td>Edit product details</td>
+        </tr>
+        <tr class="even">
+        <td><code>/search-product</code></td>
+        <td>SearchProductPage</td>
+        <td>Authenticated</td>
+        <td>Search &amp; filter products</td>
+        </tr>
+        <tr class="odd">
+        <td><code>/list-stock</code></td>
+        <td>ListStockPage</td>
+        <td>Authenticated</td>
+        <td>Complete inventory list</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="page-categories">Page Categories</h2>
+        <h3 id="public-pages-no-auth-required">Public Pages (No Auth
+        Required)</h3>
+        <ul>
+        <li><strong>HomePage</strong>: Entry point, features, login
+        link</li>
+        <li><strong>LoginPage</strong>: Authentication form</li>
+        </ul>
+        <h3 id="protected-pages-login-required">Protected Pages (Login
+        Required)</h3>
+        <ul>
+        <li><strong>UserDashboard</strong>: User's own inventory</li>
+        <li><strong>SearchProductPage</strong>: Search across
+        products</li>
+        <li><strong>ListStockPage</strong>: Full inventory view</li>
+        </ul>
+        <h3 id="admin-pages-admin-role-required">Admin Pages (Admin Role
+        Required)</h3>
+        <ul>
+        <li><strong>AdminDashboard</strong>: Admin controls</li>
+        <li><strong>AddProductPage</strong>: Create products</li>
+        <li><strong>DeleteProductPage</strong>: Delete products</li>
+        <li><strong>ChangeProductDetailsPage</strong>: Edit
+        products</li>
+        </ul>
+        <hr />
+        <h2 id="navigation-flow">Navigation Flow</h2>
+        <pre><code>User visits app
+├─ Not logged in
+│  ├─ Lands on HomePage
+│  └─ Can navigate to LoginPage
+│
+├─ After login (User role)
+│  ├─ Redirected to UserDashboard
+│  ├─ Can access SearchProductPage
+│  └─ Can access ListStockPage
+│
+└─ After login (Admin role)
+   ├─ Redirected to AdminDashboard
+   ├─ Can access all user pages
+   └─ Can access admin pages (Add, Edit, Delete)</code></pre>
+        <hr />
+        <h2 id="typical-page-structure">Typical Page Structure</h2>
+        <p>Every page follows a consistent pattern:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> PageName<span class="op">:</span> React<span class="op">.</span><span class="at">FC</span> <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 1. Authentication check</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 2. State initialization</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 3. Data fetching</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 4. Event handlers</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 5. Conditional rendering (loading, error)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 6. Layout rendering</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p>See <a href="./lifecycle.html">Page Lifecycle</a> for
+        detailed implementation patterns.</p>
+        <hr />
+        <h2 id="layout-template">Layout Template</h2>
+        <p>All pages share a consistent layout structure:</p>
+        <pre><code>┌─────────────────────────────────┐
+│         Header                  │
+├────────────┬────────────────────┤
+│            │                    │
+│ Sidebar    │   Page Content     │
+│            │                    │
+├────────────┴────────────────────┤
+│         Footer                  │
+└─────────────────────────────────┘</code></pre>
+        <p>Components like Header, Sidebar, and Footer are shared across
+        all pages for consistency.</p>
+        <hr />
+        <h2 id="documentation-structure">Documentation Structure</h2>
+        <p>This documentation is organized into focused topics:</p>
+        <ul>
+        <li><p><strong><a href="./overview.html">Overview</a></strong>
+        (this file)</p>
+        <ul>
+        <li>Routing architecture, route configuration, page summary</li>
+        </ul></li>
+        <li><p><strong><a href="./components.html">Page
+        Components</a></strong></p>
+        <ul>
+        <li>Detailed documentation of each page (HomePage, LoginPage,
+        UserDashboard, etc.)</li>
+        </ul></li>
+        <li><p><strong><a href="./lifecycle.html">Page
+        Lifecycle</a></strong></p>
+        <ul>
+        <li>Page component structure, lifecycle hooks, typical
+        patterns</li>
+        </ul></li>
+        <li><p><strong><a href="./authentication.html">Authentication
+        &amp; Protection</a></strong></p>
+        <ul>
+        <li>Route protection, role-based access, authentication
+        patterns</li>
+        </ul></li>
+        <li><p><strong><a href="./performance.html">Performance &amp;
+        Optimization</a></strong></p>
+        <ul>
+        <li>Lazy loading, memoization, code splitting, optimization
+        techniques</li>
+        </ul></li>
+        <li><p><strong><a href="./testing.html">Testing
+        Pages</a></strong></p>
+        <ul>
+        <li>Testing strategies, test structure, testing patterns</li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="quick-reference">Quick Reference</h2>
+        <h3 id="access-a-protected-page-admin-only">Access a Protected
+        Page (Admin Only)</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Route </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  path<span class="op">=</span><span class="st">&quot;/admin&quot;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  element<span class="op">=</span>{<span class="op">&lt;</span>ProtectedRoute component<span class="op">=</span>{AdminDashboard} requiredRole<span class="op">=</span><span class="st">&quot;admin&quot;</span> <span class="op">/&gt;</span>}</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">/&gt;</span></span></code></pre></div>
+        <h3 id="lazy-load-a-page">Lazy Load a Page</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> AdminDashboard <span class="op">=</span> <span class="fu">lazy</span>(() <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./pages/AdminDashboard&#39;</span>))<span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Suspense fallback<span class="op">=</span>{<span class="op">&lt;</span>SkeletonLoader <span class="op">/&gt;</span>}<span class="op">&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>AdminDashboard <span class="op">/&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Suspense<span class="op">&gt;</span></span></code></pre></div>
+        <h3 id="check-authentication-in-component">Check Authentication
+        in Component</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { user<span class="op">,</span> isAuthenticated } <span class="op">=</span> <span class="fu">useSelector</span>(state <span class="kw">=&gt;</span> state<span class="op">.</span><span class="at">auth</span>)<span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="op">!</span>isAuthenticated) {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">&lt;</span>Navigate to<span class="op">=</span><span class="st">&quot;/login&quot;</span> <span class="op">/&gt;;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="common-tasks">Common Tasks</h2>
+        <h3 id="add-a-new-page">Add a New Page</h3>
+        <ol type="1">
+        <li>Create page component in <code>src/pages/</code></li>
+        <li>Add route in <code>App.tsx</code></li>
+        <li>Add to navigation (Sidebar, Header)</li>
+        <li>Implement authentication check if protected</li>
+        <li>Create tests in <code>src/__tests__/</code></li>
+        </ol>
+        <h3 id="protect-a-route">Protect a Route</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Route </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  path<span class="op">=</span><span class="st">&quot;/admin&quot;</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  element<span class="op">=</span>{</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>ProtectedRoute </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      component<span class="op">=</span>{AdminDashboard} </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      requiredRole<span class="op">=</span><span class="st">&quot;admin&quot;</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">/&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="op">/&gt;</span></span></code></pre></div>
+        <h3 id="add-authentication-check-in-page">Add Authentication
+        Check in Page</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> AdminDashboard<span class="op">:</span> React<span class="op">.</span><span class="at">FC</span> <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { user<span class="op">,</span> isAuthenticated } <span class="op">=</span> <span class="fu">useSelector</span>(state <span class="kw">=&gt;</span> state<span class="op">.</span><span class="at">auth</span>)<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>isAuthenticated <span class="op">||</span> user<span class="op">?.</span><span class="at">role</span> <span class="op">!==</span> <span class="st">&#39;admin&#39;</span>) {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">&lt;</span>Navigate to<span class="op">=</span><span class="st">&quot;/login&quot;</span> <span class="op">/&gt;;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Page content...</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./components.html">Component Architecture</a> -
+        Detailed page components</li>
+        <li><a href="./lifecycle.html">Page Lifecycle</a> - Component
+        structure and patterns</li>
+        <li><a href="./authentication.html">Authentication</a> - Route
+        protection and access control</li>
+        <li><a href="./performance.html">Performance</a> - Optimization
+        and lazy loading</li>
+        <li><a href="./testing.html">Testing</a> - Testing
+        strategies</li>
+        <li><a href="../overview.html">Main Architecture</a> - Overall
+        app architecture</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Total Pages</strong>: 9 main page components<br />
+        <strong>Protected Routes</strong>: 6<br />
+        <strong>Public Routes</strong>: 2</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

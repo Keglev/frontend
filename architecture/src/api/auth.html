@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>auth - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="authentication-service-authts">Authentication Service
+        (<code>auth.ts</code>)</h1>
+        <h2 id="purpose">Purpose</h2>
+        <p>Handles user login, JWT token extraction, and role-based
+        authorization.</p>
+        <p><strong>Location</strong>: <code>src/api/auth.ts</code></p>
+        <hr />
+        <h2 id="primary-function-login">Primary Function: login()</h2>
+        <h3 id="signature">Signature</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">login</span>(username<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> password<span class="op">:</span> <span class="dt">string</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>{</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  token<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  role<span class="op">:</span> <span class="st">&#39;admin&#39;</span> <span class="op">|</span> <span class="st">&#39;user&#39;</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  userId<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}<span class="op">&gt;</span></span></code></pre></div>
+        <h3 id="process-flow">Process Flow</h3>
+        <div class="mermaid">
+        sequenceDiagram
+            participant UI as LoginPage
+            participant Service as auth.login()
+            participant API as apiClient
+            participant Backend as Backend /api/auth/login
+            participant Storage as localStorage
+            participant Redux as Redux Store
+
+            UI->>Service: login('user@example.com', 'pass')
+            Service->>API: POST with credentials
+            API->>Backend: HTTP POST
+            Backend->>Backend: Validate credentials
+            Backend-->>API: {success, data: {token, role}}
+            API-->>Service: Response
+            Service->>Service: Decode JWT
+            Service->>Service: Extract role from payload
+            Service-->>UI: {token, role, userId}
+            UI->>Storage: Save token
+            UI->>Redux: dispatch(setUser)
+            UI->>UI: Navigate to dashboard
+        </div>
+        <h3 id="implementation-example">Implementation Example</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> auth <span class="op">=</span> {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  login<span class="op">:</span> <span class="kw">async</span> (username<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> password<span class="op">:</span> <span class="dt">string</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> apiClient<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/api/auth/login&#39;</span><span class="op">,</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        username<span class="op">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        password<span class="op">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> { token } <span class="op">=</span> response<span class="op">.</span><span class="at">data</span><span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Decode JWT to extract payload</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> decodedPayload <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">atob</span>(token<span class="op">.</span><span class="fu">split</span>(<span class="st">&#39;.&#39;</span>)[<span class="dv">1</span>])</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> role <span class="op">=</span> decodedPayload<span class="op">.</span><span class="at">role</span><span class="op">;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> userId <span class="op">=</span> decodedPayload<span class="op">.</span><span class="at">sub</span><span class="op">;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> { token<span class="op">,</span> role<span class="op">,</span> userId }<span class="op">;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">catch</span> (error) {</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Login failed: Invalid credentials&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="jwt-token-structure">JWT Token Structure</h2>
+        <h3 id="full-jwt-format">Full JWT Format</h3>
+        <pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjEyMzQ1Njc4OTAsImV4cCI6MTIzNDU3MTQ5MH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
+        <h3 id="three-components">Three Components</h3>
+        <ol type="1">
+        <li><strong>Header</strong></li>
+        </ol>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;alg&quot;</span><span class="fu">:</span> <span class="st">&quot;HS256&quot;</span><span class="fu">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;typ&quot;</span><span class="fu">:</span> <span class="st">&quot;JWT&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <ol start="2" type="1">
+        <li><strong>Payload</strong></li>
+        </ol>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub&quot;</span><span class="fu">:</span> <span class="st">&quot;user_123&quot;</span><span class="fu">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;username&quot;</span><span class="fu">:</span> <span class="st">&quot;john_doe&quot;</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;role&quot;</span><span class="fu">:</span> <span class="st">&quot;admin&quot;</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1234567890</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;exp&quot;</span><span class="fu">:</span> <span class="dv">1234571490</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <ol start="3" type="1">
+        <li><strong>Signature</strong></li>
+        </ol>
+        <pre><code>HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload), secret)</code></pre>
+        <hr />
+        <h2 id="token-decoding-logic">Token Decoding Logic</h2>
+        <h3 id="extract-payload">Extract Payload</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> token <span class="op">=</span> <span class="st">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoiYWRtaW4ifQ.signature&quot;</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Split by dots</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> parts <span class="op">=</span> token<span class="op">.</span><span class="fu">split</span>(<span class="st">&#39;.&#39;</span>)<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> payload <span class="op">=</span> parts[<span class="dv">1</span>]<span class="op">;</span>  <span class="co">// Middle part</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Decode Base64URL</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> decodedPayload <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(<span class="fu">atob</span>(payload))<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(decodedPayload)<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">// {</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">//   sub: &quot;123&quot;,</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">//   username: &quot;john&quot;,</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">//   role: &quot;admin&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">// }</span></span></code></pre></div>
+        <h3 id="extract-role">Extract Role</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> role <span class="op">=</span> decodedPayload<span class="op">.</span><span class="at">role</span><span class="op">;</span>  <span class="co">// &#39;admin&#39; or &#39;user&#39;</span></span></code></pre></div>
+        <hr />
+        <h2 id="token-storage--persistence">Token Storage &amp;
+        Persistence</h2>
+        <h3 id="saving-token-after-login">Saving Token After Login</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In LoginPage or similar</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { token<span class="op">,</span> role } <span class="op">=</span> <span class="cf">await</span> auth<span class="op">.</span><span class="fu">login</span>(username<span class="op">,</span> password)<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Save to localStorage</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;authToken&#39;</span><span class="op">,</span> token)<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;userRole&#39;</span><span class="op">,</span> role)<span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Update Redux</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dispatch</span>({</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  type<span class="op">:</span> <span class="st">&#39;SET_USER&#39;</span><span class="op">,</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  payload<span class="op">:</span> { token<span class="op">,</span> role }</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="restoring-token-on-app-load">Restoring Token on App
+        Load</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In App.tsx or root component</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">useEffect</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;authToken&#39;</span>)<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> role <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;userRole&#39;</span>)<span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (token <span class="op">&amp;&amp;</span> role) {</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Restore session</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dispatch</span>({</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      type<span class="op">:</span> <span class="st">&#39;SET_USER&#39;</span><span class="op">,</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>      payload<span class="op">:</span> { token<span class="op">,</span> role }</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [dispatch])<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="logout">Logout</h2>
+        <h3 id="clear-token">Clear Token</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> logout <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Remove from localStorage</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;authToken&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;userRole&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;userId&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Update Redux</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dispatch</span>({ type<span class="op">:</span> <span class="st">&#39;LOGOUT&#39;</span> })<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Navigate to login</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">navigate</span>(<span class="st">&#39;/login&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="error-scenarios">Error Scenarios</h2>
+        <h3 id="invalid-credentials">Invalid Credentials</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Backend response</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;success&quot;</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;error&quot;</span><span class="op">:</span> <span class="st">&quot;INVALID_CREDENTIALS&quot;</span><span class="op">,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;message&quot;</span><span class="op">:</span> <span class="st">&quot;Username or password incorrect&quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Service throws</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Invalid credentials&#39;</span>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="network-error">Network Error</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> auth<span class="op">.</span><span class="fu">login</span>(username<span class="op">,</span> password)<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> (error) {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>error<span class="op">.</span><span class="at">response</span>) {</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Network error</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Network error - check connection&#39;</span>)<span class="op">;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="server-error">Server Error</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 500 response from server</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Propagate to UI for user to see</span></span></code></pre></div>
+        <hr />
+        <h2 id="integration-with-apiclient">Integration with
+        apiClient</h2>
+        <h3 id="automatic-token-injection">Automatic Token
+        Injection</h3>
+        <p>After login, all subsequent requests automatically include
+        token:</p>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Login</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { token } <span class="op">=</span> <span class="cf">await</span> auth<span class="op">.</span><span class="fu">login</span>(username<span class="op">,</span> password)<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Save token</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;authToken&#39;</span><span class="op">,</span> token)<span class="op">;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Any subsequent apiClient call automatically includes:</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Authorization: &quot;Bearer {token}&quot;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> products <span class="op">=</span> <span class="cf">await</span> apiClient<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/api/products&#39;</span>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="testing">Testing</h2>
+        <h3 id="mock-login">Mock Login</h3>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>vi<span class="op">.</span><span class="fu">mock</span>(<span class="st">&#39;@/api/auth&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> ({</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  auth<span class="op">:</span> {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    login<span class="op">:</span> vi<span class="op">.</span><span class="fu">fn</span>()<span class="op">.</span><span class="fu">mockResolvedValue</span>({</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      token<span class="op">:</span> <span class="st">&#39;fake-jwt-token&#39;</span><span class="op">,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      role<span class="op">:</span> <span class="st">&#39;admin&#39;</span><span class="op">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>      userId<span class="op">:</span> <span class="st">&#39;123&#39;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>}))<span class="op">;</span></span></code></pre></div>
+        <h3 id="test-token-extraction">Test Token Extraction</h3>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(<span class="st">&#39;extracts role from JWT token&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> <span class="st">&#39;eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4ifQ.signature&#39;</span><span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> payload <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(<span class="fu">atob</span>(token<span class="op">.</span><span class="fu">split</span>(<span class="st">&#39;.&#39;</span>)[<span class="dv">1</span>]))<span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect</span>(payload<span class="op">.</span><span class="at">role</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;admin&#39;</span>)<span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Decode token carefully</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> payload <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(<span class="fu">atob</span>(token<span class="op">.</span><span class="fu">split</span>(<span class="st">&#39;.&#39;</span>)[<span class="dv">1</span>]))<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Check for token expiration</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (decodedPayload<span class="op">.</span><span class="at">exp</span> <span class="op">&lt;</span> <span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>) {</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Token expired</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;authToken&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">navigate</span>(<span class="st">&#39;/login&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">// Clear token on 401</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>apiClient interceptor handles <span class="kw">this</span> automatically</span></code></pre></div>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t store passwords</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;password&#39;</span><span class="op">,</span> password)<span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t trust token without backend validation</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Always verify on server side</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t expose token in logs</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Token:&#39;</span><span class="op">,</span> token)<span class="op">;</span>  <span class="co">// Bad!</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t ignore token expiration</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">// Check exp claim if implementing refresh tokens</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./client.html">HTTP Client Configuration</a></li>
+        <li><a href="./error-handling.html">Error Handling &amp;
+        Security</a></li>
+        <li><a href="./overview.html">API Overview</a></li>
+        <li><a href="./testing.html">Testing API Layer</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

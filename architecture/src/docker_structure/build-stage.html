@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>build-stage - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="build-stage-stage-1-builder">Build Stage (Stage 1:
+        Builder)</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The builder stage compiles the React application using
+        Node.js. After the build completes, this entire stage is
+        discarded, keeping only the optimized <code>dist/</code>
+        directory in the final image.</p>
+        <hr />
+        <h2 id="stage-1-configuration">Stage 1 Configuration</h2>
+        <h3 id="base-image">Base Image</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> builder</span></code></pre></div>
+        <p><strong>Why Alpine?</strong></p>
+        <ul>
+        <li>Minimal size (~180MB vs 900MB+ for full Node.js)</li>
+        <li>Contains Node.js and npm</li>
+        <li>Security updates regularly</li>
+        </ul>
+        <h3 id="build-arguments">Build Arguments</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ARG</span> VITE_API_BASE_URL=<span class="st">&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> VITE_API_BASE_URL=${VITE_API_BASE_URL}</span></code></pre></div>
+        <p>Allows API endpoint configuration at build time:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.example.com .</span></code></pre></div>
+        <hr />
+        <h2 id="build-steps">Build Steps</h2>
+        <h3 id="1-install-dependencies">1. Install Dependencies</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> package*.json ./</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci <span class="at">--silent</span></span></code></pre></div>
+        <ul>
+        <li><code>npm ci</code> (clean install) - Uses package-lock.json
+        for reproducibility</li>
+        <li><code>--silent</code> - Reduces log noise</li>
+        <li>Dependencies: ~200-300MB of node_modules</li>
+        </ul>
+        <h3 id="2-copy-source-files">2. Copy Source Files</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> tsconfig*.json vite.config.ts ./</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> src ./src</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> public ./public</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> index.html ./</span></code></pre></div>
+        <p><strong>Copied</strong>:</p>
+        <ul>
+        <li>TypeScript configuration</li>
+        <li>Vite configuration</li>
+        <li>Source code</li>
+        <li>Public assets</li>
+        <li>Entry point HTML</li>
+        </ul>
+        <p><strong>Not copied</strong> (via .dockerignore):</p>
+        <ul>
+        <li>Tests and test configuration</li>
+        <li>Documentation</li>
+        <li>Coverage reports</li>
+        <li>Node modules (already installed)</li>
+        </ul>
+        <h3 id="3-build-application">3. Build Application</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span></code></pre></div>
+        <p><strong>Build Output</strong>:</p>
+        <ul>
+        <li>Compiles TypeScript → JavaScript</li>
+        <li>Bundles and minifies code</li>
+        <li>Optimizes assets</li>
+        <li>Generates <code>dist/</code> directory (~2-5MB)</li>
+        </ul>
+        <p><strong>Output Structure</strong>:</p>
+        <pre><code>dist/
+├── index.html (entry point)
+├── assets/
+│   ├── index-ABC123.js (app code, minified)
+│   ├── vendor-DEF456.js (React, dependencies)
+│   └── index-XYZ789.css (styles)
+└── public/
+    └── (static assets)</code></pre>
+        <hr />
+        <h2 id="performance-details">Performance Details</h2>
+        <h3 id="build-time-breakdown">Build Time Breakdown</h3>
+        <pre><code>npm ci: 20-30 seconds (installing dependencies)
+TypeScript compilation: 20-30 seconds
+Asset bundling: 10-20 seconds
+Total: ~50-80 seconds (fresh build)
+With cache: ~10-20 seconds</code></pre>
+        <h3 id="stage-output-size">Stage Output Size</h3>
+        <pre><code>Builder stage: ~400MB (includes Node.js + dependencies)
+Output artifact (dist/): ~2-5MB
+Ratio: ~100:1 reduction in size!</code></pre>
+        <p>This is why multi-stage builds are so powerful—the entire
+        builder stage is discarded after building, and only the tiny
+        <code>dist/</code> folder is copied to production.</p>
+        <hr />
+        <h2 id="environment-variables">Environment Variables</h2>
+        <h3 id="available-at-build-time">Available at Build Time</h3>
+        <ul>
+        <li><code>NODE_ENV</code> - Set to production</li>
+        <li><code>VITE_API_BASE_URL</code> - API endpoint (from build
+        arg)</li>
+        <li>Any variable starting with <code>VITE_</code> - Vite exposes
+        these</li>
+        </ul>
+        <h3 id="build-time-replacement">Build-Time Replacement</h3>
+        <p>Vite processes <code>import.meta.env.VITE_*</code> variables
+        at build time:</p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In source code</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> apiUrl <span class="op">=</span> import<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">VITE_API_BASE_URL</span><span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Build-time replacement:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">// const apiUrl = &quot;https://api.example.com&quot;;</span></span></code></pre></div>
+        <p>The actual value is baked into the compiled bundle—not
+        configurable at runtime!</p>
+        <hr />
+        <h2 id="optimization-techniques">Optimization Techniques</h2>
+        <h3 id="1-layer-caching">1. Layer Caching</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This layer is cached if package*.json hasn&#39;t changed</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> package*.json ./</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci <span class="at">--silent</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This layer rebuilds if src/ has changed</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> src ./src</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span></code></pre></div>
+        <p><strong>Strategy</strong>: Dependencies before source code =
+        faster rebuilds when only code changes.</p>
+        <h3 id="2-npm-ci-vs-npm-install">2. npm ci vs npm install</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci  <span class="co"># ← Correct for Docker</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># NOT: npm install (may update package versions!)</span></span></code></pre></div>
+        <p><code>npm ci</code> is deterministic—uses exact versions from
+        package-lock.json.</p>
+        <h3 id="3-dockerignore">3. .dockerignore</h3>
+        <pre><code>__tests__
+*.test.ts
+*.test.tsx
+docs
+coverage</code></pre>
+        <p>Excludes unnecessary files from Docker context → faster
+        builds.</p>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Docker Overview</a></li>
+        <li><a href="./production-stage.html">Production Stage</a></li>
+        <li><a href="./configuration.html">Build Configuration</a></li>
+        <li><a href="./local-usage.html">Local Usage</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

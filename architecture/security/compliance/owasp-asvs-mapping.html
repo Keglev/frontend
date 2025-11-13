@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>owasp-asvs-mapping - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="owasp-asvs-mapping---stockease-frontend">OWASP ASVS
+        Mapping - StockEase Frontend</h1>
+        <h2 id="overview">Overview</h2>
+        <p>This document maps StockEase Frontend's security controls to
+        the <strong>OWASP Application Security Verification Standard
+        (ASVS) v4.0</strong>, ensuring comprehensive coverage of
+        application security requirements across all critical areas.</p>
+        <p><strong>Standards Alignment:</strong></p>
+        <ul>
+        <li><strong>OWASP ASVS v4.0</strong> — Application-level
+        security controls</li>
+        <li><strong>OWASP Top 10 2021</strong> — Prevention of most
+        critical vulnerabilities</li>
+        <li><strong>PCI DSS 3.2.1</strong> — Payment security (if
+        applicable)</li>
+        <li><strong>GDPR</strong> — Data protection and privacy</li>
+        <li><strong>SOC 2 Type II</strong> — Security and availability
+        controls</li>
+        </ul>
+        <p><strong>Verification Level:</strong> Level 2 (Standard) with
+        aspirations toward Level 3 (Advanced)</p>
+        <hr />
+        <h2 id="-v1-architecture-design-and-threat-modeling">🔐 V1:
+        Architecture, Design and Threat Modeling</h2>
+        <h3 id="v11---threat-modeling">V1.1 - Threat Modeling</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>1.1.1</strong> Verify that security architecture is
+        documented and threats are identified using data flow
+        diagrams</td>
+        <td>✅ Implemented</td>
+        <td>Security documentation structure with threat analysis</td>
+        <td><a href="../overview.html">Architecture Overview</a>, <a
+        href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>1.1.2</strong> Verify that all components have
+        security properties documented</td>
+        <td>✅ Implemented</td>
+        <td>Component-level security documentation</td>
+        <td><a href="../frontend/overview.html">Frontend Security</a>,
+        <a href="../auth/overview.html">Auth Documentation</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v12---authentication-architecture">V1.2 - Authentication
+        Architecture</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>1.2.1</strong> Verify that user identity is verified
+        using a secure authentication mechanism</td>
+        <td>✅ Implemented</td>
+        <td>JWT Bearer token authentication with server-side
+        validation</td>
+        <td><a href="../auth/authentication.html">Authentication
+        Flow</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>1.2.2</strong> Verify that architecture prevents
+        common authentication attacks</td>
+        <td>✅ Implemented</td>
+        <td>Token validation, 401 error handling, session cleanup</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/auth-logging-security.test.ts">Auth
+        &amp; Logging Security Tests</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v13---session-management">V1.3 - Session Management</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>1.3.1</strong> Verify that session tokens are
+        invalidated on logout</td>
+        <td>✅ Implemented</td>
+        <td>Token cleared from localStorage on 401/logout</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/security-and-scenarios.test.ts">Security
+        Tests - Token Clearing</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>1.3.2</strong> Verify that session management
+        prevents fixation and hijacking attacks</td>
+        <td>✅ Implemented</td>
+        <td>Server-side JWT validation, httpOnly consideration</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security Configuration</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v2-authentication-verification">🔑 V2: Authentication
+        Verification</h2>
+        <h3 id="v21---password-security">V2.1 - Password Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>2.1.1</strong> Verify passwords are verified using
+        secure hashing algorithms</td>
+        <td>✅ Backend</td>
+        <td>Server handles hashing (bcrypt/PBKDF2)</td>
+        <td><a href="../auth/authentication.html">Authentication
+        Flow</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>2.1.2</strong> Verify that password strength
+        requirements are enforced</td>
+        <td>✅ Implemented</td>
+        <td>Client-side validation with clear requirements</td>
+        <td><a href="../auth/authentication.html">Password
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v22---general-authenticator-properties">V2.2 - General
+        Authenticator Properties</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>2.2.1</strong> Verify authenticators are not
+        disclosed in transit</td>
+        <td>✅ Implemented</td>
+        <td>HTTPS only, Bearer token in Authorization header</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/cors-origins-auth.test.ts">CORS
+        &amp; Auth Tests</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>2.2.2</strong> Verify authenticators are not
+        disclosed in logs</td>
+        <td>✅ Implemented</td>
+        <td>Tokens redacted in logs, no credentials in console</td>
+        <td><a href="../api-communication/error-logging.html">Auth &amp;
+        Logging Security</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>2.2.3</strong> Verify authenticators are not logged
+        or transmitted unencrypted</td>
+        <td>✅ Implemented</td>
+        <td>No HTTP connections, tokens redacted from error
+        messages</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/sensitive-data-protection.test.ts">Sensitive
+        Data Protection</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v23---authentication-using-passwords">V2.3 -
+        Authentication Using Passwords</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>2.3.1</strong> Verify that authentication is
+        protected against user enumeration attacks</td>
+        <td>✅ Implemented</td>
+        <td>Generic error messages for login failures</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/auth-logging-security.test.ts">Auth
+        &amp; Logging Tests</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>2.3.2</strong> Verify that credential recovery does
+        not reveal valid username</td>
+        <td>✅ Planned</td>
+        <td>To be implemented with password recovery feature</td>
+        <td><a href="../auth/overview.html">Authentication</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v27---out-of-band-authenticators">V2.7 - Out-of-Band
+        Authenticators</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>2.7.1</strong> Verify multi-factor authentication is
+        available</td>
+        <td>⏳ Future</td>
+        <td>Planned for future release</td>
+        <td><a href="../auth/overview.html">Authentication
+        Roadmap</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v3-session-management-verification">👥 V3: Session
+        Management Verification</h2>
+        <h3 id="v31---defensive-session-management">V3.1 - Defensive
+        Session Management</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>3.1.1</strong> Verify that tokens are generated
+        using cryptographically secure RNG</td>
+        <td>✅ Backend</td>
+        <td>JWT generated server-side with secure libraries</td>
+        <td><a href="../auth/jwt-tokens.html">JWT Tokens</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>3.1.2</strong> Verify that token identifiers are
+        unique and unpredictable</td>
+        <td>✅ Backend</td>
+        <td>JWT standard format with server signature</td>
+        <td><a href="../auth/jwt-tokens.html">JWT Documentation</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v32---session-binding">V3.2 - Session Binding</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>3.2.1</strong> Verify that session tokens are
+        invalidated upon logout</td>
+        <td>✅ Implemented</td>
+        <td>localStorage cleared, 401 triggers cleanup</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/http-error-handling.test.ts">Security
+        Tests</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>3.2.2</strong> Verify that session tokens prevent
+        attacks from disclosed tokens</td>
+        <td>✅ Backend</td>
+        <td>Server validates JWT signature and expiration</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v33---session-content">V3.3 - Session Content</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>3.3.1</strong> Verify that application logs do not
+        contain session tokens</td>
+        <td>✅ Implemented</td>
+        <td>All logs redact Authorization headers and tokens</td>
+        <td><a href="../api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>3.3.2</strong> Verify that session tokens are not
+        leaked in URL parameters</td>
+        <td>✅ Implemented</td>
+        <td>Tokens never appended to URLs, only in headers</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v4-access-control-verification">🔓 V4: Access Control
+        Verification</h2>
+        <h3 id="v41---general-access-control-design">V4.1 - General
+        Access Control Design</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>4.1.1</strong> Verify that access is granted through
+        consistent, standardized mechanisms</td>
+        <td>✅ Implemented</td>
+        <td>Role-based access control (RBAC) system</td>
+        <td><a href="../auth/authorization.html">Authorization</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>4.1.2</strong> Verify that access control is
+        enforced consistently throughout the application</td>
+        <td>✅ Implemented</td>
+        <td>Protected routes, component-level authorization</td>
+        <td><a href="../auth/authorization.html">Authorization
+        Documentation</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v42---operation-level-access-control">V4.2 - Operation
+        Level Access Control</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>4.2.1</strong> Verify that authorization is enforced
+        before data access</td>
+        <td>✅ Implemented</td>
+        <td>Route guards, token validation on every API call</td>
+        <td><a href="../auth/authorization.html">Authorization</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>4.2.2</strong> Verify that application does not
+        grant excessive permissions</td>
+        <td>✅ Implemented</td>
+        <td>Principle of least privilege in role definitions</td>
+        <td><a href="../auth/authorization.html">Authorization</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v43---other-access-control-considerations">V4.3 - Other
+        Access Control Considerations</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>4.3.1</strong> Verify that sensitive information or
+        operations require strong authentication</td>
+        <td>✅ Implemented</td>
+        <td>All admin operations require valid JWT</td>
+        <td><a href="../auth/authorization.html">Authorization</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>4.3.2</strong> Verify that temporary access tokens
+        expire quickly</td>
+        <td>✅ Implemented</td>
+        <td>JWT configured with reasonable expiration (backend)</td>
+        <td><a href="../auth/jwt-tokens.html">JWT Tokens</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="️-v5-validation-sanitization-and-encoding">🛡️ V5:
+        Validation, Sanitization and Encoding</h2>
+        <h3 id="v51---input-validation">V5.1 - Input Validation</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>5.1.1</strong> Verify that the application has input
+        validation controls</td>
+        <td>✅ Implemented</td>
+        <td>Client-side validation with clear rules, backend
+        enforcement</td>
+        <td><a href="../frontend/xss-and-sanitization.html">Input
+        Validation</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>5.1.2</strong> Verify that input validation is
+        case-sensitive and comprehensive</td>
+        <td>✅ Implemented</td>
+        <td>All inputs validated against whitelist rules</td>
+        <td><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v52---sanitization-and-encoding">V5.2 - Sanitization and
+        Encoding</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>5.2.1</strong> Verify that all output encoding is
+        context-appropriate</td>
+        <td>✅ Implemented</td>
+        <td>React's automatic XSS prevention, dangerouslySetInnerHTML
+        avoided</td>
+        <td><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>5.2.2</strong> Verify that dangerous characters are
+        escaped</td>
+        <td>✅ Implemented</td>
+        <td>No raw HTML injection, input sanitization enforced</td>
+        <td><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention &amp; Sanitization</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v53---output-encoding-and-injection-prevention">V5.3 -
+        Output Encoding and Injection Prevention</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>5.3.1</strong> Verify that output encoding prevents
+        injection attacks</td>
+        <td>✅ Implemented</td>
+        <td>React's built-in XSS protection, no innerHTML usage</td>
+        <td><a href="../frontend/overview.html">Frontend
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>5.3.2</strong> Verify that no database or OS
+        injection is possible</td>
+        <td>✅ Backend</td>
+        <td>API layer handles all database queries with parameterized
+        statements</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v6-cryptography-verification">🔐 V6: Cryptography
+        Verification</h2>
+        <h3 id="v61---data-classification">V6.1 - Data
+        Classification</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>6.1.1</strong> Verify that sensitive data is
+        identified and classified</td>
+        <td>✅ Implemented</td>
+        <td>Tokens, passwords, and PII marked as sensitive</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/sensitive-data-protection.test.ts">Sensitive
+        Data Protection</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v62---algorithms">V6.2 - Algorithms</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>6.2.1</strong> Verify that cryptographic algorithms
+        are modern and standardized</td>
+        <td>✅ Backend</td>
+        <td>HS256/RS256 for JWT, HTTPS with TLS 1.2+</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>6.2.2</strong> Verify that no weak cryptographic
+        algorithms are used</td>
+        <td>✅ Implemented</td>
+        <td>No MD5/SHA1, only modern algorithms</td>
+        <td><a href="../platform/overview.html">Platform
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v63---random-number-generation">V6.3 - Random Number
+        Generation</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>6.3.1</strong> Verify that all randomness is
+        generated using cryptographically secure RNG</td>
+        <td>✅ Backend</td>
+        <td>Request IDs, tokens generated with crypto library</td>
+        <td><a href="../api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v64---secret-management">V6.4 - Secret Management</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>6.4.1</strong> Verify that secrets are managed
+        securely</td>
+        <td>✅ Implemented</td>
+        <td>GitHub Secrets for CI/CD, .env files for development</td>
+        <td><a href="../frontend/secrets-config.html">Secrets &amp;
+        Config</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>6.4.2</strong> Verify that secrets are rotated
+        regularly</td>
+        <td>✅ Implemented</td>
+        <td>Automated rotation procedures in place</td>
+        <td><a href="../playbooks/key-rotation.html">Key Rotation
+        Playbook</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v7-error-handling-and-logging">🌐 V7: Error Handling
+        and Logging</h2>
+        <h3 id="v71---log-content">V7.1 - Log Content</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>7.1.1</strong> Verify that security events are
+        logged</td>
+        <td>✅ Implemented</td>
+        <td>Failed auth attempts, unauthorized access attempts
+        logged</td>
+        <td><a href="../api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>7.1.2</strong> Verify that logs do not contain
+        sensitive information</td>
+        <td>✅ Implemented</td>
+        <td>Tokens, passwords, API keys redacted from all logs</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/sensitive-data-protection.test.ts">Sensitive
+        Data Protection</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v72---log-processing">V7.2 - Log Processing</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>7.2.1</strong> Verify that logs are protected from
+        tampering and deletion</td>
+        <td>✅ Backend</td>
+        <td>Server-side log protection and retention</td>
+        <td><a href="../api-communication/error-logging.html">Logging
+        Architecture</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v73---log-protection">V7.3 - Log Protection</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>7.3.1</strong> Verify that sensitive information is
+        not logged</td>
+        <td>✅ Implemented</td>
+        <td>Comprehensive redaction of all sensitive data</td>
+        <td><a href="../api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>7.3.2</strong> Verify that third-party logging is
+        configured securely</td>
+        <td>✅ Implemented</td>
+        <td>Error tracking systems receive sanitized errors only</td>
+        <td><a href="../api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v8-data-protection-and-privacy">🌍 V8: Data Protection
+        and Privacy</h2>
+        <h3 id="v81---general-data-protection">V8.1 - General Data
+        Protection</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>8.1.1</strong> Verify that PII is not logged or
+        transmitted unnecessarily</td>
+        <td>✅ Implemented</td>
+        <td>PII masked in error messages, not logged</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/sensitive-data-protection.test.ts">Sensitive
+        Data Protection</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>8.1.2</strong> Verify that sensitive data is
+        encrypted at rest and in transit</td>
+        <td>✅ Partial</td>
+        <td>Transit: HTTPS enforced; Rest: Backend responsibility</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v82---client-side-data-protection">V8.2 - Client-side
+        Data Protection</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>8.2.1</strong> Verify that sensitive data in
+        localStorage is not exposed</td>
+        <td>✅ Implemented</td>
+        <td>Tokens stored securely, accessible only to frontend</td>
+        <td><a href="../frontend/secrets-config.html">Secrets &amp;
+        Configuration</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>8.2.2</strong> Verify that sensitive data in
+        SessionStorage is properly cleared</td>
+        <td>✅ Implemented</td>
+        <td>Session cleared on 401, logout empties storage</td>
+        <td><a href="../auth/jwt-tokens.html">Session
+        Management</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v83---sensitive-private-data">V8.3 - Sensitive Private
+        Data</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>8.3.1</strong> Verify that GDPR requirements are
+        met</td>
+        <td>✅ Partial</td>
+        <td>Frontend enforces data protection; backend handles
+        retention/deletion</td>
+        <td><a href="../compliance/overview.html">GDPR
+        Compliance</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v9-communications-verification">🌐 V9: Communications
+        Verification</h2>
+        <h3 id="v91---client-communications-security">V9.1 - Client
+        Communications Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>9.1.1</strong> Verify that TLS is used for all
+        communications</td>
+        <td>✅ Implemented</td>
+        <td>HTTPS enforced, HTTP redirected in nginx</td>
+        <td><a href="../platform/overview.html">Platform
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>9.1.2</strong> Verify that TLS is configured with
+        strong cipher suites</td>
+        <td>✅ Implemented</td>
+        <td>TLS 1.2+, strong cipher suites configured</td>
+        <td><a href="../platform/headers-and-nginx.html">nginx
+        Configuration</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v92---server-communications-security">V9.2 - Server
+        Communications Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>9.2.1</strong> Verify that server-to-server
+        communications are encrypted</td>
+        <td>✅ Backend</td>
+        <td>API-to-backend communications use HTTPS</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v93---cors">V9.3 - CORS</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>9.3.1</strong> Verify that CORS is configured
+        restrictively</td>
+        <td>✅ Implemented</td>
+        <td>Only approved origins allowed, no wildcard with
+        credentials</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/cors-origins-auth.test.ts">CORS
+        Origins &amp; Auth Tests</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>9.3.2</strong> Verify that CORS headers are
+        validated</td>
+        <td>✅ Implemented</td>
+        <td>Access-Control-Allow-Origin validated on every request</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/cors-headers-validation.test.ts">CORS
+        Headers Validation</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v94---http-security-headers">V9.4 - HTTP Security
+        Headers</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>9.4.1</strong> Verify that Content-Security-Policy
+        header is present</td>
+        <td>✅ Implemented</td>
+        <td>CSP configured in nginx with proper directives</td>
+        <td><a href="../frontend/csp.html">CSP Configuration</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>9.4.2</strong> Verify that X-Content-Type-Options is
+        set to nosniff</td>
+        <td>✅ Implemented</td>
+        <td>nginx configured to prevent MIME type sniffing</td>
+        <td><a href="../platform/headers-and-nginx.html">Headers
+        Configuration</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>9.4.3</strong> Verify that X-Frame-Options prevents
+        clickjacking</td>
+        <td>✅ Implemented</td>
+        <td>X-Frame-Options: DENY configured in nginx</td>
+        <td><a href="../platform/headers-and-nginx.html">Headers
+        Configuration</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>9.4.4</strong> Verify that HSTS is configured with
+        long max-age</td>
+        <td>✅ Implemented</td>
+        <td>Strict-Transport-Security with 1-year max-age</td>
+        <td><a href="../platform/headers-and-nginx.html">HSTS
+        Configuration</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>9.4.5</strong> Verify that Referrer-Policy is
+        configured</td>
+        <td>✅ Implemented</td>
+        <td>Referrer-Policy: strict-origin configured</td>
+        <td><a href="../platform/headers-and-nginx.html">Headers
+        Configuration</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v10-malicious-code-verification">🎯 V10: Malicious Code
+        Verification</h2>
+        <h3 id="v101---code-injection-prevention">V10.1 - Code Injection
+        Prevention</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>10.1.1</strong> Verify that code injection attacks
+        are prevented</td>
+        <td>✅ Implemented</td>
+        <td>XSS prevention, input validation, output encoding</td>
+        <td><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>10.1.2</strong> Verify that malicious code cannot
+        execute via eval()</td>
+        <td>✅ Implemented</td>
+        <td>eval() not used, no dynamic code execution</td>
+        <td><a href="../frontend/overview.html">Frontend
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v102---code-integrity">V10.2 - Code Integrity</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>10.2.1</strong> Verify that third-party libraries
+        are validated</td>
+        <td>✅ Implemented</td>
+        <td>npm audit, Renovate automation for dependency scanning</td>
+        <td><a href="../platform/dependencies.html">Dependency
+        Management</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>10.2.2</strong> Verify that dependencies are kept
+        up-to-date</td>
+        <td>✅ Implemented</td>
+        <td>Automated dependency updates via Renovate</td>
+        <td><a href="../platform/dependencies.html">Dependency
+        Management</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v11-business-logic-verification">🔄 V11: Business Logic
+        Verification</h2>
+        <h3 id="v111---business-logic-security">V11.1 - Business Logic
+        Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>11.1.1</strong> Verify that the application enforces
+        unique business rules</td>
+        <td>✅ Implemented</td>
+        <td>Backend enforces business rules; frontend validates</td>
+        <td><a href="../auth/authorization.html">Authorization</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>11.1.2</strong> Verify that application prevents
+        double submission attacks</td>
+        <td>✅ Planned</td>
+        <td>To implement CSRF tokens for state-changing operations</td>
+        <td><a href="../frontend/cors-and-csrf.html">CSRF
+        Protection</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v12-file-upload-verification">🚀 V12: File Upload
+        Verification</h2>
+        <h3 id="v121---file-upload-security">V12.1 - File Upload
+        Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>12.1.1</strong> Verify that uploaded files are
+        validated</td>
+        <td>✅ Backend</td>
+        <td>File type, size, and content validation on server</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>12.1.2</strong> Verify that file uploads cannot
+        execute code</td>
+        <td>✅ Backend</td>
+        <td>Files stored outside web root, no execution permissions</td>
+        <td><a href="../platform/overview.html">Platform
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-v13-api-verification">🔍 V13: API Verification</h2>
+        <h3 id="v131---api-security-architecture">V13.1 - API Security
+        Architecture</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>13.1.1</strong> Verify that API uses authentication
+        and authorization</td>
+        <td>✅ Implemented</td>
+        <td>JWT Bearer token on every request</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>13.1.2</strong> Verify that API enforces rate
+        limiting</td>
+        <td>✅ Backend</td>
+        <td>Rate limiting configured on API endpoints</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="v132---restful-web-service-security">V13.2 - RESTful Web
+        Service Security</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Requirement</th>
+        <th>Status</th>
+        <th>Implementation</th>
+        <th>Evidence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>13.2.1</strong> Verify that API enforces request
+        validation</td>
+        <td>✅ Backend</td>
+        <td>Input validation on all API endpoints</td>
+        <td><a href="../api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>13.2.2</strong> Verify that API returns appropriate
+        HTTP status codes</td>
+        <td>✅ Implemented</td>
+        <td>401 for auth errors, 403 for forbidden, 400 for bad
+        requests</td>
+        <td><a
+        href="../../src/__tests__/services/api-client-operations/security/http-error-handling.test.ts">HTTP
+        Error Handling Tests</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-compliance-summary">📊 Compliance Summary</h2>
+        <h3 id="coverage-by-asvs-level">Coverage by ASVS Level</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Level</th>
+        <th>Status</th>
+        <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Level 1</strong></td>
+        <td>✅ Complete</td>
+        <td>Fundamental security controls implemented</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Level 2</strong></td>
+        <td>✅ ~90%</td>
+        <td>Standard security controls mostly implemented</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Level 3</strong></td>
+        <td>⏳ Partial</td>
+        <td>Advanced controls partially implemented (MFA, advanced
+        encryption)</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="coverage-by-owasp-top-10-2021">Coverage by OWASP Top 10
+        2021</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Vulnerability</th>
+        <th>Status</th>
+        <th>Mitigation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>A01: Broken Access Control</strong></td>
+        <td>✅ Mitigated</td>
+        <td>RBAC, route guards, token validation</td>
+        </tr>
+        <tr class="even">
+        <td><strong>A02: Cryptographic Failures</strong></td>
+        <td>✅ Mitigated</td>
+        <td>HTTPS, strong cryptography, secure storage</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>A03: Injection</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Input validation, parameterized queries (backend)</td>
+        </tr>
+        <tr class="even">
+        <td><strong>A04: Insecure Design</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Threat modeling, secure architecture</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>A05: Security Misconfiguration</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Automated scanning, secure defaults</td>
+        </tr>
+        <tr class="even">
+        <td><strong>A06: Vulnerable Components</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Dependency scanning, automated updates</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>A07: Authentication Failures</strong></td>
+        <td>✅ Mitigated</td>
+        <td>JWT, secure token handling, session cleanup</td>
+        </tr>
+        <tr class="even">
+        <td><strong>A08: Data Integrity Failures</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Input validation, CSRF protection (planned)</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>A09: Logging &amp; Monitoring</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Comprehensive error logging, no sensitive data</td>
+        </tr>
+        <tr class="even">
+        <td><strong>A10: SSRF</strong></td>
+        <td>✅ Mitigated</td>
+        <td>Backend responsible, API validation</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-implementation-roadmap">🔄 Implementation Roadmap</h2>
+        <h3 id="current-q4-2025">Current (Q4 2025)</h3>
+        <ul>
+        <li>✅ JWT authentication and session management</li>
+        <li>✅ CORS validation and headers</li>
+        <li>✅ XSS prevention and input validation</li>
+        <li>✅ Error logging without sensitive data</li>
+        <li>✅ HTTPS enforcement and security headers</li>
+        <li>✅ Dependency scanning and updates</li>
+        </ul>
+        <h3 id="near-term-q1-2026">Near-term (Q1 2026)</h3>
+        <ul>
+        <li>⏳ CSRF protection implementation</li>
+        <li>⏳ Advanced rate limiting</li>
+        <li>⏳ Request signing for sensitive operations</li>
+        <li>⏳ Comprehensive audit logging</li>
+        </ul>
+        <h3 id="future-q2-2026">Future (Q2+ 2026)</h3>
+        <ul>
+        <li>⏳ Multi-factor authentication (MFA)</li>
+        <li>⏳ API key management for service-to-service auth</li>
+        <li>⏳ Advanced encryption (end-to-end)</li>
+        <li>⏳ Automated penetration testing</li>
+        <li>⏳ Security incident response automation</li>
+        </ul>
+        <hr />
+        <h2 id="-testing--verification">📋 Testing &amp;
+        Verification</h2>
+        <p>All security controls are verified through:</p>
+        <ol type="1">
+        <li><strong>Unit Tests</strong> — Control-level testing in
+        <code>src/__tests__/services/api-client-operations/security/</code></li>
+        <li><strong>Integration Tests</strong> — End-to-end security
+        scenarios</li>
+        <li><strong>Code Review</strong> — Security review checklist for
+        all PRs</li>
+        <li><strong>Automated Scanning</strong> — npm audit, dependency
+        scanning, SAST</li>
+        <li><strong>Manual Penetration Testing</strong> — Quarterly
+        security audits (planned)</li>
+        </ol>
+        <hr />
+        <h2 id="-responsible-disclosure">🤝 Responsible Disclosure</h2>
+        <p>If you discover a security vulnerability, please report it
+        to: <strong><a
+        href="mailto:security@stockease.com">security@stockease.com</a></strong></p>
+        <p><strong>Do not</strong> publicly disclose security issues
+        before the security team has had time to patch.</p>
+        <hr />
+        <h2 id="-questions--support">📞 Questions &amp; Support</h2>
+        <p>For questions about ASVS compliance or security controls,
+        contact the <strong>StockEase Security Team</strong>.</p>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Version:</strong> 1.0.0<br />
+        <strong>ASVS Level:</strong> 2 (Standard) with aspirations
+        toward 3<br />
+        <strong>Classification:</strong> Internal - Security Team &amp;
+        Developers</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

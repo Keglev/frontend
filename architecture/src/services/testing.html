@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>testing - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="service--hook-testing">Service &amp; Hook Testing</h1>
+        <h2 id="purpose">Purpose</h2>
+        <p>Document testing patterns for services, custom hooks, and
+        integration tests.</p>
+        <p><strong>Location</strong>:
+        <code>src/__tests__/services/</code> and
+        <code>src/__tests__/hooks/</code></p>
+        <hr />
+        <h2 id="testing-structure">Testing Structure</h2>
+        <pre><code>src/__tests__/services/
+├── apiClient.test.ts
+├── ProductService.test.ts
+├── auth.test.ts
+└── integration/
+    └── productWorkflow.integration.test.ts
+
+src/__tests__/hooks/
+├── useProducts.test.ts
+├── useForm.test.ts
+├── useAuth.test.ts
+├── useDebounce.test.ts
+└── useLocalStorage.test.ts</code></pre>
+        <hr />
+        <h2 id="service-testing-patterns">Service Testing Patterns</h2>
+        <h3 id="testing-api-services">Testing API Services</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { describe<span class="op">,</span> it<span class="op">,</span> expect<span class="op">,</span> vi<span class="op">,</span> beforeEach } <span class="im">from</span> <span class="st">&#39;vitest&#39;</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { ProductService } <span class="im">from</span> <span class="st">&#39;@/api/ProductService&#39;</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { apiClient } <span class="im">from</span> <span class="st">&#39;@/services/apiClient&#39;</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>vi<span class="op">.</span><span class="fu">mock</span>(<span class="st">&#39;@/services/apiClient&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;ProductService&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> mockApiClient <span class="op">=</span> vi<span class="op">.</span><span class="fu">mocked</span>(apiClient)<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">beforeEach</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">clearAllMocks</span>()<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(<span class="st">&#39;getProducts&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;fetches and returns products&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> mockProducts <span class="op">=</span> [</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        { id<span class="op">:</span> <span class="st">&#39;1&#39;</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Product 1&#39;</span><span class="op">,</span> quantity<span class="op">:</span> <span class="dv">10</span> }<span class="op">,</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        { id<span class="op">:</span> <span class="st">&#39;2&#39;</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Product 2&#39;</span><span class="op">,</span> quantity<span class="op">:</span> <span class="dv">20</span> }</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      ]<span class="op">;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">get</span><span class="op">.</span><span class="fu">mockResolvedValue</span>({</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        data<span class="op">:</span> mockProducts</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">getProducts</span>()<span class="op">;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result)<span class="op">.</span><span class="fu">toEqual</span>(mockProducts)<span class="op">;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(mockApiClient<span class="op">.</span><span class="at">get</span>)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>(</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;/api/products&#39;</span><span class="op">,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        expect<span class="op">.</span><span class="fu">any</span>(<span class="bu">Object</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;handles validation errors&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">get</span><span class="op">.</span><span class="fu">mockRejectedValue</span>({</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        response<span class="op">:</span> {</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>          status<span class="op">:</span> <span class="dv">400</span><span class="op">,</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>          data<span class="op">:</span> { details<span class="op">:</span> { query<span class="op">:</span> <span class="st">&#39;Invalid query&#39;</span> } }</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> <span class="fu">expect</span>(ProductService<span class="op">.</span><span class="fu">getProducts</span>())</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="at">rejects</span><span class="op">.</span><span class="fu">toThrow</span>(<span class="st">&#39;Invalid&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;handles 401 unauthorized&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">get</span><span class="op">.</span><span class="fu">mockRejectedValue</span>({</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        response<span class="op">:</span> { status<span class="op">:</span> <span class="dv">401</span> }</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> <span class="fu">expect</span>(ProductService<span class="op">.</span><span class="fu">getProducts</span>())</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="at">rejects</span><span class="op">.</span><span class="fu">toThrow</span>(<span class="st">&#39;Unauthorized&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;handles network errors&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">get</span><span class="op">.</span><span class="fu">mockRejectedValue</span>(</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Network Error&#39;</span>)</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> <span class="fu">expect</span>(ProductService<span class="op">.</span><span class="fu">getProducts</span>())</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="at">rejects</span><span class="op">.</span><span class="fu">toThrow</span>(<span class="st">&#39;Network&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(<span class="st">&#39;createProduct&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;posts new product data&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> newProduct <span class="op">=</span> {</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        name<span class="op">:</span> <span class="st">&#39;New Product&#39;</span><span class="op">,</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        quantity<span class="op">:</span> <span class="dv">50</span><span class="op">,</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        category<span class="op">:</span> <span class="st">&#39;Electronics&#39;</span><span class="op">,</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        sku<span class="op">:</span> <span class="st">&#39;NEW-001&#39;</span><span class="op">,</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        price<span class="op">:</span> <span class="fl">99.99</span><span class="op">,</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        description<span class="op">:</span> <span class="st">&#39;Test&#39;</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>      }<span class="op">;</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> created <span class="op">=</span> { id<span class="op">:</span> <span class="st">&#39;prod-123&#39;</span><span class="op">,</span> <span class="op">...</span>newProduct }<span class="op">;</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">post</span><span class="op">.</span><span class="fu">mockResolvedValue</span>({ data<span class="op">:</span> created })<span class="op">;</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">createProduct</span>(newProduct)<span class="op">;</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result)<span class="op">.</span><span class="fu">toEqual</span>(created)<span class="op">;</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(mockApiClient<span class="op">.</span><span class="at">post</span>)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>(</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;/api/products&#39;</span><span class="op">,</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        newProduct</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;throws ConflictError on 409&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">post</span><span class="op">.</span><span class="fu">mockRejectedValue</span>({</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        response<span class="op">:</span> {</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>          status<span class="op">:</span> <span class="dv">409</span><span class="op">,</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>          data<span class="op">:</span> { message<span class="op">:</span> <span class="st">&#39;SKU already exists&#39;</span> }</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> <span class="fu">expect</span>(ProductService<span class="op">.</span><span class="fu">createProduct</span>({} <span class="im">as</span> <span class="dt">any</span>))</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="at">rejects</span><span class="op">.</span><span class="fu">toThrow</span>(<span class="st">&#39;already exists&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(<span class="st">&#39;updateProduct&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;sends PUT request with updates&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> updates <span class="op">=</span> { quantity<span class="op">:</span> <span class="dv">25</span> }<span class="op">;</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> updated <span class="op">=</span> { id<span class="op">:</span> <span class="st">&#39;prod-123&#39;</span><span class="op">,</span> quantity<span class="op">:</span> <span class="dv">25</span> }<span class="op">;</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">put</span><span class="op">.</span><span class="fu">mockResolvedValue</span>({ data<span class="op">:</span> updated })<span class="op">;</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">updateProduct</span>(<span class="st">&#39;prod-123&#39;</span><span class="op">,</span> updates)<span class="op">;</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result)<span class="op">.</span><span class="fu">toEqual</span>(updated)<span class="op">;</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(mockApiClient<span class="op">.</span><span class="at">put</span>)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>(</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;/api/products/prod-123&#39;</span><span class="op">,</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>        updates</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(<span class="st">&#39;deleteProduct&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;sends DELETE request&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">delete</span><span class="op">.</span><span class="fu">mockResolvedValue</span>({ status<span class="op">:</span> <span class="dv">204</span> })<span class="op">;</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">deleteProduct</span>(<span class="st">&#39;prod-123&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(mockApiClient<span class="op">.</span><span class="at">delete</span>)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>(</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;/api/products/prod-123&#39;</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(<span class="st">&#39;searchProducts&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">&#39;searches with query parameter&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> results <span class="op">=</span> [{ id<span class="op">:</span> <span class="st">&#39;1&#39;</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Laptop&#39;</span> }]<span class="op">;</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>      mockApiClient<span class="op">.</span><span class="at">get</span><span class="op">.</span><span class="fu">mockResolvedValue</span>({ data<span class="op">:</span> results })<span class="op">;</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">searchProducts</span>(<span class="st">&#39;laptop&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result)<span class="op">.</span><span class="fu">toEqual</span>(results)<span class="op">;</span></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(mockApiClient<span class="op">.</span><span class="at">get</span>)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>(</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;/api/products/search&#39;</span><span class="op">,</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>        expect<span class="op">.</span><span class="fu">objectContaining</span>({</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>          params<span class="op">:</span> { q<span class="op">:</span> <span class="st">&#39;laptop&#39;</span> }</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="custom-hook-testing">Custom Hook Testing</h2>
+        <h3 id="hook-testing-setup">Hook Testing Setup</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { renderHook<span class="op">,</span> act<span class="op">,</span> waitFor } <span class="im">from</span> <span class="st">&#39;@testing-library/react&#39;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useProducts } <span class="im">from</span> <span class="st">&#39;@/services/hooks/useProducts&#39;</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { ProductService } <span class="im">from</span> <span class="st">&#39;@/api/ProductService&#39;</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>vi<span class="op">.</span><span class="fu">mock</span>(<span class="st">&#39;@/api/ProductService&#39;</span>)<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;useProducts Hook&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">beforeEach</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">clearAllMocks</span>()<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;fetches products on mount&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> mockProducts <span class="op">=</span> [</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      { id<span class="op">:</span> <span class="st">&#39;1&#39;</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Product 1&#39;</span><span class="op">,</span> quantity<span class="op">:</span> <span class="dv">10</span> }</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">getProducts</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>(mockProducts)<span class="op">;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span> <span class="fu">useProducts</span>())<span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Initial state</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">loading</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Wait for fetch to complete</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitFor</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">loading</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">products</span>)<span class="op">.</span><span class="fu">toEqual</span>(mockProducts)<span class="op">;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;sets error state on fetch failure&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> error <span class="op">=</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Fetch failed&#39;</span>)<span class="op">;</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">getProducts</span>)<span class="op">.</span><span class="fu">mockRejectedValue</span>(error)<span class="op">;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span> <span class="fu">useProducts</span>())<span class="op">;</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitFor</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">error</span>)<span class="op">.</span><span class="fu">toBeTruthy</span>()<span class="op">;</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">products</span>)<span class="op">.</span><span class="fu">toEqual</span>([])<span class="op">;</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;refetches products when calling refetch&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> mockProducts <span class="op">=</span> [{ id<span class="op">:</span> <span class="st">&#39;1&#39;</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Product 1&#39;</span> }]<span class="op">;</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">getProducts</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>(mockProducts)<span class="op">;</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span> <span class="fu">useProducts</span>())<span class="op">;</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitFor</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">loading</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Call refetch</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">act</span>(<span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">refetch</span>()<span class="op">;</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">getProducts</span>))<span class="op">.</span><span class="fu">toHaveBeenCalledTimes</span>(<span class="dv">2</span>)<span class="op">;</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="form-hook-testing">Form Hook Testing</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { renderHook<span class="op">,</span> act } <span class="im">from</span> <span class="st">&#39;@testing-library/react&#39;</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useForm } <span class="im">from</span> <span class="st">&#39;@/services/hooks/useForm&#39;</span><span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;useForm Hook&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;initializes with initial values&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> initialValues <span class="op">=</span> { name<span class="op">:</span> <span class="st">&#39;&#39;</span><span class="op">,</span> email<span class="op">:</span> <span class="st">&#39;&#39;</span> }<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">useForm</span>(initialValues<span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {})</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">values</span>)<span class="op">.</span><span class="fu">toEqual</span>(initialValues)<span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">errors</span>)<span class="op">.</span><span class="fu">toEqual</span>({})<span class="op">;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;updates values on change&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">useForm</span>({ name<span class="op">:</span> <span class="st">&#39;&#39;</span><span class="op">,</span> email<span class="op">:</span> <span class="st">&#39;&#39;</span> }<span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {})</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">act</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">handleChange</span>({</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        target<span class="op">:</span> { name<span class="op">:</span> <span class="st">&#39;name&#39;</span><span class="op">,</span> value<span class="op">:</span> <span class="st">&#39;John&#39;</span> }</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      } <span class="im">as</span> <span class="dt">any</span>)<span class="op">;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">values</span><span class="op">.</span><span class="at">name</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;John&#39;</span>)<span class="op">;</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;validates form on submit&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> onSubmit <span class="op">=</span> vi<span class="op">.</span><span class="fu">fn</span>()<span class="op">;</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> validate <span class="op">=</span> vi<span class="op">.</span><span class="fu">fn</span>()<span class="op">.</span><span class="fu">mockReturnValue</span>({</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      name<span class="op">:</span> <span class="st">&#39;Name is required&#39;</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">useForm</span>({ name<span class="op">:</span> <span class="st">&#39;&#39;</span> }<span class="op">,</span> onSubmit<span class="op">,</span> validate)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">act</span>(<span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">handleSubmit</span>({ preventDefault<span class="op">:</span> () <span class="kw">=&gt;</span> {} } <span class="im">as</span> <span class="dt">any</span>)<span class="op">;</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">errors</span><span class="op">.</span><span class="at">name</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;Name is required&#39;</span>)<span class="op">;</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(onSubmit)<span class="op">.</span><span class="at">not</span><span class="op">.</span><span class="fu">toHaveBeenCalled</span>()<span class="op">;</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;calls onSubmit with valid data&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> onSubmit <span class="op">=</span> vi<span class="op">.</span><span class="fu">fn</span>()<span class="op">;</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> validate <span class="op">=</span> vi<span class="op">.</span><span class="fu">fn</span>()<span class="op">.</span><span class="fu">mockReturnValue</span>({})<span class="op">;</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">useForm</span>({ name<span class="op">:</span> <span class="st">&#39;John&#39;</span> }<span class="op">,</span> onSubmit<span class="op">,</span> validate)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">act</span>(<span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">handleSubmit</span>({ preventDefault<span class="op">:</span> () <span class="kw">=&gt;</span> {} } <span class="im">as</span> <span class="dt">any</span>)<span class="op">;</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(onSubmit)<span class="op">.</span><span class="fu">toHaveBeenCalledWith</span>({ name<span class="op">:</span> <span class="st">&#39;John&#39;</span> })<span class="op">;</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;resets form state&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> initialValues <span class="op">=</span> { name<span class="op">:</span> <span class="st">&#39;John&#39;</span><span class="op">,</span> email<span class="op">:</span> <span class="st">&#39;john@example.com&#39;</span> }<span class="op">;</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>      <span class="fu">useForm</span>(initialValues<span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {})</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">act</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>      result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">setValues</span>({ name<span class="op">:</span> <span class="st">&#39;Jane&#39;</span><span class="op">,</span> email<span class="op">:</span> <span class="st">&#39;jane@example.com&#39;</span> })<span class="op">;</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">values</span><span class="op">.</span><span class="at">name</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;Jane&#39;</span>)<span class="op">;</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">act</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>      result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="fu">reset</span>()<span class="op">;</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span><span class="op">.</span><span class="at">values</span>)<span class="op">.</span><span class="fu">toEqual</span>(initialValues)<span class="op">;</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="debounce-hook-testing">Debounce Hook Testing</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { renderHook } <span class="im">from</span> <span class="st">&#39;@testing-library/react&#39;</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useDebounce } <span class="im">from</span> <span class="st">&#39;@/services/hooks/useDebounce&#39;</span><span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { vi<span class="op">,</span> beforeEach<span class="op">,</span> afterEach } <span class="im">from</span> <span class="st">&#39;vitest&#39;</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;useDebounce Hook&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">beforeEach</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">useFakeTimers</span>()<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">afterEach</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">restoreAllMocks</span>()<span class="op">;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;returns initial value immediately&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result } <span class="op">=</span> <span class="fu">renderHook</span>(() <span class="kw">=&gt;</span> <span class="fu">useDebounce</span>(<span class="st">&#39;test&#39;</span><span class="op">,</span> <span class="dv">300</span>))<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;test&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;delays updating value&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result<span class="op">,</span> rerender } <span class="op">=</span> <span class="fu">renderHook</span>(</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      ({ value<span class="op">,</span> delay }) <span class="kw">=&gt;</span> <span class="fu">useDebounce</span>(value<span class="op">,</span> delay)<span class="op">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      { initialProps<span class="op">:</span> { value<span class="op">:</span> <span class="st">&#39;initial&#39;</span><span class="op">,</span> delay<span class="op">:</span> <span class="dv">300</span> } }</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;initial&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Update value</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rerender</span>({ value<span class="op">:</span> <span class="st">&#39;updated&#39;</span><span class="op">,</span> delay<span class="op">:</span> <span class="dv">300</span> })<span class="op">;</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Still initial while debouncing</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;initial&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fast-forward time</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">advanceTimersByTime</span>(<span class="dv">300</span>)<span class="op">;</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Now updated</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;updated&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;resets timer on value change&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> { result<span class="op">,</span> rerender } <span class="op">=</span> <span class="fu">renderHook</span>(</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>      ({ value<span class="op">,</span> delay }) <span class="kw">=&gt;</span> <span class="fu">useDebounce</span>(value<span class="op">,</span> delay)<span class="op">,</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>      { initialProps<span class="op">:</span> { value<span class="op">:</span> <span class="st">&#39;first&#39;</span><span class="op">,</span> delay<span class="op">:</span> <span class="dv">300</span> } }</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    )<span class="op">;</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rerender</span>({ value<span class="op">:</span> <span class="st">&#39;second&#39;</span><span class="op">,</span> delay<span class="op">:</span> <span class="dv">300</span> })<span class="op">;</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">advanceTimersByTime</span>(<span class="dv">150</span>)<span class="op">;</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rerender</span>({ value<span class="op">:</span> <span class="st">&#39;third&#39;</span><span class="op">,</span> delay<span class="op">:</span> <span class="dv">300</span> })<span class="op">;</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">advanceTimersByTime</span>(<span class="dv">150</span>)<span class="op">;</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;first&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">advanceTimersByTime</span>(<span class="dv">300</span>)<span class="op">;</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">current</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;third&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="integration-testing">Integration Testing</h2>
+        <h3 id="service-integration-flow">Service Integration Flow</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;Product Service Integration&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;completes full CRUD workflow&#39;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Create</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> newProduct <span class="op">=</span> {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      name<span class="op">:</span> <span class="st">&#39;Integration Test Product&#39;</span><span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      quantity<span class="op">:</span> <span class="dv">100</span><span class="op">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      category<span class="op">:</span> <span class="st">&#39;Test&#39;</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      sku<span class="op">:</span> <span class="st">&#39;INT-001&#39;</span><span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      price<span class="op">:</span> <span class="fl">19.99</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      description<span class="op">:</span> <span class="st">&#39;Test&#39;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">createProduct</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>({</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      id<span class="op">:</span> <span class="st">&#39;prod-123&#39;</span><span class="op">,</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>newProduct</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> created <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">createProduct</span>(newProduct)<span class="op">;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(created<span class="op">.</span><span class="at">id</span>)<span class="op">.</span><span class="fu">toBeDefined</span>()<span class="op">;</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Read</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">getProductById</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>(created)<span class="op">;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> retrieved <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">getProductById</span>(<span class="st">&#39;prod-123&#39;</span>)<span class="op">;</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(retrieved<span class="op">.</span><span class="at">name</span>)<span class="op">.</span><span class="fu">toBe</span>(newProduct<span class="op">.</span><span class="at">name</span>)<span class="op">;</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Update</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> updates <span class="op">=</span> { quantity<span class="op">:</span> <span class="dv">50</span> }<span class="op">;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">updateProduct</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>({</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>created<span class="op">,</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>updates</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> updated <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">updateProduct</span>(<span class="st">&#39;prod-123&#39;</span><span class="op">,</span> updates)<span class="op">;</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(updated<span class="op">.</span><span class="at">quantity</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="dv">50</span>)<span class="op">;</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Delete</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    vi<span class="op">.</span><span class="fu">mocked</span>(ProductService<span class="op">.</span><span class="at">deleteProduct</span>)<span class="op">.</span><span class="fu">mockResolvedValue</span>(<span class="kw">undefined</span>)<span class="op">;</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">deleteProduct</span>(<span class="st">&#39;prod-123&#39;</span>)<span class="op">;</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(ProductService<span class="op">.</span><span class="at">deleteProduct</span>)<span class="op">.</span><span class="fu">toHaveBeenCalled</span>()<span class="op">;</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="testing-checklist">Testing Checklist</h2>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Mock external dependencies
+        (API calls)</label></li>
+        <li><label><input type="checkbox" />Test successful
+        scenarios</label></li>
+        <li><label><input type="checkbox" />Test error scenarios (4xx,
+        5xx, network)</label></li>
+        <li><label><input type="checkbox" />Test data
+        transformation</label></li>
+        <li><label><input type="checkbox" />Test loading/error/success
+        states</label></li>
+        <li><label><input type="checkbox" />Test retry
+        logic</label></li>
+        <li><label><input type="checkbox" />Test cleanup (timers,
+        subscriptions)</label></li>
+        <li><label><input type="checkbox" />Test accessibility for
+        hooks</label></li>
+        <li><label><input type="checkbox" />Test TypeScript
+        types</label></li>
+        </ul>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <p>✅ <strong>DO:</strong></p>
+        <ul>
+        <li>Mock external API calls</li>
+        <li>Test behavior, not implementation</li>
+        <li>Use meaningful test descriptions</li>
+        <li>Test error scenarios</li>
+        <li>Clean up after tests (vi.clearAllMocks)</li>
+        <li>Test with realistic data</li>
+        </ul>
+        <p>❌ <strong>DON'T:</strong></p>
+        <ul>
+        <li>Make real API calls in tests</li>
+        <li>Test implementation details</li>
+        <li>Skip error testing</li>
+        <li>Use vague test descriptions</li>
+        <li>Forget to clean up mocks</li>
+        <li>Test multiple concerns in one test</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        Services overview</li>
+        <li><strong><a href="./structure.html">Structure</a></strong> -
+        Service organization</li>
+        <li><strong><a href="./custom-hooks.html">Custom
+        Hooks</a></strong> - Hook patterns</li>
+        <li><strong><a href="./error-handling.html">Error
+        Handling</a></strong> - Error patterns</li>
+        <li><strong><a href="../tests/overview.html">Testing
+        Guide</a></strong> - General testing</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

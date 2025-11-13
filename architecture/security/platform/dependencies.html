@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>dependencies - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="dependency-management--security-audits">Dependency
+        Management &amp; Security Audits</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Dependencies are one of the largest sources of
+        vulnerabilities in modern applications. This document covers how
+        StockEase Frontend manages dependencies, audits for
+        vulnerabilities, and keeps them updated.</p>
+        <hr />
+        <h2 id="dependency-landscape">Dependency Landscape</h2>
+        <h3 id="current-dependencies">Current Dependencies</h3>
+        <p><strong>Production Dependencies:</strong></p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;axios&quot;</span><span class="fu">:</span> <span class="st">&quot;^1.7.7&quot;</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;i18next&quot;</span><span class="fu">:</span> <span class="st">&quot;^24.0.5&quot;</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;i18next-browser-languagedetector&quot;</span><span class="fu">:</span> <span class="st">&quot;^8.0.2&quot;</span><span class="fu">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react&quot;</span><span class="fu">:</span> <span class="st">&quot;^18.3.1&quot;</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react-dom&quot;</span><span class="fu">:</span> <span class="st">&quot;^18.3.1&quot;</span><span class="fu">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react-i18next&quot;</span><span class="fu">:</span> <span class="st">&quot;^15.4.0&quot;</span><span class="fu">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react-icons&quot;</span><span class="fu">:</span> <span class="st">&quot;^5.4.0&quot;</span><span class="fu">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react-redux&quot;</span><span class="fu">:</span> <span class="st">&quot;^9.2.0&quot;</span><span class="fu">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;react-router-dom&quot;</span><span class="fu">:</span> <span class="st">&quot;^7.1.1&quot;</span><span class="fu">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;recharts&quot;</span><span class="fu">:</span> <span class="st">&quot;^2.15.1&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <p><strong>Development Dependencies:</strong></p>
+        <ul>
+        <li>TypeScript, Vite, ESLint</li>
+        <li>Testing libraries (Vitest, Testing Library)</li>
+        <li>Build tools (PostCSS, Tailwind)</li>
+        <li>Documentation tools (TypeDoc)</li>
+        </ul>
+        <h3 id="dependency-count">Dependency Count</h3>
+        <ul>
+        <li><strong>Total dependencies:</strong> ~150-200 (including
+        transitive)</li>
+        <li><strong>Direct dependencies:</strong> ~15-20</li>
+        <li><strong>DevDependencies:</strong> ~40-50</li>
+        <li><strong>Update frequency:</strong> Regular (Renovate
+        bot)</li>
+        </ul>
+        <hr />
+        <h2 id="vulnerability-scanning">Vulnerability Scanning</h2>
+        <h3 id="npm-audit">npm audit</h3>
+        <p><strong>Built into npm:</strong></p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit</span></code></pre></div>
+        <p><strong>What it does:</strong></p>
+        <ol type="1">
+        <li>Checks all dependencies against npm security database</li>
+        <li>Lists known vulnerabilities</li>
+        <li>Provides severity levels</li>
+        <li>Suggests fixes (upgrade, patch)</li>
+        </ol>
+        <p><strong>Example output:</strong></p>
+        <pre><code>found 3 vulnerabilities in 487 packages
+  2 moderate
+  1 high
+
+Run `npm audit fix` to fix them, or `npm audit --audit-level=moderate` to ignore low</code></pre>
+        <h3 id="npm-audit-fix">npm audit fix</h3>
+        <p><strong>Automatically fixes vulnerabilities:</strong></p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit fix</span></code></pre></div>
+        <p><strong>What it does:</strong></p>
+        <ol type="1">
+        <li>Updates vulnerable packages to patched versions</li>
+        <li>Updates package-lock.json</li>
+        <li>Preserves semver constraints</li>
+        </ol>
+        <p><strong>Limitations:</strong></p>
+        <ul>
+        <li>⚠️ May not fix all issues (breaking changes)</li>
+        <li>⚠️ May update transitive dependencies unexpectedly</li>
+        <li>⚠️ Should test after running</li>
+        </ul>
+        <h3 id="checking-specific-dependencies">Checking Specific
+        Dependencies</h3>
+        <p><strong>View package info:</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> view axios versions</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> view axios bugs</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> view axios security</span></code></pre></div>
+        <p><strong>Check for known vulnerabilities:</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit <span class="at">--registry</span><span class="op">=</span>https://registry.npmjs.org/</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit <span class="at">--audit-level</span><span class="op">=</span>high</span></code></pre></div>
+        <hr />
+        <h2 id="security-advisories">Security Advisories</h2>
+        <h3 id="npm-security-advisory-database">npm Security Advisory
+        Database</h3>
+        <p>npm maintains a database of known vulnerabilities:</p>
+        <ul>
+        <li><strong>URL:</strong> <a
+        href="https://advisories.npmjs.com/">https://advisories.npmjs.com/</a></li>
+        <li><strong>Updated:</strong> Continuously</li>
+        <li><strong>Coverage:</strong> All published npm packages</li>
+        </ul>
+        <h3 id="types-of-advisories">Types of Advisories</h3>
+        <p><strong>1. Critical Vulnerabilities</strong></p>
+        <ul>
+        <li>Security exploits (RCE, auth bypass)</li>
+        <li>Immediate action required</li>
+        <li>Usually patched quickly</li>
+        </ul>
+        <p><strong>2. High Severity</strong></p>
+        <ul>
+        <li>Data leakage (XSS, CSRF)</li>
+        <li>Requires prompt patching</li>
+        <li>May require app testing</li>
+        </ul>
+        <p><strong>3. Moderate Severity</strong></p>
+        <ul>
+        <li>Logic errors, edge cases</li>
+        <li>Update when convenient</li>
+        <li>Test thoroughly</li>
+        </ul>
+        <p><strong>4. Low Severity</strong></p>
+        <ul>
+        <li>Minor issues, rarely exploited</li>
+        <li>Can defer update</li>
+        </ul>
+        <h3 id="checking-advisories">Checking Advisories</h3>
+        <p><strong>View vulnerability details:</strong></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit <span class="at">--json</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">&#39;.vulnerabilities&#39;</span></span></code></pre></div>
+        <p><strong>Check if package is safe:</strong></p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit <span class="at">--json</span> axios <span class="kw">|</span> <span class="ex">jq</span> <span class="st">&#39;.advisories&#39;</span></span></code></pre></div>
+        <hr />
+        <h2 id="automated-dependency-updates-with-renovate">Automated
+        Dependency Updates with Renovate</h2>
+        <h3 id="what-is-renovate">What is Renovate?</h3>
+        <p>Renovate is a bot that automatically detects and updates
+        dependencies:</p>
+        <ul>
+        <li>Checks for new versions daily</li>
+        <li>Creates pull requests with updates</li>
+        <li>Runs tests automatically</li>
+        <li>Suggests merge when passing</li>
+        </ul>
+        <h3 id="current-stockease-setup">Current StockEase Setup</h3>
+        <p><strong>Configuration file:</strong> <code>.renovaterc</code>
+        (or in <code>package.json</code>)</p>
+        <p><strong>Typical configuration:</strong></p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;extends&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;config:base&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;schedule&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;before 3am on Monday&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dependencyDashboard&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;packageRules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;minor&quot;</span><span class="ot">,</span> <span class="st">&quot;patch&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchDatasources&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;npm&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;major&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <h3 id="how-renovate-works">How Renovate Works</h3>
+        <pre><code>Renovate Bot (GitHub App)
+  ↓
+Check for new versions daily
+  ↓
+For each dependency:
+  ├─ Check npm registry
+  ├─ Compare to current version
+  ├─ Determine semver type (major/minor/patch)
+  └─ Create PR if update available
+  ↓
+Pull Request Created:
+  ├─ Title: &quot;Update dependency-name to v1.2.3&quot;
+  ├─ Description: Changelog, commits, breaking changes
+  ├─ Triggered CI tests
+  └─ Labels: dependencies, renovate
+  ↓
+Tests Run:
+  ├─ Build project
+  ├─ Run unit tests
+  ├─ Run integration tests
+  └─ Check types (TypeScript)
+  ↓
+Review &amp; Merge:
+  ├─ If tests pass → May auto-merge (patch/minor)
+  └─ If tests fail → Manual review required</code></pre>
+        <h3 id="renovate-rules">Renovate Rules</h3>
+        <p><strong>StockEase Recommended Configuration:</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;extends&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;config:base&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;schedule&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;after 10pm on Monday&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dependencyDashboard&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;semanticCommits&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;packageRules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Auto-merge patch and minor updates&quot;</span><span class="fu">,</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;patch&quot;</span><span class="ot">,</span> <span class="st">&quot;minor&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automergeType&quot;</span><span class="fu">:</span> <span class="st">&quot;pr&quot;</span><span class="fu">,</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automergeStrategy&quot;</span><span class="fu">:</span> <span class="st">&quot;squash&quot;</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Require manual review for major updates&quot;</span><span class="fu">,</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;major&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;assignees&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;@owner&quot;</span><span class="ot">]</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Security updates (critical)&quot;</span><span class="fu">,</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchDatasources&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;npm&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;security&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;schedule&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;at any time&quot;</span><span class="ot">]</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;DevDependencies - more lenient&quot;</span><span class="fu">,</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchDepTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;devDependencies&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automerge&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;automergeType&quot;</span><span class="fu">:</span> <span class="st">&quot;branch&quot;</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <h3 id="renovate-security-best-practices">Renovate Security Best
+        Practices</h3>
+        <p>✅ <strong>DO:</strong></p>
+        <ul>
+        <li>✅ Enable automatic minor/patch updates</li>
+        <li>✅ Require manual review for major updates</li>
+        <li>✅ Fast-track security updates</li>
+        <li>✅ Monitor dependency dashboard</li>
+        <li>✅ Keep schedule during business hours</li>
+        <li>✅ Test before merging</li>
+        </ul>
+        <p>❌ <strong>DON'T:</strong></p>
+        <ul>
+        <li>❌ Auto-merge all major updates</li>
+        <li>❌ Disable Renovate (manual updates miss security
+        patches)</li>
+        <li>❌ Ignore security update PRs</li>
+        <li>❌ Merge PRs without tests passing</li>
+        <li>❌ Update dependencies in production without testing</li>
+        </ul>
+        <hr />
+        <h2 id="supply-chain-attack-prevention">Supply Chain Attack
+        Prevention</h2>
+        <h3 id="what-is-supply-chain-attack">What is Supply Chain
+        Attack?</h3>
+        <p>Malicious actors compromise dependencies to inject
+        malware:</p>
+        <p><strong>Example:</strong></p>
+        <pre><code>Popular package &quot;lodash&quot; is compromised
+Hacker publishes version 4.17.21 with malware
+npm publish lodash@4.17.21
+All apps using ^4.17.x automatically install malware</code></pre>
+        <h3 id="prevention-strategies">Prevention Strategies</h3>
+        <h4 id="1-pinning-versions">1. Pinning Versions</h4>
+        <p><strong>Exact pinning (safest):</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dependencies&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;axios&quot;</span><span class="fu">:</span> <span class="st">&quot;1.7.7&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <p><strong>Caret (^) - allows minor updates:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;dependencies&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;axios&quot;</span><span class="fu">:</span> <span class="st">&quot;^1.7.7&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <p><strong>Lock file (package-lock.json):</strong></p>
+        <pre><code>Locks exact versions for all transitive dependencies
+Ensures reproducible builds
+Required for security</code></pre>
+        <h4 id="2-npm-integrity-checks">2. npm Integrity Checks</h4>
+        <p><strong>npm verifies signatures:</strong></p>
+        <pre><code>npm install
+├─ Download package
+├─ Verify checksum from package-lock.json
+├─ Verify npm registry signature
+└─ Install if checksums match</code></pre>
+        <p><strong>Check integrity:</strong></p>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--audit</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci  <span class="co"># Cleaner install (uses lock file)</span></span></code></pre></div>
+        <h4 id="3-private-package-registry">3. Private Package
+        Registry</h4>
+        <p><strong>Option: Use private npm registry</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> config set registry https://private.registry.com/</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install  <span class="co"># Uses private registry instead of public npm</span></span></code></pre></div>
+        <p><strong>Benefits:</strong></p>
+        <ul>
+        <li>Mirror of npm (security review before use)</li>
+        <li>Block malicious packages</li>
+        <li>Speed up installs (local copy)</li>
+        </ul>
+        <h4 id="4-monitor-package-popularity">4. Monitor Package
+        Popularity</h4>
+        <p><strong>Check before installing:</strong></p>
+        <ul>
+        <li>Downloads per week</li>
+        <li>GitHub stars</li>
+        <li>Security advisories</li>
+        <li>Last update date</li>
+        </ul>
+        <p><strong>Red flags:</strong></p>
+        <ul>
+        <li>0 downloads/week</li>
+        <li>No GitHub presence</li>
+        <li>Known vulnerabilities</li>
+        <li>Unmaintained (last update &gt; 1 year ago)</li>
+        </ul>
+        <hr />
+        <h2 id="sca-software-composition-analysis">SCA (Software
+        Composition Analysis)</h2>
+        <h3 id="what-is-sca">What is SCA?</h3>
+        <p>SCA tools identify all components (dependencies) and their
+        vulnerabilities:</p>
+        <pre><code>Your Application
+  ├─ React 18.3.1
+  │   ├─ Known Vulnerability: CVE-2024-1234
+  │   └─ Fix: Update to 18.4.0
+  ├─ Axios 1.7.7
+  │   └─ No known vulnerabilities
+  └─ Lodash 4.17.21
+      ├─ Known Vulnerability: CVE-2024-5678
+      └─ Fix: Update to 4.17.22</code></pre>
+        <h3 id="sca-tools">SCA Tools</h3>
+        <p><strong>npm audit (Built-in)</strong></p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit</span></code></pre></div>
+        <ul>
+        <li>Free</li>
+        <li>Built into npm</li>
+        <li>Good for quick scans</li>
+        </ul>
+        <p><strong>Snyk</strong></p>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">-g</span> snyk</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snyk</span> test</span></code></pre></div>
+        <ul>
+        <li>Commercial option</li>
+        <li>Real-time monitoring</li>
+        <li>Detailed reports</li>
+        </ul>
+        <p><strong>OWASP Dependency Check</strong></p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Java-based, supports multiple languages</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dependency-check</span> <span class="at">--project</span> <span class="st">&quot;StockEase Frontend&quot;</span> <span class="at">--scan</span> ./node_modules</span></code></pre></div>
+        <p><strong>GitHub Dependabot</strong></p>
+        <ul>
+        <li>Built into GitHub</li>
+        <li>Free for public repos</li>
+        <li>Automatic PR creation</li>
+        </ul>
+        <h3 id="sca-rules">SCA Rules</h3>
+        <p><strong>Example SCA policy:</strong></p>
+        <div class="sourceCode" id="cb23"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rules</span><span class="kw">:</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">severity</span><span class="kw">:</span><span class="at"> critical</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> block</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Do not allow critical vulnerabilities&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">severity</span><span class="kw">:</span><span class="at"> high</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> warn</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Review high severity vulnerabilities&quot;</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">severity</span><span class="kw">:</span><span class="at"> medium</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> allow</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Medium vulnerabilities allowed (plan updates)&quot;</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">severity</span><span class="kw">:</span><span class="at"> low</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> allow</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Low severity vulnerabilities accepted&quot;</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">deprecated</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> block</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Do not use deprecated packages&quot;</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">unmaintained</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">action</span><span class="kw">:</span><span class="at"> warn</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Consider alternatives to unmaintained packages&quot;</span></span></code></pre></div>
+        <h3 id="enforcing-sca-rules-in-cicd">Enforcing SCA Rules in
+        CI/CD</h3>
+        <p><strong>GitHub Actions:</strong></p>
+        <div class="sourceCode" id="cb24"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run npm audit</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm audit --audit-level=moderate</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run Snyk scan</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    npm install -g snyk</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    snyk test --severity-threshold=high</span></code></pre></div>
+        <p><strong>Failing build if issues found:</strong></p>
+        <div class="sourceCode" id="cb25"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Check dependencies</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    if npm audit | grep -q &quot;high&quot;; then</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>      echo &quot;❌ High severity vulnerabilities found&quot;</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>      exit 1</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    fi</span></code></pre></div>
+        <hr />
+        <h2 id="auditing-workflow">Auditing Workflow</h2>
+        <h3 id="weekly-audit-process">Weekly Audit Process</h3>
+        <pre><code>Monday Morning:
+  ├─ Run `npm audit`
+  ├─ Review results
+  ├─ Create issues for vulnerabilities
+  └─ Plan fixes
+
+Tuesday-Thursday:
+  ├─ Test updates in staging
+  ├─ Verify functionality
+  ├─ Check performance impact
+  └─ Merge PRs
+
+Friday:
+  ├─ Final review of merged changes
+  ├─ Deploy to production
+  └─ Monitor for issues</code></pre>
+        <h3 id="quarterly-deep-audit">Quarterly Deep Audit</h3>
+        <p><strong>Every 3 months:</strong></p>
+        <ol type="1">
+        <li>Full dependency audit</li>
+        <li>Review lock file for anomalies</li>
+        <li>Check for abandoned dependencies</li>
+        <li>Evaluate alternatives</li>
+        <li>Document findings</li>
+        </ol>
+        <h3 id="incident-response">Incident Response</h3>
+        <p><strong>When vulnerability discovered:</strong></p>
+        <ol type="1">
+        <li>Check if StockEase is affected</li>
+        <li>Check if publicly exploited</li>
+        <li>Assess severity</li>
+        <li>Plan patch</li>
+        <li>Test thoroughly</li>
+        <li>Deploy immediately (if critical)</li>
+        </ol>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <ul>
+        <li>✅ Run <code>npm audit</code> regularly (daily/weekly)</li>
+        <li>✅ Use <code>package-lock.json</code> (commit to repo)</li>
+        <li>✅ Enable Renovate or Dependabot</li>
+        <li>✅ Test updates before merging</li>
+        <li>✅ Fast-track security updates</li>
+        <li>✅ Monitor npm advisories</li>
+        <li>✅ Keep Node.js updated</li>
+        <li>✅ Document dependency decisions</li>
+        <li>✅ Use exact versions for critical packages</li>
+        <li>✅ Review dependency changelogs</li>
+        </ul>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <ul>
+        <li>❌ Ignore npm audit warnings</li>
+        <li>❌ Auto-merge without tests</li>
+        <li>❌ Use untrusted dependencies</li>
+        <li>❌ Pin old vulnerable versions</li>
+        <li>❌ Disable npm audit</li>
+        <li>❌ Remove package-lock.json</li>
+        <li>❌ Skip security update reviews</li>
+        <li>❌ Use deprecated packages</li>
+        <li>❌ Trust unverified sources</li>
+        <li>❌ Delay critical security updates</li>
+        </ul>
+        <hr />
+        <h2 id="common-issues--solutions">Common Issues &amp;
+        Solutions</h2>
+        <h3 id="issue-1-npm-audit-fails-cant-fix">Issue 1: npm audit
+        Fails, Can't Fix</h3>
+        <p><strong>Problem:</strong></p>
+        <pre><code>npm audit fix
+up to date, audited 250 packages
+found 3 vulnerabilities
+  1 critical
+  2 high</code></pre>
+        <p><strong>Causes:</strong></p>
+        <ul>
+        <li>Dependency conflict (package A requires lodash 3.x, package
+        B requires 4.x)</li>
+        <li>No patched version available yet</li>
+        <li>Breaking change in patched version</li>
+        </ul>
+        <p><strong>Solutions:</strong></p>
+        <div class="sourceCode" id="cb28"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Check if update exists</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> view vulnerable-package versions</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Check for PR/issue on GitHub</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Does it have a fix in development?</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Consider alternatives</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Is there a maintained fork?</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Force update (use with caution)</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install vulnerable-package@fixed-version <span class="at">--save</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Report to maintainers</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co"># File issue if no fix exists</span></span></code></pre></div>
+        <h3 id="issue-2-renovate-creates-too-many-prs">Issue 2: Renovate
+        Creates Too Many PRs</h3>
+        <p><strong>Problem:</strong> Renovate creates 50+ PRs per
+        week</p>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb29"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;packageRules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchDatasources&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;npm&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;matchUpdateTypes&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;patch&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;groupName&quot;</span><span class="fu">:</span> <span class="st">&quot;Patch updates&quot;</span><span class="fu">,</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;schedule&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;after 10pm on Sunday&quot;</span><span class="ot">]</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <h3 id="issue-3-dependency-conflict">Issue 3: Dependency
+        Conflict</h3>
+        <p><strong>Problem:</strong></p>
+        <pre><code>npm ERR! peer dep missing: react@^17.0.0, required by package-a@1.0.0
+npm ERR! peer dep missing: react@^18.0.0, required by package-b@1.0.0</code></pre>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb31"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Option 1: Check if peer dep is optional</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--no-optional</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Option 2: Update conflicting package</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install package-a@latest  <span class="co"># Version with react 18 support</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Option 3: Use npm override</span></span></code></pre></div>
+        <hr />
+        <h2 id="tools--resources">Tools &amp; Resources</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Tool</th>
+        <th>Purpose</th>
+        <th>Cost</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>npm audit</code></td>
+        <td>Built-in vulnerability scanning</td>
+        <td>Free</td>
+        </tr>
+        <tr class="even">
+        <td>Renovate</td>
+        <td>Automated dependency updates</td>
+        <td>Free (GitHub)</td>
+        </tr>
+        <tr class="odd">
+        <td>Snyk</td>
+        <td>SCA + real-time monitoring</td>
+        <td>Paid (free tier)</td>
+        </tr>
+        <tr class="even">
+        <td>Dependabot</td>
+        <td>GitHub native dependency management</td>
+        <td>Free</td>
+        </tr>
+        <tr class="odd">
+        <td>OWASP Dependency Check</td>
+        <td>Offline SCA tool</td>
+        <td>Free</td>
+        </tr>
+        <tr class="even">
+        <td>npm advisories</td>
+        <td>Security advisory database</td>
+        <td>Free</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="related-files">Related Files</h2>
+        <ul>
+        <li><strong>Workflow:</strong>
+        <code>.github/workflows/deploy-frontend.yml</code></li>
+        <li><strong>Config:</strong> <code>package.json</code>,
+        <code>package-lock.json</code></li>
+        <li><strong>Renovate Config:</strong> <code>.renovaterc</code>
+        (if configured)</li>
+        <li><strong>CI/CD Secrets:</strong> See <a
+        href="./ci-secrets.html">CI Secrets Documentation</a></li>
+        </ul>
+        <hr />
+        <h2 id="references">References</h2>
+        <ul>
+        <li><a
+        href="https://docs.npmjs.com/cli/v10/commands/npm-audit">npm
+        audit Documentation</a></li>
+        <li><a href="https://advisories.npmjs.com/">npm Security
+        Advisories</a></li>
+        <li><a href="https://docs.renovatebot.com/">Renovate
+        Documentation</a></li>
+        <li><a
+        href="https://owasp.org/www-project-dependency-check/">OWASP
+        Dependency Check</a></li>
+        <li><a
+        href="https://www.gartner.com/en/information-technology/glossary/software-composition-analysis-sca">Software
+        Composition Analysis Explained</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Production-Ready<br />
+        <strong>Priority:</strong> High (Prevents supply chain
+        attacks)</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

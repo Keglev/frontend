@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>build-deploy - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="stage-2-build--deployment">Stage 2: Build &amp;
+        Deployment</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The build and deployment stage runs <strong>only after tests
+        pass</strong> and <strong>only on push to master/main</strong>.
+        It is skipped for pull requests.</p>
+        <p><strong>Duration</strong>: 2-5 minutes<br />
+        <strong>Runs on</strong>: Push to master/main only (after tests
+        pass)</p>
+        <hr />
+        <h2 id="deployment-flow">Deployment Flow</h2>
+        <div class="mermaid">
+        graph TD
+            A["Depends on: test job passed"]
+            B["Check: Only on push<br/>to master/main"]
+            C{"Passed?"}
+            D["Setup Node.js 20"]
+            E["Install dependencies"]
+            F["Build app<br/>npm run build"]
+            G["Verify build"]
+            H["Build Docker image"]
+            I["Push to registry"]
+            J["Deploy to production"]
+            K["Verify deployment"]
+            
+            A --> B
+            B --> C
+            C -->|No (PR)| L["Skip deployment"]
+            C -->|Yes| D
+            D --> E
+            E --> F
+            F --> G
+            G --> H
+            H --> I
+            I --> J
+            J --> K
+            K --> M["Done"]
+            
+            style M fill:#c8e6c9
+            style L fill:#ffccbc
+        </div>
+        <hr />
+        <h2 id="build-job-steps">Build Job Steps</h2>
+        <h3 id="1-checkout-repository">1. Checkout Repository</h3>
+        <p>Clones repository and sets up git context.</p>
+        <h3 id="2-setup-nodejs--cache">2. Setup Node.js &amp; Cache</h3>
+        <p>Uses Node.js v20 with npm caching.</p>
+        <h3 id="3-install-dependencies">3. Install Dependencies</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm ci</span></span></code></pre></div>
+        <p>Clean install from package-lock.json.</p>
+        <h3 id="4-build-production-bundle">4. Build Production
+        Bundle</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build production bundle</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    if [ -n &quot;${{ secrets.FRONTEND_API_BASE_URL }}&quot; ]; then</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      export VITE_API_BASE_URL=&quot;${{ secrets.FRONTEND_API_BASE_URL }}&quot;</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    fi</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    npm run build</span></code></pre></div>
+        <p><strong>Build Process</strong>:</p>
+        <ul>
+        <li>TypeScript compilation</li>
+        <li>Bundling and minification</li>
+        <li>Asset optimization</li>
+        <li>Tree shaking</li>
+        <li>Code splitting</li>
+        </ul>
+        <p><strong>Output</strong>: <code>dist/</code> directory</p>
+        <h3 id="5-verify-production-build">5. Verify Production
+        Build</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Verify production build</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> bash scripts/verify-production-build.sh</span></span></code></pre></div>
+        <p><strong>Verification Checks</strong>:</p>
+        <ul>
+        <li>✓ dist/ directory exists</li>
+        <li>✓ No test files (<em>.test.</em>)</li>
+        <li>✓ No source maps in production</li>
+        <li>✓ No docs/ directory</li>
+        <li>✓ index.html is present</li>
+        <li>✓ No console.logs or debuggers</li>
+        </ul>
+        <h3 id="6-build-docker-image">6. Build Docker Image</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build Docker image</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> docker build \</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    --build-arg VITE_API_BASE_URL=&quot;${{ secrets.FRONTEND_API_BASE_URL }}&quot; \</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    -t stockease-frontend:latest .</span></span></code></pre></div>
+        <p><strong>Multi-stage Build</strong>:</p>
+        <ol type="1">
+        <li><p>Stage 1: Builder - Node.js 18 Alpine</p>
+        <ul>
+        <li>Install dependencies</li>
+        <li>Copy source files</li>
+        <li>Run build</li>
+        <li>Output: dist/</li>
+        </ul></li>
+        <li><p>Stage 2: Production - nginx Alpine</p>
+        <ul>
+        <li>Copy dist/ from builder</li>
+        <li>Configure nginx</li>
+        <li>Expose port 80</li>
+        <li>Final image: ~45MB</li>
+        </ul></li>
+        </ol>
+        <h3 id="7-additional-steps">7. Additional Steps</h3>
+        <ul>
+        <li>Push to Docker Registry</li>
+        <li>Deploy to cloud platform</li>
+        <li>Run smoke tests</li>
+        <li>Notify deployment status</li>
+        </ul>
+        <hr />
+        <h2 id="build-output">Build Output</h2>
+        <h3 id="artifact-structure">Artifact Structure</h3>
+        <pre><code>dist/
+├── index.html                          # Entry point
+├── assets/
+│   ├── index-ABC123DEF456.js           # Bundled JavaScript (minified)
+│   ├── index-XYZ789UVW012.css          # Compiled CSS (minified)
+│   ├── vendor-ABC123DEF456.js          # Vendor code (React, etc.)
+│   └── images/                         # Optimized images
+└── public/
+    └── (copied public assets)</code></pre>
+        <h3 id="build-statistics">Build Statistics</h3>
+        <pre><code>Metrics:
+├─ Bundle Size: ~250KB gzipped
+├─ JavaScript: ~180KB gzipped
+├─ CSS: ~40KB gzipped
+├─ Images: ~30KB gzipped
+├─ Build Time: 30-60 seconds
+└─ Chunk Count: 3-5 optimal chunks</code></pre>
+        <hr />
+        <h2 id="docker-build-process">Docker Build Process</h2>
+        <h3 id="build-command">Build Command</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.stockease.com/api <span class="dt">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-t</span> stockease-frontend:latest .</span></code></pre></div>
+        <h3 id="dockerfile-multi-stage-build">Dockerfile Multi-Stage
+        Build</h3>
+        <p><strong>Stage 1: Builder</strong> (Node.js 18 Alpine)</p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> builder</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> package*.json ./</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> . .</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span></code></pre></div>
+        <p><strong>Stage 2: Production</strong> (nginx Alpine)</p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> nginx:alpine</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> /app/dist /usr/share/nginx/html</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> ops/nginx/nginx.conf /etc/nginx/nginx.conf</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 80</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;nginx&quot;</span>, <span class="st">&quot;-g&quot;</span>, <span class="st">&quot;daemon off;&quot;</span>]</span></code></pre></div>
+        <h3 id="image-verification">Image Verification</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List image layers</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> history stockease-frontend:latest</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check image size</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> images stockease-frontend</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and test</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8080:80 stockease-frontend:latest</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:8080</span></code></pre></div>
+        <hr />
+        <h2 id="deployment-strategy">Deployment Strategy</h2>
+        <h3 id="zero-downtime-deployment">Zero-Downtime Deployment</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;3&#39;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">services</span><span class="kw">:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">frontend</span><span class="kw">:</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> stockease-frontend:${BUILD_TAG}</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;80:80&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">healthcheck</span><span class="kw">:</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">test</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;CMD&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;curl&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-f&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;http://localhost/index.html&quot;</span><span class="kw">]</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">interval</span><span class="kw">:</span><span class="at"> 10s</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">timeout</span><span class="kw">:</span><span class="at"> 5s</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">retries</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> always</span></span></code></pre></div>
+        <p><strong>Health Checks</strong>:</p>
+        <ul>
+        <li>Verify container starts</li>
+        <li>Check HTTP 200 on index.html</li>
+        <li>Automatic restart on failure</li>
+        <li>Graceful rollback if unhealthy</li>
+        </ul>
+        <h3 id="deployment-process">Deployment Process</h3>
+        <pre><code>Build Docker image
+         ↓
+Push to registry
+         ↓
+Pull on production server
+         ↓
+Stop old container
+         ↓
+Start new container
+         ↓
+Health checks
+         ↓
+Success → Done
+Failure → Rollback to old version</code></pre>
+        <hr />
+        <h2 id="local-testing">Local Testing</h2>
+        <h3 id="build-locally">Build Locally</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build production bundle</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify dist directory</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> dist/</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for test files (should be empty)</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> dist <span class="at">-name</span> <span class="st">&quot;*.test.*&quot;</span> </span></code></pre></div>
+        <h3 id="test-docker-locally">Test Docker Locally</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build Docker image</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-f</span> Dockerfile <span class="at">-t</span> stockease:test .</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run container</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8080:80 stockease:test</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Test in browser</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:8080</span></code></pre></div>
+        <hr />
+        <h2 id="environment-configuration">Environment
+        Configuration</h2>
+        <p>Build uses environment variables from GitHub Secrets:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Secret</th>
+        <th>Usage</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>FRONTEND_API_BASE_URL</td>
+        <td>Injected as VITE_API_BASE_URL</td>
+        </tr>
+        <tr class="even">
+        <td>DOCKER_USERNAME</td>
+        <td>Docker registry authentication</td>
+        </tr>
+        <tr class="odd">
+        <td>DOCKER_PASSWORD</td>
+        <td>Docker registry token</td>
+        </tr>
+        </tbody>
+        </table>
+        <p>See <a href="./secrets.html">Secrets Configuration</a> for
+        setup details.</p>
+        <hr />
+        <h2 id="conditional-deployment">Conditional Deployment</h2>
+        <p>Deployment only runs if:</p>
+        <ul>
+        <li>✓ Event is push (not pull_request)</li>
+        <li>✓ Branch is master or main</li>
+        <li>✓ Previous tests passed</li>
+        <li>✓ Build completed successfully</li>
+        </ul>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">if</span><span class="kw">:</span><span class="at"> github.event_name == &#39;push&#39; &amp;&amp; (github.ref == &#39;refs/heads/master&#39; || github.ref == &#39;refs/heads/main&#39;)</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Main Pipeline Overview</a></li>
+        <li><a href="./testing.html">Testing Stage</a></li>
+        <li><a href="./secrets.html">Secrets Configuration</a></li>
+        <li><a href="./troubleshooting.html">Troubleshooting</a></li>
+        <li><a href="../src/dockerstructure.html">Docker &amp;
+        Containerization</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Build Tool</strong>: Vite 6.0.5<br />
+        <strong>Docker Base</strong>: nginx Alpine<br />
+        <strong>Image Size</strong>: ~45MB</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

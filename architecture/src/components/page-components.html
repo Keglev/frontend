@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>page-components - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="page-components--routes">Page Components &amp;
+        Routes</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Nine main page components mapped to routes with specific
+        purposes.</p>
+        <p><strong>Location</strong>: <code>src/pages/</code></p>
+        <hr />
+        <h2 id="page-component-mapping">Page Component Mapping</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Page</th>
+        <th>Route</th>
+        <th>Purpose</th>
+        <th>Auth Required</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>LoginPage</td>
+        <td><code>/login</code></td>
+        <td>User authentication</td>
+        <td>❌ No</td>
+        </tr>
+        <tr class="even">
+        <td>HomePage</td>
+        <td><code>/</code></td>
+        <td>Landing page</td>
+        <td>❌ No</td>
+        </tr>
+        <tr class="odd">
+        <td>UserDashboard</td>
+        <td><code>/dashboard</code></td>
+        <td>User analytics &amp; overview</td>
+        <td>✅ Yes</td>
+        </tr>
+        <tr class="even">
+        <td>ListStockPage</td>
+        <td><code>/products</code></td>
+        <td>Product inventory list</td>
+        <td>✅ Yes</td>
+        </tr>
+        <tr class="odd">
+        <td>AddProductPage</td>
+        <td><code>/products/add</code></td>
+        <td>Create new product</td>
+        <td>✅ Yes (Admin)</td>
+        </tr>
+        <tr class="even">
+        <td>ChangeProductDetailsPage</td>
+        <td><code>/products/:id/edit</code></td>
+        <td>Modify product</td>
+        <td>✅ Yes (Admin)</td>
+        </tr>
+        <tr class="odd">
+        <td>DeleteProductPage</td>
+        <td><code>/products/:id/delete</code></td>
+        <td>Remove product</td>
+        <td>✅ Yes (Admin)</td>
+        </tr>
+        <tr class="even">
+        <td>SearchProductPage</td>
+        <td><code>/search</code></td>
+        <td>Search products</td>
+        <td>✅ Yes</td>
+        </tr>
+        <tr class="odd">
+        <td>AdminDashboard</td>
+        <td><code>/admin</code></td>
+        <td>Admin management</td>
+        <td>✅ Yes (Admin)</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="page-lifecycle">Page Lifecycle</h2>
+        <pre><code>App.tsx
+├── Router Setup
+│   ├── Public Routes
+│   │   ├── LoginPage
+│   │   └── HomePage
+│   │
+│   └── Protected Routes
+│       ├── ProtectedRoute wrapper
+│       │   ├── Check authentication
+│       │   ├── Check authorization
+│       │   └── Render page or redirect
+│       │
+│       ├── UserDashboard
+│       ├── ListStockPage
+│       ├── SearchProductPage
+│       ├── AdminDashboard (admin only)
+│       ├── AddProductPage (admin only)
+│       ├── ChangeProductDetailsPage (admin only)
+│       └── DeleteProductPage (admin only)</code></pre>
+        <hr />
+        <h2 id="detailed-page-components">Detailed Page Components</h2>
+        <h3 id="1-loginpage">1. LoginPage</h3>
+        <p><strong>Purpose</strong>: User authentication form</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Email/password input</li>
+        <li>Form validation</li>
+        <li>Error messages</li>
+        <li>Remember me checkbox</li>
+        <li>Language selector</li>
+        <li>API integration</li>
+        </ul>
+        <p><strong>Key Props</strong>: None (route component)</p>
+        <p><strong>State Management</strong>:</p>
+        <ul>
+        <li>Local form state (email, password)</li>
+        <li>Redux: Set user on successful login</li>
+        </ul>
+        <p><strong>API Calls</strong>:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> auth<span class="op">.</span><span class="fu">login</span>(email<span class="op">,</span> password)</span></code></pre></div>
+        <p><strong>Error Handling</strong>:</p>
+        <ul>
+        <li>Invalid credentials</li>
+        <li>Network errors</li>
+        <li>Server errors</li>
+        </ul>
+        <hr />
+        <h3 id="2-homepage">2. HomePage</h3>
+        <p><strong>Purpose</strong>: Landing page with product
+        overview</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Welcome message</li>
+        <li>Featured products</li>
+        <li>Quick stats</li>
+        <li>Call-to-action buttons</li>
+        <li>Navigation hints</li>
+        </ul>
+        <hr />
+        <h3 id="3-userdashboard">3. UserDashboard</h3>
+        <p><strong>Purpose</strong>: User-specific analytics and
+        overview</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Statistics (total products, recent additions)</li>
+        <li>Quick action cards</li>
+        <li>Recent activity</li>
+        <li>Search quick access</li>
+        <li>Performance charts</li>
+        </ul>
+        <p><strong>Data Requirements</strong>:</p>
+        <ul>
+        <li>Product count</li>
+        <li>Recent products</li>
+        <li>User activity log</li>
+        </ul>
+        <hr />
+        <h3 id="4-liststockpage">4. ListStockPage</h3>
+        <p><strong>Purpose</strong>: Complete product inventory
+        display</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Product table with sorting</li>
+        <li>Pagination</li>
+        <li>Filtering by category</li>
+        <li>Search integration</li>
+        <li>Bulk actions</li>
+        <li>Row actions (edit, delete, view)</li>
+        </ul>
+        <p><strong>State</strong>:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> ListStockState {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  products<span class="op">:</span> Product[]<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  filter<span class="op">:</span> { category<span class="op">?:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  sortBy<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  sortOrder<span class="op">:</span> <span class="st">&#39;asc&#39;</span> <span class="op">|</span> <span class="st">&#39;desc&#39;</span><span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  page<span class="op">:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  limit<span class="op">:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>API Calls</strong>:</p>
+        <ul>
+        <li>GET /api/products (with pagination)</li>
+        <li>DELETE /api/products/:id</li>
+        <li>PUT /api/products/stock/batch</li>
+        </ul>
+        <hr />
+        <h3 id="5-addproductpage">5. AddProductPage</h3>
+        <p><strong>Purpose</strong>: Create new product form</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Form with validation</li>
+        <li>Required field indicators</li>
+        <li>Real-time validation feedback</li>
+        <li>SKU uniqueness check</li>
+        <li>Category dropdown</li>
+        <li>Cancel &amp; Save buttons</li>
+        </ul>
+        <p><strong>Form Fields</strong>:</p>
+        <ul>
+        <li>name (text, required)</li>
+        <li>quantity (number, required, &gt;= 0)</li>
+        <li>category (select, required)</li>
+        <li>sku (text, required, unique)</li>
+        <li>price (number, required, &gt; 0)</li>
+        <li>description (textarea, optional)</li>
+        </ul>
+        <p><strong>API Calls</strong>:</p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">createProduct</span>(formData)</span></code></pre></div>
+        <hr />
+        <h3 id="6-changeproductdetailspage">6.
+        ChangeProductDetailsPage</h3>
+        <p><strong>Purpose</strong>: Edit existing product</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Load product by ID</li>
+        <li>Pre-populate form</li>
+        <li>Validation</li>
+        <li>Conflict handling</li>
+        <li>Cancel &amp; Save buttons</li>
+        </ul>
+        <p><strong>URL Param</strong>: <code>:id</code></p>
+        <p><strong>Data Flow</strong>:</p>
+        <ol type="1">
+        <li>Route with product ID</li>
+        <li>Fetch product details</li>
+        <li>Display in form</li>
+        <li>Submit updates</li>
+        <li>Navigate back to list</li>
+        </ol>
+        <hr />
+        <h3 id="7-deleteproductpage">7. DeleteProductPage</h3>
+        <p><strong>Purpose</strong>: Product deletion confirmation</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Display product details</li>
+        <li>Confirmation dialog</li>
+        <li>Prevent accidental deletion</li>
+        <li>Error handling</li>
+        <li>Success redirection</li>
+        </ul>
+        <p><strong>API Calls</strong>:</p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">deleteProduct</span>(productId)</span></code></pre></div>
+        <p><strong>Confirmation Flow</strong>:</p>
+        <ol type="1">
+        <li>Display product info</li>
+        <li>Show warning message</li>
+        <li>Request confirmation</li>
+        <li>Execute deletion</li>
+        <li>Redirect to product list</li>
+        </ol>
+        <hr />
+        <h3 id="8-searchproductpage">8. SearchProductPage</h3>
+        <p><strong>Purpose</strong>: Product search interface</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Search input with debouncing</li>
+        <li>Real-time results</li>
+        <li>Result filtering</li>
+        <li>Result count</li>
+        <li>Empty state handling</li>
+        </ul>
+        <p><strong>API Calls</strong>:</p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> results <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">searchProducts</span>(query)</span></code></pre></div>
+        <p><strong>Search Scope</strong>:</p>
+        <ul>
+        <li>Product name</li>
+        <li>SKU</li>
+        <li>Description</li>
+        <li>Category</li>
+        </ul>
+        <hr />
+        <h3 id="9-admindashboard">9. AdminDashboard</h3>
+        <p><strong>Purpose</strong>: Administrative management
+        interface</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>User management</li>
+        <li>System statistics</li>
+        <li>Configuration options</li>
+        <li>Audit logs</li>
+        <li>Bulk operations</li>
+        </ul>
+        <p><strong>Sections</strong>:</p>
+        <ul>
+        <li>Statistics overview</li>
+        <li>User list with actions</li>
+        <li>System health</li>
+        <li>Recent activity</li>
+        </ul>
+        <hr />
+        <h2 id="routing-configuration">Routing Configuration</h2>
+        <h3 id="router-setup">Router Setup</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/main.tsx or App.tsx</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> router <span class="op">=</span> <span class="fu">createBrowserRouter</span>([</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    path<span class="op">:</span> <span class="st">&#39;/&#39;</span><span class="op">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    element<span class="op">:</span> <span class="op">&lt;</span>Layout <span class="op">/&gt;,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    children<span class="op">:</span> [</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Public routes</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      { path<span class="op">:</span> <span class="st">&#39;login&#39;</span><span class="op">,</span> element<span class="op">:</span> <span class="op">&lt;</span>LoginPage <span class="op">/&gt;</span> }<span class="op">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      { path<span class="op">:</span> <span class="st">&#39;/&#39;</span><span class="op">,</span> element<span class="op">:</span> <span class="op">&lt;</span>HomePage <span class="op">/&gt;</span> }<span class="op">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Protected routes</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/dashboard&#39;</span><span class="op">,</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute<span class="op">&gt;&lt;</span>UserDashboard <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/products&#39;</span><span class="op">,</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute<span class="op">&gt;&lt;</span>ListStockPage <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/products/add&#39;</span><span class="op">,</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute adminOnly<span class="op">&gt;&lt;</span>AddProductPage <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/products/:id/edit&#39;</span><span class="op">,</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute adminOnly<span class="op">&gt;&lt;</span>ChangeProductDetailsPage <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/products/:id/delete&#39;</span><span class="op">,</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute adminOnly<span class="op">&gt;&lt;</span>DeleteProductPage <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/search&#39;</span><span class="op">,</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute<span class="op">&gt;&lt;</span>SearchProductPage <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        path<span class="op">:</span> <span class="st">&#39;/admin&#39;</span><span class="op">,</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        element<span class="op">:</span> <span class="op">&lt;</span>ProtectedRoute adminOnly<span class="op">&gt;&lt;</span>AdminDashboard <span class="op">/&gt;&lt;/</span>ProtectedRoute<span class="op">&gt;</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>])<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="common-page-patterns">Common Page Patterns</h2>
+        <h3 id="pattern-1-form-page-addedit">Pattern 1: Form Page
+        (Add/Edit)</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> FormPage <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [formData<span class="op">,</span> setFormData] <span class="op">=</span> <span class="fu">useState</span>(initialData)<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [errors<span class="op">,</span> setErrors] <span class="op">=</span> <span class="fu">useState</span>({})<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [isSubmitting<span class="op">,</span> setIsSubmitting] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> handleSubmit <span class="op">=</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setIsSubmitting</span>(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> {</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> <span class="fu">submitForm</span>(formData)<span class="op">;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">navigate</span>(<span class="st">&#39;/previous-page&#39;</span>)<span class="op">;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">catch</span> (error) {</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setErrors</span>(error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">data</span><span class="op">?.</span><span class="at">details</span>)<span class="op">;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">finally</span> {</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setIsSubmitting</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>form onSubmit<span class="op">=</span>{handleSubmit}<span class="op">&gt;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>      {<span class="co">/* Form fields */</span>}</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>Button <span class="kw">type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span> isLoading<span class="op">=</span>{isSubmitting}<span class="op">&gt;</span>Save<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>form<span class="op">&gt;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <h3 id="pattern-2-list-page-with-pagination">Pattern 2: List
+        Page with Pagination</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ListPage <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [page<span class="op">,</span> setPage] <span class="op">=</span> <span class="fu">useState</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [items<span class="op">,</span> setItems] <span class="op">=</span> <span class="fu">useState</span>([])<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [loading<span class="op">,</span> setLoading] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">useEffect</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> loadItems <span class="op">=</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">setLoading</span>(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">try</span> {</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> data <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetchItems</span>({ page<span class="op">,</span> limit<span class="op">:</span> <span class="dv">20</span> })<span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">setItems</span>(data)<span class="op">;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">finally</span> {</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">setLoading</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">loadItems</span>()<span class="op">;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span> [page])<span class="op">;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>      {loading <span class="op">?</span> <span class="op">&lt;</span>SkeletonLoader <span class="op">/&gt;</span> <span class="op">:</span> <span class="op">&lt;</span>ItemList items<span class="op">=</span>{items} <span class="op">/&gt;</span>}</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>Pagination page<span class="op">=</span>{page} onPageChange<span class="op">=</span>{setPage} <span class="op">/&gt;</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/&gt;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        Component architecture</li>
+        <li><strong><a href="./shared-components.html">Shared
+        Components</a></strong> - Reusable UI components</li>
+        <li><strong><a href="./styling.html">Styling</a></strong> - CSS
+        and design patterns</li>
+        <li><strong><a href="./testing.html">Testing</a></strong> -
+        Component testing strategies</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1
+        id="documentation-pipeline---complete-overview">Documentation
+        Pipeline - Complete Overview</h1>
+        <p><strong>Status</strong>: ✅ <strong>READY TO
+        PUSH</strong></p>
+        <hr />
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <p>This directory contains comprehensive documentation about the
+        StockEase Frontend documentation pipeline.</p>
+        <h3 id="-start-here-5-min-read">🚀 Start Here (5 min read)</h3>
+        <p><strong><a href="./docs_architecture_diagram.html">System
+        Architecture Diagrams</a></strong> - Visual Overview</p>
+        <ul>
+        <li>System overview with Mermaid diagrams</li>
+        <li>File generation pipeline</li>
+        <li>Workflow decision tree</li>
+        <li>Security &amp; isolation architecture</li>
+        <li>Performance strategy</li>
+        </ul>
+        <h3 id="-configuration-details-30-min-read">✅ Configuration
+        Details (30 min read)</h3>
+        <p><strong><a href="./config-verification.html">Configuration
+        Verification</a></strong> - Technical Analysis</p>
+        <ul>
+        <li>Line-by-line verification of all 12 components</li>
+        <li>package.json documentation scripts</li>
+        <li>vitest.config.ts and typedoc.json setup</li>
+        <li>Docker and deployment configuration</li>
+        <li>Link resolution logic</li>
+        <li>Branch &amp; artifact flow</li>
+        <li>Security &amp; privacy audit</li>
+        </ul>
+        <h3 id="️-issues--recommendations-10-min-read">⚠️ Issues &amp;
+        Recommendations (10 min read)</h3>
+        <p><strong><a href="./issues-recommendations.html">Issues &amp;
+        Recommendations</a></strong> - Action Items</p>
+        <ul>
+        <li>Critical issues found and resolved</li>
+        <li>Recommendations for optimization</li>
+        <li>Pre-push checklist</li>
+        <li>Final verdict and next steps</li>
+        </ul>
+        <hr />
+        <h2 id="what-you-built">What You Built</h2>
+        <p>A professional, automated documentation pipeline that:</p>
+        <ol type="1">
+        <li><strong>Generates</strong> four types of documentation from
+        your source code</li>
+        <li><strong>Publishes</strong> them to GitHub Pages (gh-pages
+        branch)</li>
+        <li><strong>Keeps</strong> everything organized and separate
+        from production code</li>
+        <li><strong>Triggers</strong> intelligently based on what files
+        change</li>
+        </ol>
+        <hr />
+        <h2 id="the-key-questions-answered">The Key Questions
+        Answered</h2>
+        <h3 id="-are-documentation-sources-excluded-from-production">❓
+        Are documentation sources excluded from production?</h3>
+        <p>✅ <strong>YES</strong> - <code>.dockerignore</code> excludes
+        <code>docs/</code> directory and all <code>.md</code> files</p>
+        <h3 id="-are-generated-html-docs-excluded-from-production">❓
+        Are generated HTML docs excluded from production?</h3>
+        <p>✅ <strong>YES</strong> - <code>public-docs/</code> never
+        enters Docker build (exists only during workflow)</p>
+        <h3 id="-are-generated-html-docs-excluded-from-main-branch">❓
+        Are generated HTML docs excluded from main branch?</h3>
+        <p>✅ <strong>YES</strong> - <code>public-docs/</code> is in
+        <code>.gitignore</code> (won't be committed)</p>
+        <h3 id="-is-everything-in-gh-pages-branch-documentation-only">❓
+        Is everything in gh-pages branch documentation only?</h3>
+        <p>✅ <strong>YES</strong> - <code>docs-pipeline.yml</code>
+        publishes ONLY <code>public-docs/</code> to gh-pages</p>
+        <h3 id="-are-paths-and-links-correct">❓ Are paths and links
+        correct?</h3>
+        <p>✅ <strong>YES</strong> - All verified; links use relative
+        paths that work anywhere</p>
+        <h3 id="-is-the-configuration-error-free">❓ Is the
+        configuration error-free?</h3>
+        <p>✅ <strong>YES</strong> - All 12 components verified
+        correct</p>
+        <hr />
+        <h2 id="how-it-works-simple-version">How It Works (Simple
+        Version)</h2>
+        <pre><code>You push to main
+    ↓
+GitHub Actions runs TWO workflows in parallel:
+
+1. deploy-frontend.yml
+   • Tests your code
+   • Builds production app (dist/)
+   • Deploys to Vercel
+   • Result: Live app at vercel.app URL
+
+2. docs-pipeline.yml (only if docs files changed)
+   • Generates HTML from markdown
+   • Generates API docs from TypeScript
+   • Generates coverage reports
+   • Publishes to gh-pages
+   • Result: Docs at github.io URL
+
+Everything stays separate. No conflicts. No duplication.</code></pre>
+        <hr />
+        <h2 id="file-structure">File Structure</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>File</th>
+        <th>Purpose</th>
+        <th>Lines</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>docs_architecture_diagram.md</strong></td>
+        <td>Mermaid diagrams &amp; visual architecture</td>
+        <td>260</td>
+        <td>✅ Optimized</td>
+        </tr>
+        <tr class="even">
+        <td><strong>config-verification.md</strong></td>
+        <td>Detailed configuration analysis</td>
+        <td>380</td>
+        <td>✅ Created</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>issues-recommendations.md</strong></td>
+        <td>Issues found &amp; next steps</td>
+        <td>210</td>
+        <td>✅ Created</td>
+        </tr>
+        <tr class="even">
+        <td><strong>overview.md</strong></td>
+        <td>This file - navigation hub</td>
+        <td>130</td>
+        <td>✅ Updated</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="file-locations">File Locations</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>What</th>
+        <th>Where</th>
+        <th>Committed?</th>
+        <th>Published To</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Markdown sources</strong></td>
+        <td><code>docs/architecture/</code></td>
+        <td>✅ Yes</td>
+        <td>Source of truth</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Generated HTML</strong></td>
+        <td><code>public-docs/</code></td>
+        <td>❌ No (.gitignore)</td>
+        <td>GitHub Pages</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Production app</strong></td>
+        <td><code>dist/</code></td>
+        <td>❌ No (.gitignore)</td>
+        <td>Vercel</td>
+        </tr>
+        <tr class="even">
+        <td><strong>API documentation</strong></td>
+        <td><code>public-docs/typedoc/</code></td>
+        <td>❌ No (.gitignore)</td>
+        <td>GitHub Pages</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Coverage reports</strong></td>
+        <td><code>public-docs/coverage/</code></td>
+        <td>❌ No (.gitignore)</td>
+        <td>GitHub Pages</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Build scripts</strong></td>
+        <td><code>scripts/</code></td>
+        <td>✅ Yes</td>
+        <td>CI/CD pipeline</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="deployment-flow">Deployment Flow</h2>
+        <h3 id="when-you-push-markdown-changes">When you push markdown
+        changes:</h3>
+        <pre><code>1. Edit docs/architecture/*.md
+2. Push to main
+3. docs-pipeline.yml triggers:
+   - Converts markdown to HTML
+   - Generates TypeDoc
+   - Generates coverage
+   - Publishes to gh-pages
+4. Production (Vercel) unaffected</code></pre>
+        <h3 id="when-you-push-source-code-changes">When you push source
+        code changes:</h3>
+        <pre><code>1. Edit src/component.ts
+2. Push to main
+3. Both pipelines trigger:
+   - deploy-frontend.yml: Tests &amp; deploys to Vercel
+   - docs-pipeline.yml: Regenerates TypeDoc &amp; publishes to gh-pages
+4. Everything stays in sync</code></pre>
+        <hr />
+        <h2 id="next-steps">Next Steps</h2>
+        <ol type="1">
+        <li>✅ <strong>Review</strong> the architecture diagrams: <a
+        href="./docs_architecture_diagram.html">docs_architecture_diagram.md</a></li>
+        <li>✅ <strong>Verify</strong> configuration details: <a
+        href="./config-verification.html">config-verification.md</a></li>
+        <li>✅ <strong>Check</strong> recommendations: <a
+        href="./issues-recommendations.html">issues-recommendations.md</a></li>
+        <li>👉 <strong>Push</strong> all changes to main</li>
+        <li>✅ Verify documentation appears at your gh-pages URL</li>
+        <li>✅ Verify production still deploys to Vercel</li>
+        </ol>
+        <hr />
+        <p><strong>Status</strong>: ✅ All systems ready for
+        production<br />
+        <strong>Generated</strong>: November 12, 2025<br />
+        <strong>Last Updated</strong>: Complete refactor with Mermaid
+        diagrams</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-playbooks">Security Playbooks</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Security playbooks are step-by-step operational procedures
+        for handling security incidents, planned maintenance, and
+        emergency scenarios. These playbooks ensure consistent,
+        repeatable responses to common security situations in StockEase
+        Frontend.</p>
+        <hr />
+        <h2 id="playbooks-index">Playbooks Index</h2>
+        <h3 id="1-token-revocation--forced-logout">1. <strong>Token
+        Revocation &amp; Forced Logout</strong></h3>
+        <p>📄 <a href="./revoke-tokens.html">revoke-tokens.md</a></p>
+        <p><strong>Purpose:</strong> Handle forced user logout
+        scenarios, revoke compromised tokens, and manage session
+        termination.</p>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>When to revoke tokens (security incidents, account changes,
+        policy updates)</li>
+        <li>Token revocation methods (server-side blacklist, distributed
+        cache, client-only)</li>
+        <li>Current logout implementation vs. recommended
+        improvements</li>
+        <li>Batch token revocation for incidents</li>
+        <li>Monitoring and verification</li>
+        <li>Emergency response procedures</li>
+        </ul>
+        <p><strong>Use Cases:</strong></p>
+        <pre><code>Scenario: User reports account compromise
+├─ Follow: Token Revocation &amp; Forced Logout
+├─ Action: Revoke all tokens for user
+├─ Result: User forced to re-authenticate
+└─ Follow-up: Password reset + security audit</code></pre>
+        <p><strong>Current Implementation:</strong></p>
+        <ul>
+        <li>✅ Client-side logout (remove token from localStorage)</li>
+        <li>❌ Server-side blacklist (not implemented -
+        recommended)</li>
+        <li>❌ Batch revocation (not implemented - needed for
+        incidents)</li>
+        </ul>
+        <p><strong>Recommended Actions:</strong></p>
+        <ol type="1">
+        <li>Implement server-side token blacklist (Redis)</li>
+        <li>Create revocation endpoint for manual/programmatic
+        revocation</li>
+        <li>Setup batch revocation for security incidents</li>
+        <li>Add audit logging for all revocations</li>
+        </ol>
+        <hr />
+        <h3 id="2-key-rotation--rollout">2. <strong>Key Rotation &amp;
+        Rollout</strong></h3>
+        <p>📄 <a href="./key-rotation.html">key-rotation.md</a></p>
+        <p><strong>Purpose:</strong> Plan and execute JWT signing key
+        rotations, maintain availability, and recover from
+        incidents.</p>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>Why rotate keys (security, compliance, maintenance)</li>
+        <li>Current key architecture (HS256, environment variables)</li>
+        <li>Three rotation strategies:
+        <ul>
+        <li><strong>Immediate</strong> (emergency - key compromise)</li>
+        <li><strong>Graceful</strong> (planned - 3-4 week rollout)</li>
+        <li><strong>Rolling</strong> (continuous - 4 week rotation by
+        cohort)</li>
+        </ul></li>
+        <li>Step-by-step rollout procedures</li>
+        <li>Emergency rollback process</li>
+        <li>Monitoring and metrics</li>
+        <li>Key rotation schedule</li>
+        </ul>
+        <p><strong>Use Cases:</strong></p>
+        <pre><code>Scenario: Quarterly scheduled key rotation
+├─ Follow: Key Rotation &amp; Rollout
+├─ Strategy: Graceful rotation (3-4 weeks)
+├─ Timeline: Generate → Deploy dual-key → Monitor → Deprecate
+└─ Result: All users migrated to new key
+
+Scenario: Key compromise detected
+├─ Follow: Key Rotation &amp; Rollout (Immediate strategy)
+├─ Timeline: Generate new key → Deploy → Force re-login
+├─ Duration: &lt; 1 hour
+└─ Result: System secure, old tokens invalid</code></pre>
+        <p><strong>Current Implementation:</strong></p>
+        <ul>
+        <li>❌ Automated rotation (not implemented)</li>
+        <li>❌ Dual-key support (not implemented)</li>
+        <li>❌ Rotation monitoring (not implemented)</li>
+        </ul>
+        <p><strong>Recommended Actions:</strong></p>
+        <ol type="1">
+        <li>Implement dual-key support in backend</li>
+        <li>Create key rotation monitoring dashboard</li>
+        <li>Schedule quarterly rotation (every 90 days)</li>
+        <li>Setup automated alerts for key rotation events</li>
+        </ol>
+        <hr />
+        <h2 id="quick-reference-when-to-use-which-playbook">Quick
+        Reference: When to Use Which Playbook</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Situation</th>
+        <th>Playbook</th>
+        <th>Timeline</th>
+        <th>Impact</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>User forgot password</td>
+        <td>None (use login)</td>
+        <td>N/A</td>
+        <td>None</td>
+        </tr>
+        <tr class="even">
+        <td>User requests logout</td>
+        <td>Token Revocation</td>
+        <td>Immediate</td>
+        <td>Minimal</td>
+        </tr>
+        <tr class="odd">
+        <td>Account compromise suspected</td>
+        <td>Token Revocation</td>
+        <td>&lt; 5 min</td>
+        <td>User session ends</td>
+        </tr>
+        <tr class="even">
+        <td>Admin revokes user access</td>
+        <td>Token Revocation</td>
+        <td>&lt; 1 min</td>
+        <td>User forced to login</td>
+        </tr>
+        <tr class="odd">
+        <td>Security breach detected</td>
+        <td>Token Revocation (batch)</td>
+        <td>&lt; 30 min</td>
+        <td>Multiple users affected</td>
+        </tr>
+        <tr class="even">
+        <td>Quarterly maintenance</td>
+        <td>Key Rotation (graceful)</td>
+        <td>3-4 weeks</td>
+        <td>Minimal (transparent)</td>
+        </tr>
+        <tr class="odd">
+        <td>Key leaked/compromised</td>
+        <td>Key Rotation (immediate)</td>
+        <td>&lt; 1 hour</td>
+        <td>All users re-login</td>
+        </tr>
+        <tr class="even">
+        <td>Post-incident analysis</td>
+        <td>Both</td>
+        <td>24 hours</td>
+        <td>Documentation</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="security-incident-response-flow">Security Incident
+        Response Flow</h2>
+        <h3 id="token-compromise-detected">Token Compromise
+        Detected</h3>
+        <pre><code>Step 1: Detection &amp; Assessment
+├─ Token found in logs/breach
+├─ Attacker using token observed
+├─ Multiple accounts affected
+└─ Severity: CRITICAL
+
+Step 2: Immediate Actions (&lt; 5 min)
+├─ See: Token Revocation &amp; Forced Logout
+├─ Action: Batch revoke all affected tokens
+├─ Result: Tokens immediately invalid
+└─ Next: Force affected users to re-login
+
+Step 3: Containment (&lt; 30 min)
+├─ Determine scope: How many users?
+├─ Determine cause: How was token leaked?
+├─ Isolate: Stop further leaks
+└─ Notify: Alert security team
+
+Step 4: Recovery (&lt; 1 hour)
+├─ See: Key Rotation &amp; Rollout (Immediate strategy)
+├─ Action: Rotate signing key if compromised
+├─ Result: New tokens cannot be forged
+└─ Verify: All old tokens invalid
+
+Step 5: Follow-up (24 hours)
+├─ Audit: How did it happen?
+├─ Fix: Prevent future leaks
+├─ Notify: Communicate with users
+├─ Document: Post-incident review</code></pre>
+        <hr />
+        <h2 id="security-checklist-for-operations-team">Security
+        Checklist for Operations Team</h2>
+        <h3 id="daily">Daily</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Monitor authentication
+        metrics</label></li>
+        <li><label><input type="checkbox" />Check for unusual token
+        verification errors</label></li>
+        <li><label><input type="checkbox" />Review audit logs for
+        revocation activity</label></li>
+        <li><label><input type="checkbox" />Verify key rotation schedule
+        remains on track</label></li>
+        </ul>
+        <h3 id="weekly">Weekly</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Review token revocation
+        audit log</label></li>
+        <li><label><input type="checkbox" />Check Redis cache (revoked
+        tokens) health</label></li>
+        <li><label><input type="checkbox" />Monitor dual-key usage
+        (during rotation)</label></li>
+        <li><label><input type="checkbox" />Test key rotation playbook
+        (dry run)</label></li>
+        </ul>
+        <h3 id="monthly">Monthly</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Full security audit of
+        authentication system</label></li>
+        <li><label><input type="checkbox" />Review and update
+        playbooks</label></li>
+        <li><label><input type="checkbox" />Test emergency procedures
+        (incident simulation)</label></li>
+        <li><label><input type="checkbox" />Update
+        documentation</label></li>
+        </ul>
+        <h3 id="quarterly">Quarterly</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Execute scheduled key
+        rotation</label></li>
+        <li><label><input type="checkbox" />Review and rotate master
+        keys</label></li>
+        <li><label><input type="checkbox" />Compliance audit (HIPAA, PCI
+        DSS, SOC 2)</label></li>
+        <li><label><input type="checkbox" />Security training for
+        team</label></li>
+        </ul>
+        <hr />
+        <h2 id="playbook-activation-decision-tree">Playbook Activation
+        Decision Tree</h2>
+        <pre><code>Security Event Detected
+│
+├─ Is it a token/session issue?
+│  │
+│  ├─ YES: User logout, permission change, account suspension?
+│  │   └─ USE: Token Revocation &amp; Forced Logout
+│  │       ├─ Revoke user&#39;s tokens
+│  │       ├─ Force re-authentication
+│  │       └─ Document in audit log
+│  │
+│  └─ NO: Signing key issue?
+│      │
+│      ├─ YES: Key compromise suspected or scheduled rotation?
+│      │   └─ USE: Key Rotation &amp; Rollout
+│      │       ├─ Generate new key
+│      │       ├─ Deploy dual-key or immediate rollout
+│      │       └─ Monitor migration
+│      │
+│      └─ NO: Unknown issue
+│          └─ ESCALATE: Call incident commander
+│
+└─ Execute selected playbook
+   └─ Document all actions
+      └─ Post-incident review</code></pre>
+        <hr />
+        <h2 id="communication-templates">Communication Templates</h2>
+        <h3 id="user-notification-forced-re-login">User Notification:
+        Forced Re-login</h3>
+        <pre><code>Subject: Security Update - Please Log In Again
+
+Hi [User],
+
+For your account security, we&#39;re requiring all users to log in again.
+This is part of our ongoing security maintenance.
+
+Actions needed:
+1. Click &quot;Logout&quot; or close your browser
+2. Visit https://stockease.com
+3. Log in with your credentials
+
+The re-login process takes &lt; 1 minute.
+
+If you have any issues, contact support@stockease.com
+
+Thank you,
+Security Team</code></pre>
+        <h3 id="security-alert-incident-response">Security Alert:
+        Incident Response</h3>
+        <pre><code>Subject: URGENT - Security Incident Response
+
+Hi Team,
+
+A potential security incident has been detected and identified as [INCIDENT TYPE].
+
+Status: [CONTAINED / IN PROGRESS / RESOLVED]
+
+Timeline:
+├─ [TIME] Detected
+├─ [TIME] Containment actions started
+├─ [TIME] Expected resolution
+
+Impact:
+├─ Affected users: [NUMBER]
+├─ Service impact: [BRIEF DESCRIPTION]
+├─ Data at risk: [YES/NO]
+
+Actions taken:
+- [ACTION 1]
+- [ACTION 2]
+- [ACTION 3]
+
+Next steps:
+- [NEXT STEP 1]
+- [NEXT STEP 2]
+
+Questions? Contact: security@stockease.com
+
+Incident Commander: [NAME]</code></pre>
+        <hr />
+        <h2 id="tools--resources">Tools &amp; Resources</h2>
+        <h3 id="monitoring-tools">Monitoring Tools</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Key Rotation Monitoring</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>https<span class="op">:</span><span class="co">//monitoring.stockease.com/dashboards/key-rotation</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Token Revocation Audit</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>https<span class="op">:</span><span class="co">//logging.stockease.com/queries/token-revocation</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Authentication Metrics</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>https<span class="op">:</span><span class="co">//metrics.stockease.com/auth/dashboard</span></span></code></pre></div>
+        <h3 id="commands-reference">Commands Reference</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check Redis for revoked tokens</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-cli</span> keys <span class="st">&quot;revoked_*&quot;</span> <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Decode JWT token</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">jwt</span> decode <span class="at">--secret</span><span class="op">=</span><span class="va">$JWT_SECRET</span> <span class="op">&lt;</span>token<span class="op">&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate new signing key</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-e</span> <span class="st">&quot;console.log(require(&#39;crypto&#39;).randomBytes(32).toString(&#39;hex&#39;))&quot;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Monitor token verification errors</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span> <span class="at">-f</span> /var/log/stockease/auth.log <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;VERIFICATION_ERROR&quot;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dual-key usage</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> https://api.stockease.com/metrics/auth/keys</span></code></pre></div>
+        <h3 id="escalation-contacts">Escalation Contacts</h3>
+        <pre><code>Authentication Issue:
+├─ Level 1: DevOps Team (ops@stockease.com)
+├─ Level 2: Security Team (security@stockease.com)
+└─ Level 3: CTO (cto@stockease.com)
+
+Security Incident:
+├─ Level 1: Security Team (security@stockease.com)
+├─ Level 2: Incident Commander (on-call)
+└─ Level 3: Executive Team (escalation list)
+
+Key Compromise:
+├─ Immediate: Page on-call security engineer
+├─ Notify: Incident commander
+└─ Execute: Key Rotation (Immediate strategy)</code></pre>
+        <hr />
+        <h2 id="playbook-exercises">Playbook Exercises</h2>
+        <h3 id="exercise-1-quarterly-key-rotation">Exercise 1: Quarterly
+        Key Rotation</h3>
+        <p><strong>Objective:</strong> Test key rotation procedures</p>
+        <p><strong>Duration:</strong> 4 weeks
+        <strong>Environment:</strong> Production (with monitoring)
+        <strong>Success Criteria:</strong></p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />New key generated and
+        secured</label></li>
+        <li><label><input type="checkbox" />Dual-key deployed to all
+        servers</label></li>
+        <li><label><input type="checkbox" />Token usage metrics
+        tracked</label></li>
+        <li><label><input type="checkbox" />Previous key
+        deprecated</label></li>
+        <li><label><input type="checkbox" />Zero downtime</label></li>
+        <li><label><input type="checkbox" />Documentation
+        updated</label></li>
+        </ul>
+        <p><strong>Runbook:</strong> See <a
+        href="./key-rotation.html">Key Rotation &amp; Rollout</a></p>
+        <hr />
+        <h3 id="exercise-2-emergency-token-revocation">Exercise 2:
+        Emergency Token Revocation</h3>
+        <p><strong>Objective:</strong> Test emergency revocation
+        procedures</p>
+        <p><strong>Duration:</strong> 1 hour
+        <strong>Environment:</strong> Staging (simulate production)
+        <strong>Scenario:</strong> "Admin account compromised, revoke
+        all admin tokens"</p>
+        <p><strong>Success Criteria:</strong></p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All admin tokens revoked in
+        &lt; 5 minutes</label></li>
+        <li><label><input type="checkbox" />Audit log records all
+        revocations</label></li>
+        <li><label><input type="checkbox" />Affected users
+        notified</label></li>
+        <li><label><input type="checkbox" />Users can
+        re-login</label></li>
+        <li><label><input type="checkbox" />No legitimate user data
+        lost</label></li>
+        <li><label><input type="checkbox" />System performance
+        normal</label></li>
+        </ul>
+        <p><strong>Runbook:</strong> See <a
+        href="./revoke-tokens.html">Token Revocation &amp; Forced
+        Logout</a></p>
+        <hr />
+        <h3 id="exercise-3-incident-simulation">Exercise 3: Incident
+        Simulation</h3>
+        <p><strong>Objective:</strong> Test full incident response</p>
+        <p><strong>Duration:</strong> 2 hours
+        <strong>Environment:</strong> Staging (full simulation)
+        <strong>Scenario:</strong> "Signing key found in GitHub repo
+        history"</p>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Detect the compromise</li>
+        <li>Execute Emergency Key Rotation</li>
+        <li>Execute Batch Token Revocation</li>
+        <li>Notify users</li>
+        <li>Post-incident review</li>
+        <li>Document lessons learned</li>
+        </ol>
+        <p><strong>Success Criteria:</strong></p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Complete within 1
+        hour</label></li>
+        <li><label><input type="checkbox" />Zero downtime</label></li>
+        <li><label><input type="checkbox" />Full audit
+        trail</label></li>
+        <li><label><input type="checkbox" />Clear
+        communication</label></li>
+        <li><label><input type="checkbox" />Documented
+        response</label></li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <h3 id="authentication--authorization">Authentication &amp;
+        Authorization</h3>
+        <ul>
+        <li><a href="../auth/authentication.html">Authentication
+        Flow</a></li>
+        <li><a href="../auth/jwt-tokens.html">JWT Token
+        Handling</a></li>
+        <li><a href="../auth/authorization.html">Authorization &amp;
+        Access Control</a></li>
+        </ul>
+        <h3 id="api-security">API Security</h3>
+        <ul>
+        <li><a href="../api-communication/api-security.html">API
+        Communication Security</a></li>
+        <li><a href="../api-communication/error-logging.html">Error
+        Logging &amp; Monitoring</a></li>
+        </ul>
+        <h3 id="frontend-security">Frontend Security</h3>
+        <ul>
+        <li><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention &amp; Input Sanitization</a></li>
+        <li><a href="../frontend/secrets-config.html">Secrets &amp;
+        Configuration</a></li>
+        </ul>
+        <h3 id="platform-security">Platform Security</h3>
+        <ul>
+        <li><a href="../platform/ci-secrets.html">CI/CD Secrets &amp;
+        Pipeline</a></li>
+        <li><a href="../platform/dependencies.html">Dependency
+        Management</a></li>
+        </ul>
+        <hr />
+        <h2 id="playbook-maintenance">Playbook Maintenance</h2>
+        <h3 id="version-control">Version Control</h3>
+        <pre><code>Last Updated: November 13, 2025
+Version: 1.0
+Maintained By: Security Team
+Review Schedule: Quarterly</code></pre>
+        <h3 id="change-log">Change Log</h3>
+        <pre><code>2025-11-13 | v1.0 | Initial creation
+           |      | - Token Revocation playbook
+           |      | - Key Rotation playbook
+           |      | - Incident response procedures</code></pre>
+        <h3 id="update-procedure">Update Procedure</h3>
+        <ol type="1">
+        <li>Draft proposed changes</li>
+        <li>Security team review</li>
+        <li>Test changes in staging</li>
+        <li>Update documentation</li>
+        <li>Announce to operations team</li>
+        <li>Archive old version</li>
+        </ol>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Operational (Ready for Use)<br />
+        <strong>Priority:</strong> High (Incident Response)<br />
+        <strong>Maintainer:</strong> Security Operations Team</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

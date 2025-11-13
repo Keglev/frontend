@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="components-architecture">Components Architecture</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The components layer provides reusable UI building blocks
+        organized into shared components (buttons, modals, loaders) and
+        page-specific components. All components follow React best
+        practices with proper TypeScript typing, error boundaries, and
+        accessibility.</p>
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <ul>
+        <li><strong><a href="./shared-components.html">Shared
+        Components</a></strong> - Reusable components (Header, Sidebar,
+        Footer, Buttons, ErrorBoundary, HelpModal, SkeletonLoader)</li>
+        <li><strong><a href="./page-components.html">Page
+        Components</a></strong> - Page-level components and route
+        mapping (9 pages)</li>
+        <li><strong><a href="./styling.html">Styling</a></strong> - CSS
+        hierarchy, Tailwind CSS, responsive design patterns</li>
+        <li><strong><a href="./testing.html">Testing</a></strong> -
+        Component testing patterns, accessibility testing, snapshot
+        testing</li>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        This file</li>
+        </ul>
+        <hr />
+        <h2 id="component-hierarchy">Component Hierarchy</h2>
+        <pre><code>src/components/
+├── Buttons.tsx           # Reusable button components
+├── ErrorBoundary.tsx     # Error boundary wrapper
+├── Footer.tsx            # Footer component
+├── Header.tsx            # Header with navigation
+├── HelpModal.tsx         # Help documentation modal
+├── Sidebar.tsx           # Navigation sidebar
+└── SkeletonLoader.tsx    # Loading placeholder
+
+src/pages/
+├── AdminDashboard.tsx    # Admin management interface
+├── ChangeProductDetailsPage.tsx
+├── DeleteProductPage.tsx
+├── HomePage.tsx          # Landing page
+├── ListStockPage.tsx     # Product inventory list
+├── LoginPage.tsx         # Authentication
+├── SearchProductPage.tsx
+├── UserDashboard.tsx     # User dashboard
+└── AddProductPage.tsx    # Product creation</code></pre>
+        <hr />
+        <h2 id="data-flow">Data Flow</h2>
+        <pre><code>App.tsx (Root)
+├── Router (React Router)
+│   ├── Layout Components
+│   │   ├── Header (Navigation, User Menu)
+│   │   ├── Sidebar (Route Links)
+│   │   └── Footer (Static Info)
+│   │
+│   └── Page Components (Routed)
+│       ├── LoginPage
+│       ├── HomePage
+│       ├── ListStockPage
+│       ├── AdminDashboard
+│       └── ... (other pages)
+│
+└── Redux Store (Global State)
+    ├── Products State
+    ├── User/Auth State
+    └── UI State (Modals, Notifications)</code></pre>
+        <hr />
+        <h2 id="component-types">Component Types</h2>
+        <h3 id="1-sharedlayout-components">1. Shared/Layout
+        Components</h3>
+        <p>Used across multiple pages:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Component</th>
+        <th>Purpose</th>
+        <th>Props</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Header</td>
+        <td>Top navigation, user menu</td>
+        <td>navigation links</td>
+        </tr>
+        <tr class="even">
+        <td>Sidebar</td>
+        <td>Left sidebar navigation</td>
+        <td>routes, collapsed state</td>
+        </tr>
+        <tr class="odd">
+        <td>Footer</td>
+        <td>Bottom footer</td>
+        <td>static content</td>
+        </tr>
+        <tr class="even">
+        <td>Buttons</td>
+        <td>Action buttons</td>
+        <td>variant, onClick, disabled</td>
+        </tr>
+        <tr class="odd">
+        <td>ErrorBoundary</td>
+        <td>Catch React errors</td>
+        <td>children, fallback</td>
+        </tr>
+        <tr class="even">
+        <td>HelpModal</td>
+        <td>Help documentation</td>
+        <td>isOpen, onClose</td>
+        </tr>
+        <tr class="odd">
+        <td>SkeletonLoader</td>
+        <td>Loading state</td>
+        <td>count, variant</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="2-page-components">2. Page Components</h3>
+        <p>Route-specific components:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Page</th>
+        <th>Route</th>
+        <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>LoginPage</td>
+        <td>/login</td>
+        <td>User authentication</td>
+        </tr>
+        <tr class="even">
+        <td>HomePage</td>
+        <td>/</td>
+        <td>Landing page</td>
+        </tr>
+        <tr class="odd">
+        <td>ListStockPage</td>
+        <td>/products</td>
+        <td>Product inventory</td>
+        </tr>
+        <tr class="even">
+        <td>AddProductPage</td>
+        <td>/products/add</td>
+        <td>Create new product</td>
+        </tr>
+        <tr class="odd">
+        <td>ChangeProductDetailsPage</td>
+        <td>/products/:id/edit</td>
+        <td>Modify product</td>
+        </tr>
+        <tr class="even">
+        <td>DeleteProductPage</td>
+        <td>/products/:id/delete</td>
+        <td>Remove product</td>
+        </tr>
+        <tr class="odd">
+        <td>SearchProductPage</td>
+        <td>/search</td>
+        <td>Product search interface</td>
+        </tr>
+        <tr class="even">
+        <td>UserDashboard</td>
+        <td>/dashboard</td>
+        <td>User analytics</td>
+        </tr>
+        <tr class="odd">
+        <td>AdminDashboard</td>
+        <td>/admin</td>
+        <td>Admin management</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="component-communication-patterns">Component
+        Communication Patterns</h2>
+        <h3 id="parent-to-child-props">Parent to Child (Props)</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Parent</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>ProductList products<span class="op">=</span>{products} onSelectProduct<span class="op">=</span>{handleSelect} <span class="op">/&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Child</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> ProductListProps {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  products<span class="op">:</span> Product[]<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  onSelectProduct<span class="op">:</span> (id<span class="op">:</span> <span class="dt">string</span>) <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="child-to-parent-callbacks">Child to Parent
+        (Callbacks)</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Parent state</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [selectedId<span class="op">,</span> setSelectedId] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span><span class="dt">string</span> <span class="op">|</span> <span class="dt">null</span><span class="op">&gt;</span>(<span class="kw">null</span>)<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Pass callback</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>ProductItem onSelect<span class="op">=</span>{setSelectedId} <span class="op">/&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Child calls callback</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> handleClick <span class="op">=</span> () <span class="kw">=&gt;</span> props<span class="op">.</span><span class="fu">onSelect</span>(product<span class="op">.</span><span class="at">id</span>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="global-state-redux">Global State (Redux)</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In page component</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> products <span class="op">=</span> <span class="fu">useSelector</span>(selectProducts)<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> dispatch <span class="op">=</span> <span class="fu">useDispatch</span>()<span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> loadProducts <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dispatch</span>(<span class="fu">fetchProducts</span>())<span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="styling-strategy">Styling Strategy</h2>
+        <h3 id="three-layer-css-architecture">Three-Layer CSS
+        Architecture</h3>
+        <ol type="1">
+        <li><p><strong>Global Styles</strong>
+        (<code>src/styles/globals.css</code>)</p>
+        <ul>
+        <li>Reset, typography, base styles</li>
+        </ul></li>
+        <li><p><strong>Component Styles</strong>
+        (<code>src/components/*.css</code> and
+        <code>.module.css</code>)</p>
+        <ul>
+        <li>Component-specific styles</li>
+        <li>BEM or utility-first (Tailwind)</li>
+        </ul></li>
+        <li><p><strong>Page Styles</strong>
+        (<code>src/styles/pages/*.css</code>)</p>
+        <ul>
+        <li>Page-specific layouts and styling</li>
+        </ul></li>
+        </ol>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <p>✅ <strong>DO:</strong></p>
+        <ul>
+        <li>Use TypeScript for all components</li>
+        <li>Memoize components with React.memo for performance</li>
+        <li>Keep components focused (single responsibility)</li>
+        <li>Use custom hooks for logic extraction</li>
+        <li>Add proper prop validation with interfaces</li>
+        <li>Include accessibility attributes (aria-*)</li>
+        </ul>
+        <p>❌ <strong>DON'T:</strong></p>
+        <ul>
+        <li>Prop drilling (pass through multiple levels)</li>
+        <li>Inline styles (use CSS/Tailwind)</li>
+        <li>Create components inside components</li>
+        <li>Use index.js as default export</li>
+        <li>Skip error boundaries</li>
+        <li>Ignore loading states</li>
+        </ul>
+        <hr />
+        <h2 id="file-structure-standards">File Structure Standards</h2>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Standard component file structure</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> React <span class="im">from</span> <span class="st">&#39;react&#39;</span><span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useSelector<span class="op">,</span> useDispatch } <span class="im">from</span> <span class="st">&#39;react-redux&#39;</span><span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="st">&#39;@/styles/componentName.css&#39;</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ===== Types =====</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> ComponentProps {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  prop1<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  prop2<span class="op">?:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  onChange<span class="op">?:</span> (value<span class="op">:</span> <span class="dt">string</span>) <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">// ===== Component =====</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> ComponentName<span class="op">:</span> React<span class="op">.</span><span class="at">FC</span><span class="op">&lt;</span>ComponentProps<span class="op">&gt;</span> <span class="op">=</span> ({</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  prop1<span class="op">,</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  prop2<span class="op">,</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  onChange</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>}) <span class="kw">=&gt;</span> {</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Hooks</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> state <span class="op">=</span> <span class="fu">useSelector</span>(selectState)<span class="op">;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> dispatch <span class="op">=</span> <span class="fu">useDispatch</span>()<span class="op">;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Event handlers</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> handleClick <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    onChange<span class="op">?.</span>(prop1)<span class="op">;</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">// JSX</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>div className<span class="op">=</span><span class="st">&quot;component&quot;</span><span class="op">&gt;</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>h2<span class="op">&gt;</span>{prop1}<span class="op">&lt;/</span>h2<span class="op">&gt;</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>button onClick<span class="op">=</span>{handleClick}<span class="op">&gt;</span>Action<span class="op">&lt;/</span>button<span class="op">&gt;</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>div<span class="op">&gt;</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> ComponentName<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="performance-optimization">Performance Optimization</h2>
+        <h3 id="memoization">Memoization</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Prevent unnecessary re-renders</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> ProductItem <span class="op">=</span> React<span class="op">.</span><span class="fu">memo</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  ({ product<span class="op">,</span> onSelect }<span class="op">:</span> Props) <span class="kw">=&gt;</span> (</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>div onClick<span class="op">=</span>{() <span class="kw">=&gt;</span> <span class="fu">onSelect</span>(product<span class="op">.</span><span class="at">id</span>)}<span class="op">&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      {product<span class="op">.</span><span class="at">name</span>}</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>div<span class="op">&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  )<span class="op">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  (prevProps<span class="op">,</span> nextProps) <span class="kw">=&gt;</span> {</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Custom comparison</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> prevProps<span class="op">.</span><span class="at">product</span><span class="op">.</span><span class="at">id</span> <span class="op">===</span> nextProps<span class="op">.</span><span class="at">product</span><span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="code-splitting">Code Splitting</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Lazy load pages</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> AdminDashboard <span class="op">=</span> <span class="fu">lazy</span>(() <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;@/pages/AdminDashboard&#39;</span>))<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Suspense fallback<span class="op">=</span>{<span class="op">&lt;</span>SkeletonLoader <span class="op">/&gt;</span>}<span class="op">&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>AdminDashboard <span class="op">/&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Suspense<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="testing-overview">Testing Overview</h2>
+        <p>All components include:</p>
+        <ul>
+        <li>Unit tests for props and behavior</li>
+        <li>Integration tests with parent components</li>
+        <li>Accessibility tests (a11y)</li>
+        <li>Snapshot tests for UI consistency</li>
+        </ul>
+        <p>See <a href="./testing.html">Component Testing</a> for
+        detailed patterns.</p>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./shared-components.html">Shared Components
+        Details</a></strong> - Header, Sidebar, Footer, Buttons,
+        etc.</li>
+        <li><strong><a href="./page-components.html">Page
+        Components</a></strong> - Page-level components and routes</li>
+        <li><strong><a href="./styling.html">Styling</a></strong> - CSS
+        organization and Tailwind usage</li>
+        <li><strong><a href="./testing.html">Testing
+        Components</a></strong> - Testing patterns and examples</li>
+        <li><strong><a href="../pages/overview.html">Pages
+        Architecture</a></strong> - Page structure and lifecycle</li>
+        <li><strong><a
+        href="../services/overview.html">Services</a></strong> - Data
+        layer integration</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

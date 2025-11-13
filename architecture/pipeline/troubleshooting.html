@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>troubleshooting - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="troubleshooting--support">Troubleshooting &amp;
+        Support</h1>
+        <h2 id="common-pipeline-issues">Common Pipeline Issues</h2>
+        <h3 id="tests-fail-on-ci-but-pass-locally">Tests Fail on CI But
+        Pass Locally</h3>
+        <p><strong>Symptoms</strong>: Tests pass with
+        <code>npm test</code> locally but fail in GitHub Actions</p>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>Node version mismatch</li>
+        <li>Missing environment variable</li>
+        <li>Timing/async issues on slower CI runner</li>
+        <li>File path issues (Windows vs Linux)</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify Node version matches</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-v</span>  <span class="co"># Should be v20.x</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check .nvmrc or package.json engines field</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .nvmrc</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Recreate CI environment locally</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci  <span class="co"># Clean install like CI does</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--run</span>  <span class="co"># Single run, not watch mode</span></span></code></pre></div>
+        <h3 id="build-fails-with-module-not-found">Build Fails with
+        "Module Not Found"</h3>
+        <p><strong>Symptoms</strong>: <code>npm run build</code> fails
+        with module resolution error</p>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>Dependency not installed</li>
+        <li>Incorrect import path</li>
+        <li>Circular dependencies</li>
+        <li>TypeScript configuration issue</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean install all dependencies</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> node_modules package-lock.json</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check import path</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> src/<span class="pp">[</span><span class="ss">path/to/file</span><span class="pp">]</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify TypeScript configuration</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> tsconfig.json <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-A</span> 5 <span class="st">&quot;compilerOptions&quot;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Build with verbose output</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build <span class="at">--</span> <span class="at">--debug</span></span></code></pre></div>
+        <h3 id="docker-build-fails">Docker Build Fails</h3>
+        <p><strong>Symptoms</strong>: Docker build step fails in
+        pipeline</p>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>Required files excluded by .dockerignore</li>
+        <li>Missing build argument</li>
+        <li>Base image unavailable</li>
+        <li>Dockerfile syntax error</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what .dockerignore excludes</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .dockerignore</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify Dockerfile is valid</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--dry-run</span> .</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build with build args</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--build-arg</span> VITE_API_BASE_URL=<span class="st">&quot;...&quot;</span> <span class="at">-t</span> test .</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check base image</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull nginx:alpine  <span class="co"># Verify image exists</span></span></code></pre></div>
+        <h3 id="deployment-fails">Deployment Fails</h3>
+        <p><strong>Symptoms</strong>: Build succeeds but deployment step
+        fails</p>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>GitHub Secret not set or incorrect</li>
+        <li>Docker registry credentials wrong</li>
+        <li>SSH key invalid or unreachable host</li>
+        <li>Insufficient permissions</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify secrets are set</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Go to Settings → Secrets and variables → Actions</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check each secret exists and has value</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Test Docker credentials</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> login <span class="at">-u</span> <span class="va">$DOCKER_USERNAME</span> <span class="at">-p</span> <span class="va">$DOCKER_PASSWORD</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Test SSH connection</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-i</span> deploy_key.pem deploy@prod.server.com</span></code></pre></div>
+        <h3 id="tests-timeout">Tests Timeout</h3>
+        <p><strong>Symptoms</strong>: Tests hang or timeout after 30+
+        seconds</p>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>Infinite loop in test</li>
+        <li>Unresolved promise</li>
+        <li>Missing timeout configuration</li>
+        <li>Network request not mocked</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for infinite loops</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-r</span> <span class="st">&quot;while(true)&quot;</span> src/__tests__/</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify all API calls are mocked</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-r</span> <span class="st">&quot;fetch\|axios&quot;</span> src/__tests__/ <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-v</span> <span class="st">&quot;vi.mock&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run specific test with timeout</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--testTimeout</span> 10000 path/to/test.ts</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for async issues</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:ui  <span class="co"># Visual debugging</span></span></code></pre></div>
+        <hr />
+        <h2 id="debugging-pipeline">Debugging Pipeline</h2>
+        <h3 id="view-full-logs">View Full Logs</h3>
+        <ol type="1">
+        <li>Go to GitHub repository → <strong>Actions</strong> tab</li>
+        <li>Click the workflow run that failed</li>
+        <li>Click the job name (e.g., "test")</li>
+        <li>Expand each step to see full logs</li>
+        <li>Look for error messages and stack traces</li>
+        </ol>
+        <h3 id="recreate-locally">Recreate Locally</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Match CI environment as closely as possible</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-v</span>           <span class="co"># Check Node v20</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> <span class="at">-v</span>            <span class="co"># Check npm version</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci             <span class="co"># Clean install</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint       <span class="co"># Run linter</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--run</span>  <span class="co"># Run tests once</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build      <span class="co"># Build bundle</span></span></code></pre></div>
+        <h3 id="enable-debug-logging">Enable Debug Logging</h3>
+        <p><strong>In GitHub Actions</strong>:</p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Enable debug logging</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> echo &quot;::debug::Debug message&quot;</span></span></code></pre></div>
+        <p><strong>In Node.js</strong>:</p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="va">DEBUG</span><span class="op">=</span><span class="pp">*</span> <span class="ex">npm</span> test  <span class="co"># Enable all debug output</span></span></code></pre></div>
+        <h3 id="check-git-status">Check Git Status</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status        <span class="co"># Uncommitted changes</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--oneline</span> <span class="co"># Recent commits</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff HEAD     <span class="co"># See what changed</span></span></code></pre></div>
+        <hr />
+        <h2 id="specific-error-solutions">Specific Error Solutions</h2>
+        <h3 id="error-cannot-find-module">Error: "Cannot find
+        module"</h3>
+        <pre><code>Error: Cannot find module &#39;@/components/Header&#39;
+
+Solution:
+1. Verify file exists at src/components/Header.tsx
+2. Check import path is correct (case-sensitive on Linux)
+3. Verify tsconfig.json paths are configured
+4. Run: npm ci (clean install)</code></pre>
+        <h3 id="error-tests-failed-123-tests-passed-1-failed">Error:
+        "Tests failed: 123 tests passed, 1 failed"</h3>
+        <pre><code>Solution:
+1. Run locally: npm test -- --grep &quot;failing test name&quot;
+2. See test output and error message
+3. Fix the test or code causing failure
+4. Commit and re-push</code></pre>
+        <h3 id="error-docker-image-build-failed">Error: "Docker image
+        build failed"</h3>
+        <pre><code>Error: Step X/Y : COPY src ./src
+COPY failed: file not found in build context
+
+Solution:
+1. Check .dockerignore - may be excluding needed files
+2. Verify file path in COPY command
+3. Check Dockerfile syntax (wrong quotes, etc.)
+4. Test build locally: docker build .</code></pre>
+        <h3 id="error-secret-not-found">Error: "Secret not found"</h3>
+        <pre><code>Error: The following secrets were not found
+
+Solution:
+1. Go to Settings → Secrets and variables → Actions
+2. Create any missing secrets
+3. Verify spelling (case-sensitive: FRONTEND_API_BASE_URL)
+4. Re-run workflow</code></pre>
+        <h3 id="error-permission-denied">Error: "Permission denied"</h3>
+        <pre><code>Error: Permission denied (publickey)
+Error: docker: permission denied while trying to connect
+
+Solution:
+1. Check SSH key/credentials are in GitHub Secrets
+2. Verify permissions on deployment server
+3. Test locally: docker login, ssh connection
+4. Check service account has required permissions</code></pre>
+        <hr />
+        <h2 id="performance-issues">Performance Issues</h2>
+        <h3 id="pipeline-running-slowly">Pipeline Running Slowly</h3>
+        <p><strong>Possible Causes</strong>:</p>
+        <ul>
+        <li>npm cache not working</li>
+        <li>Tests running sequentially</li>
+        <li>Docker layer cache misses</li>
+        <li>Large dependencies</li>
+        </ul>
+        <p><strong>Solutions</strong>:</p>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure npm cache is working</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cache</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;npm&#39;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel test execution (already default in Vitest)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># No action needed, Vitest parallelizes automatically</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build Docker image efficiently</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="at">docker build --cache-from stockease:latest .</span></span></code></pre></div>
+        <h3 id="long-build-times">Long Build Times</h3>
+        <pre><code>Solution:
+1. Cache npm dependencies
+2. Use multi-stage Docker builds (already configured)
+3. Limit bundle size (tree-shake, code split)
+4. Minimize Docker layer count</code></pre>
+        <hr />
+        <h2 id="when-to-ask-for-help">When to Ask for Help</h2>
+        <h3 id="gather-information">Gather Information</h3>
+        <p>Before asking for help, collect:</p>
+        <ol type="1">
+        <li><p><strong>Full error message</strong></p>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy complete error from GitHub Actions logs</span></span></code></pre></div></li>
+        <li><p><strong>Recent changes</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> log <span class="at">--oneline</span> <span class="at">-5</span>  <span class="co"># Last 5 commits</span></span></code></pre></div></li>
+        <li><p><strong>Local reproduction</strong></p>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci <span class="kw">&amp;&amp;</span> <span class="ex">npm</span> test <span class="at">--</span> <span class="at">--run</span>  <span class="co"># Does it fail locally?</span></span></code></pre></div></li>
+        <li><p><strong>Environment info</strong></p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">--version</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> <span class="at">--version</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> <span class="at">--version</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span></code></pre></div></li>
+        </ol>
+        <h3 id="github-issues">GitHub Issues</h3>
+        <p>When creating issue:</p>
+        <ul>
+        <li>Title: Clear, specific (e.g., "Tests timeout in CI on docker
+        build step")</li>
+        <li>Description: What you were doing, what failed</li>
+        <li>Error: Full error message/logs</li>
+        <li>Reproduction: Steps to reproduce locally</li>
+        <li>Environment: Node/npm versions, OS</li>
+        </ul>
+        <hr />
+        <h2 id="useful-commands">Useful Commands</h2>
+        <h3 id="local-testing">Local Testing</h3>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests once (like CI does)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--run</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests with verbose output</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--reporter</span><span class="op">=</span>verbose</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run specific test file</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> src/__tests__/components/Header.test.tsx</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests matching pattern</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--grep</span> <span class="st">&quot;Header&quot;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate coverage</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:coverage</span></code></pre></div>
+        <h3 id="building">Building</h3>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build production bundle</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># List build output</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> dist/</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for test files (should be empty)</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> dist <span class="at">-name</span> <span class="st">&quot;*.test.*&quot;</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Build Docker image</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-f</span> Dockerfile <span class="at">-t</span> stockease:test .</span></code></pre></div>
+        <h3 id="linting">Linting</h3>
+        <div class="sourceCode" id="cb23"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run linter</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix linting issues</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> <span class="at">--fix</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check specific file</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> src/App.tsx</span></code></pre></div>
+        <h3 id="debugging">Debugging</h3>
+        <div class="sourceCode" id="cb24"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View Node.js logs</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--reporter</span><span class="op">=</span>verbose</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Interactive UI mode</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:ui</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Debug specific test</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--testNamePattern</span><span class="op">=</span><span class="st">&quot;test name&quot;</span></span></code></pre></div>
+        <hr />
+        <h2 id="escalation-path">Escalation Path</h2>
+        <ol type="1">
+        <li><strong>Check logs</strong> - Review full GitHub Actions
+        logs</li>
+        <li><strong>Reproduce locally</strong> - Can you recreate the
+        issue?</li>
+        <li><strong>Search documentation</strong> - Check this
+        troubleshooting guide</li>
+        <li><strong>Consult team</strong> - Ask teammates if they've
+        seen it</li>
+        <li><strong>Create GitHub issue</strong> - If unresolved,
+        document and file issue</li>
+        </ol>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Main Pipeline Overview</a></li>
+        <li><a href="./testing.html">Testing Stage</a></li>
+        <li><a href="./build-deploy.html">Build &amp;
+        Deployment</a></li>
+        <li><a href="./secrets.html">Secrets Configuration</a></li>
+        <li><a href="https://docs.github.com/en/actions">GitHub Actions
+        Documentation</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Status</strong>: Tested &amp; Production Ready<br />
+        <strong>Maintenance</strong>: Reviewed monthly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

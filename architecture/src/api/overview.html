@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="api-architecture--integration-overview">API Architecture
+        &amp; Integration Overview</h1>
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Architecture
+        Overview</a></strong> (this file)</li>
+        <li><strong><a href="./client.html">HTTP Client
+        Configuration</a></strong> - apiClient setup and
+        interceptors</li>
+        <li><strong><a href="./auth.html">Authentication
+        Service</a></strong> - Login, JWT token handling</li>
+        <li><strong><a href="./product-service.html">Product
+        Service</a></strong> - Product CRUD operations</li>
+        <li><strong><a href="./error-handling.html">Error Handling &amp;
+        Security</a></strong> - Error patterns, security practices</li>
+        <li><strong><a href="./testing.html">Testing API
+        Layer</a></strong> - API testing strategies and patterns</li>
+        </ul>
+        <hr />
+        <h2 id="overview">Overview</h2>
+        <p>The API layer provides a clean abstraction for backend
+        communication with centralized authentication, error handling,
+        and request/response logging. The architecture uses
+        <strong>Axios</strong> as the HTTP client with custom
+        interceptors.</p>
+        <h3 id="key-features">Key Features</h3>
+        <ul>
+        <li><strong>JWT Authentication</strong>: Automatic token
+        injection and management</li>
+        <li><strong>Centralized Configuration</strong>: Single source of
+        truth for API setup</li>
+        <li><strong>Request Logging</strong>: All requests/responses
+        logged for debugging</li>
+        <li><strong>Error Handling</strong>: 401 unauthorized automatic
+        cleanup</li>
+        <li><strong>Type Safety</strong>: Full TypeScript support with
+        interfaces</li>
+        </ul>
+        <hr />
+        <h2 id="architecture-diagram">Architecture Diagram</h2>
+        <div class="mermaid">
+        graph TB
+            Component["React Component"]
+            Service["Service Layer<br/>(ProductService, auth)"]
+            Client["apiClient<br/>(Axios Instance)"]
+            Interceptors["Request/Response<br/>Interceptors"]
+            Backend["Backend API<br/>/api/*"]
+            
+            Component -->|Service calls| Service
+            Service -->|HTTP calls| Client
+            Client -->|Interceptors| Interceptors
+            Interceptors -->|Decorated requests| Backend
+            Backend -->|Response| Interceptors
+            Interceptors -->|Processed| Client
+            Client -->|Data| Service
+            Service -->|State/Props| Component
+        </div>
+        <hr />
+        <h2 id="core-components">Core Components</h2>
+        <h3 id="1-http-client-apiclientts">1. <strong>HTTP
+        Client</strong> (<code>apiClient.ts</code>)</h3>
+        <p>The configured Axios instance handling all HTTP
+        communication.</p>
+        <ul>
+        <li>Base URL configuration from environment</li>
+        <li>Request/response interceptors</li>
+        <li>JWT token injection</li>
+        <li>Error handling and 401 cleanup</li>
+        <li>2-minute request timeout</li>
+        </ul>
+        <p><strong><a href="./client.html">Read more →</a></strong></p>
+        <h3 id="2-authentication-service-authts">2.
+        <strong>Authentication Service</strong>
+        (<code>auth.ts</code>)</h3>
+        <p>Handles user login and JWT token management.</p>
+        <ul>
+        <li>Login endpoint integration</li>
+        <li>JWT token extraction and storage</li>
+        <li>Role-based authorization</li>
+        <li>Token cleanup on logout/401</li>
+        </ul>
+        <p><strong><a href="./auth.html">Read more →</a></strong></p>
+        <h3 id="3-product-service-productservicets">3. <strong>Product
+        Service</strong> (<code>ProductService.ts</code>)</h3>
+        <p>Abstracts all product-related API operations.</p>
+        <ul>
+        <li>GET all products (paginated and unpaginated)</li>
+        <li>POST create new product</li>
+        <li>DELETE product</li>
+        <li>SEARCH by name</li>
+        <li>UPDATE product price and quantity</li>
+        </ul>
+        <p><strong><a href="./product-service.html">Read more
+        →</a></strong></p>
+        <hr />
+        <h2 id="data-flow-patterns">Data Flow Patterns</h2>
+        <h3 id="typical-api-call-pattern">Typical API Call Pattern</h3>
+        <div class="mermaid">
+        graph TD
+            Component["Component<br/>(Page)"]
+            UseEffect["useEffect"]
+            Service["Service Layer<br/>(ProductService)"]
+            Redux["Redux State"]
+            UI["UI Update"]
+            
+            Component -->|Component Mount| UseEffect
+            UseEffect -->|Call service| Service
+            Service -->|HTTP Request| apiClient["apiClient"]
+            apiClient -->|Response| Service
+            Service -->|Dispatch action| Redux
+            Redux -->|State change| Component
+            Component -->|Re-render| UI
+        </div>
+        <h3 id="request-interceptor-flow">Request Interceptor Flow</h3>
+        <div class="mermaid">
+        sequenceDiagram
+            participant App as Application
+            participant Interceptor as Request Interceptor
+            participant Storage as localStorage
+            participant Request as HTTP Request
+
+            App->>Interceptor: Make API call
+            Interceptor->>Storage: Get JWT token
+            alt Token exists
+                Interceptor->>Interceptor: Inject Authorization header
+                Note over Interceptor: Bearer ${token}
+            else No token
+                Interceptor->>Interceptor: Skip authorization
+            end
+            Interceptor->>Interceptor: Log request
+            Interceptor->>Request: Send decorated request
+        </div>
+        <hr />
+        <h2 id="error-handling-strategy">Error Handling Strategy</h2>
+        <h3 id="error-categories">Error Categories</h3>
+        <div class="mermaid">
+        graph TB
+            Error["API Error"]
+            
+            Error -->|401| Unauthorized["Unauthorized<br/>Token expired/invalid"]
+            Error -->|4xx| ClientError["Client Error<br/>Bad request, validation"]
+            Error -->|5xx| ServerError["Server Error<br/>Backend failure"]
+            Error -->|Network| NetworkError["Network Error<br/>Connection issues"]
+            
+            Unauthorized -->|Action| LogoutAction["Clear token<br/>Redirect to login"]
+            ClientError -->|Action| ShowMessage["Show error message<br/>to user"]
+            ServerError -->|Action| ShowMessage
+            NetworkError -->|Action| RetryAction["Retry or show<br/>offline message"]
+        </div>
+        <p><strong><a href="./error-handling.html">Read more
+        →</a></strong></p>
+        <hr />
+        <h2 id="security-practices">Security Practices</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Practice</th>
+        <th>Implementation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Token Storage</strong></td>
+        <td>localStorage (HttpOnly cookies preferred)</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Token Injection</strong></td>
+        <td>Automatic via request interceptor</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Token Cleanup</strong></td>
+        <td>Automatic on logout or 401 response</td>
+        </tr>
+        <tr class="even">
+        <td><strong>HTTPS</strong></td>
+        <td>Enforced in production</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>CORS</strong></td>
+        <td>Handled by backend</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Timeout</strong></td>
+        <td>2-minute request timeout</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Logging</strong></td>
+        <td>Sensitive data not logged</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong><a href="./error-handling.html">Read more
+        →</a></strong></p>
+        <hr />
+        <h2 id="environment-configuration">Environment
+        Configuration</h2>
+        <h3 id="environment-variables">Environment Variables</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Development</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>http://localhost:8081/api</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Production</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>https://api.stockease.com/api</span></code></pre></div>
+        <h3 id="configuration-loading">Configuration Loading</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> baseURL <span class="op">=</span> import<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">VITE_API_BASE_URL</span> <span class="op">||</span> <span class="st">&#39;http://localhost:8081/api&#39;</span><span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="performance-considerations">Performance
+        Considerations</h2>
+        <h3 id="request-caching">Request Caching</h3>
+        <p>Products cached in Redux to avoid redundant API calls.</p>
+        <h3 id="pagination">Pagination</h3>
+        <p>Large datasets use pagination for better performance.</p>
+        <h3 id="request-debouncing">Request Debouncing</h3>
+        <p>Search requests debounced to prevent excessive API calls
+        (300ms delay).</p>
+        <hr />
+        <h2 id="testing-the-api-layer">Testing the API Layer</h2>
+        <p>The API layer has comprehensive test coverage including:</p>
+        <ul>
+        <li>Client configuration and setup</li>
+        <li>Request/response interceptors</li>
+        <li>Authentication flow</li>
+        <li>Error scenarios</li>
+        <li>Product CRUD operations</li>
+        <li>Security and authorization</li>
+        </ul>
+        <p><strong><a href="./testing.html">Read more →</a></strong></p>
+        <hr />
+        <h2 id="quick-reference">Quick Reference</h2>
+        <h3 id="making-api-calls">Making API Calls</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Import the service</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ProductService <span class="im">from</span> <span class="st">&#39;@/api/ProductService&#39;</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Call a method</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> products <span class="op">=</span> <span class="cf">await</span> ProductService<span class="op">.</span><span class="fu">fetchProducts</span>()<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">// In a component with error handling</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">useEffect</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  ProductService<span class="op">.</span><span class="fu">fetchProducts</span>()</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">then</span>(data <span class="kw">=&gt;</span> <span class="fu">dispatch</span>(<span class="fu">setProducts</span>(data)))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">catch</span>(error <span class="kw">=&gt;</span> <span class="fu">dispatch</span>(<span class="fu">setError</span>(error<span class="op">.</span><span class="at">message</span>)))<span class="op">;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [dispatch])<span class="op">;</span></span></code></pre></div>
+        <h3 id="jwt-token-handling">JWT Token Handling</h3>
+        <p>Token is automatically:</p>
+        <ul>
+        <li>Extracted from login response</li>
+        <li>Stored in localStorage</li>
+        <li>Injected in all API requests</li>
+        <li>Cleared on logout or 401 error</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="../components/overview.html">Components
+        Architecture</a></li>
+        <li><a href="../services/overview.html">Services Layer</a></li>
+        <li><a href="../tests/overview.html">Testing Strategy</a></li>
+        <li><a href="../../overview.html">Main Architecture
+        Overview</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>API Version</strong>: v1.0</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

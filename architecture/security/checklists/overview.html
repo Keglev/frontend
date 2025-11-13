@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-checklists">Security Checklists</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Welcome to the <strong>Security Checklists</strong> section.
+        This directory contains practical, actionable security
+        verification lists designed for different stages of the
+        development and deployment lifecycle.</p>
+        <p>These checklists ensure consistent application of security
+        controls, prevent regressions, and provide a standardized
+        approach to security verification across teams.</p>
+        <hr />
+        <h2 id="-available-checklists">📋 Available Checklists</h2>
+        <h3 id="pr-security-review-checklist"><a
+        href="./pr-security-review.html">PR Security Review
+        Checklist</a></h3>
+        <p><strong>For:</strong> Code reviewers, security team, and
+        maintainers<br />
+        <strong>When:</strong> Every pull request with code
+        changes<br />
+        <strong>Duration:</strong> 5-15 minutes per PR<br />
+        <strong>Purpose:</strong> Prevent security vulnerabilities from
+        entering the codebase</p>
+        <p><strong>Key Areas Covered:</strong></p>
+        <ul>
+        <li>✅ Authentication &amp; Authorization (tokens, sessions,
+        access control)</li>
+        <li>✅ Input Validation &amp; XSS Prevention (form validation,
+        React safety, DOM operations)</li>
+        <li>✅ API Security (requests, responses, error handling,
+        CORS)</li>
+        <li>✅ Data Protection &amp; Logging (sensitive data, error
+        messages, audit trails)</li>
+        <li>✅ Dependencies &amp; Third-party Code (npm audit,
+        vulnerabilities, supply chain)</li>
+        <li>✅ Cryptography &amp; Secrets (environment variables,
+        secrets management)</li>
+        <li>✅ Code Quality &amp; Best Practices (TypeScript, ESLint,
+        error handling)</li>
+        <li>✅ Testing (security test coverage, test execution)</li>
+        <li>✅ Documentation &amp; Comments (code comments, PR
+        descriptions)</li>
+        <li>✅ Manual Security Testing (functional verification,
+        security testing)</li>
+        </ul>
+        <p><strong>Checklist Structure:</strong></p>
+        <ul>
+        <li>10 major categories</li>
+        <li>40+ specific items to verify</li>
+        <li>Sign-off section for reviewer accountability</li>
+        <li>Reference links to detailed documentation</li>
+        </ul>
+        <p><strong>Use this checklist when:</strong></p>
+        <ul>
+        <li>Reviewing code changes from team members</li>
+        <li>Preparing to merge PRs to master</li>
+        <li>Verifying security practices in new code</li>
+        <li>Training new reviewers on security standards</li>
+        </ul>
+        <hr />
+        <h3 id="pre-release-security-checklist"><a
+        href="./pre-release-security.html">Pre-Release Security
+        Checklist</a></h3>
+        <p><strong>For:</strong> DevOps teams, SRE, and release
+        managers<br />
+        <strong>When:</strong> 1-2 days before every production
+        release<br />
+        <strong>Duration:</strong> 30-60 minutes per release<br />
+        <strong>Purpose:</strong> Ensure all security controls are
+        active and verified before production deployment</p>
+        <p><strong>Key Areas Covered:</strong></p>
+        <ul>
+        <li>✅ HTTPS &amp; TLS Security (certificates, protocols, cipher
+        suites, HSTS)</li>
+        <li>✅ Security Headers Configuration (CSP, X-Frame-Options,
+        HSTS, Referrer-Policy)</li>
+        <li>✅ Environment &amp; Secrets Configuration (environment
+        variables, API keys, secret rotation)</li>
+        <li>✅ Authentication &amp; Authorization (token validation,
+        login security, RBAC)</li>
+        <li>✅ CORS &amp; Cross-Origin Security (allowed origins,
+        headers, preflight handling)</li>
+        <li>✅ Data Protection &amp; Privacy (encryption, logging, audit
+        trails)</li>
+        <li>✅ Dependencies &amp; Vulnerabilities (npm audit,
+        vulnerability assessment, build security)</li>
+        <li>✅ Deployment &amp; Infrastructure (web server config,
+        access controls, network security)</li>
+        <li>✅ Deployment Verification (health checks, security header
+        validation, SSL/TLS testing)</li>
+        <li>✅ Rollback &amp; Contingency (rollback procedures, incident
+        response)</li>
+        </ul>
+        <p><strong>Checklist Structure:</strong></p>
+        <ul>
+        <li>10 major categories</li>
+        <li>60+ specific items to verify</li>
+        <li>Multi-phase approach (pre-deployment, deployment day,
+        post-deployment)</li>
+        <li>Sign-off section with team accountability</li>
+        <li>Post-deployment metrics to monitor</li>
+        </ul>
+        <p><strong>Use this checklist when:</strong></p>
+        <ul>
+        <li>Preparing for production deployment</li>
+        <li>Setting up new environments</li>
+        <li>Verifying configuration before release</li>
+        <li>Compliance audits and security reviews</li>
+        <li>Infrastructure changes or updates</li>
+        </ul>
+        <hr />
+        <h2 id="-checklist-selection-guide">🎯 Checklist Selection
+        Guide</h2>
+        <h3 id="based-on-your-role">Based on Your Role</h3>
+        <p><strong>👨‍💼 Code Reviewer / Developer</strong> → Use:
+        <strong><a href="./pr-security-review.html">PR Security Review
+        Checklist</a></strong></p>
+        <ul>
+        <li>Quick review of code changes</li>
+        <li>Before approving PRs to master</li>
+        <li>~5-15 minutes per PR</li>
+        </ul>
+        <p><strong>🚀 DevOps / SRE / Release Manager</strong> → Use:
+        <strong><a href="./pre-release-security.html">Pre-Release
+        Security Checklist</a></strong></p>
+        <ul>
+        <li>Before production releases</li>
+        <li>Environment configuration verification</li>
+        <li>~30-60 minutes per release</li>
+        </ul>
+        <p><strong>🔐 Security Team Lead</strong> → Use: <strong>Both
+        checklists</strong></p>
+        <ul>
+        <li>During code reviews</li>
+        <li>Before releases</li>
+        <li>Quarterly audits</li>
+        </ul>
+        <p><strong>📋 QA / Testing</strong> → Use: <strong>PR Security
+        Review</strong> (H1-H2 sections only)</p>
+        <ul>
+        <li>Security test coverage verification</li>
+        <li>Test execution validation</li>
+        </ul>
+        <hr />
+        <h2 id="-how-to-use-these-checklists">🔄 How to Use These
+        Checklists</h2>
+        <h3 id="for-pull-request-reviews">For Pull Request Reviews</h3>
+        <ol type="1">
+        <li><strong>Copy the PR Security Review Checklist</strong> into
+        a GitHub comment or local document</li>
+        <li><strong>Work through each section</strong> systematically:
+        <ul>
+        <li>Skip items marked N/A (e.g., if PR doesn't touch API)</li>
+        <li>✅ Check items that pass</li>
+        <li>⚠️ Note items that need attention</li>
+        <li>❌ Block PR if critical issues found</li>
+        </ul></li>
+        <li><strong>Document findings</strong> with specific code
+        references</li>
+        <li><strong>Sign off</strong> with reviewer name and date</li>
+        <li><strong>Approve or request changes</strong> in GitHub</li>
+        </ol>
+        <h3 id="for-pre-release-verification">For Pre-Release
+        Verification</h3>
+        <ol type="1">
+        <li><strong>Schedule 1-2 days before planned
+        release</strong></li>
+        <li><strong>Gather team</strong> (DevOps lead, security lead,
+        product manager)</li>
+        <li><strong>Work through each section</strong> on
+        deployment/staging environment:
+        <ul>
+        <li>Test actual configurations</li>
+        <li>Run validation scripts (SSL Labs, curl tests, etc.)</li>
+        <li>Verify monitoring and alerting</li>
+        </ul></li>
+        <li><strong>Document any exceptions</strong> with risk
+        assessment</li>
+        <li><strong>Get sign-offs</strong> from all required
+        stakeholders</li>
+        <li><strong>Execute deployment</strong> with team
+        monitoring</li>
+        <li><strong>Run post-deployment validation</strong> within 24
+        hours</li>
+        </ol>
+        <hr />
+        <h2 id="-checklist-statistics">📊 Checklist Statistics</h2>
+        <h3 id="pr-security-review-checklist-1">PR Security Review
+        Checklist</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Category</th>
+        <th>Items</th>
+        <th>Estimated Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Authentication &amp; Authorization</td>
+        <td>7</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="even">
+        <td>Input Validation &amp; XSS</td>
+        <td>6</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="odd">
+        <td>API Security</td>
+        <td>9</td>
+        <td>3 min</td>
+        </tr>
+        <tr class="even">
+        <td>Data Protection &amp; Logging</td>
+        <td>6</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Dependencies</td>
+        <td>6</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="even">
+        <td>Secrets Management</td>
+        <td>4</td>
+        <td>1 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Code Quality</td>
+        <td>9</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="even">
+        <td>Testing</td>
+        <td>4</td>
+        <td>1 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Documentation</td>
+        <td>4</td>
+        <td>1 min</td>
+        </tr>
+        <tr class="even">
+        <td>Manual Testing</td>
+        <td>6</td>
+        <td>2 min</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>TOTAL</strong></td>
+        <td><strong>41</strong></td>
+        <td><strong>5-15 min</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="pre-release-security-checklist-1">Pre-Release Security
+        Checklist</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Category</th>
+        <th>Items</th>
+        <th>Estimated Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>HTTPS &amp; TLS</td>
+        <td>9</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="even">
+        <td>Security Headers</td>
+        <td>11</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Environment &amp; Secrets</td>
+        <td>7</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="even">
+        <td>Authentication &amp; Authorization</td>
+        <td>8</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="odd">
+        <td>CORS</td>
+        <td>6</td>
+        <td>3 min</td>
+        </tr>
+        <tr class="even">
+        <td>Data Protection</td>
+        <td>10</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Dependencies &amp; Vulnerabilities</td>
+        <td>9</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="even">
+        <td>Deployment &amp; Infrastructure</td>
+        <td>10</td>
+        <td>5 min</td>
+        </tr>
+        <tr class="odd">
+        <td>Verification</td>
+        <td>12</td>
+        <td>10 min</td>
+        </tr>
+        <tr class="even">
+        <td>Rollback &amp; Contingency</td>
+        <td>5</td>
+        <td>3 min</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>TOTAL</strong></td>
+        <td><strong>87</strong></td>
+        <td><strong>30-60 min</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-checklist-implementation">🚀 Checklist
+        Implementation</h2>
+        <h3 id="integrating-into-workflow">Integrating into
+        Workflow</h3>
+        <h4 id="github-branch-protection-rules">GitHub Branch Protection
+        Rules</h4>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Require security checklist to be completed</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Required status checks</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;Security Review Complete&quot;</span><span class="at"> (comment from reviewer)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">CODEOWNERS</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  /src/ @security-team</span></span></code></pre></div>
+        <h4 id="release-procedure">Release Procedure</h4>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Release Process</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  1. Code → PR with security review ✅</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  2. Staging deployment</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">  3. Pre-release security checklist ✅</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">  4. Production deployment</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">  5. Post-deployment verification ✅</span></span></code></pre></div>
+        <h4 id="cicd-integration">CI/CD Integration</h4>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example GitHub Actions workflow trigger</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Pre-Release Security Check</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span><span class="co">  # Manual trigger before release</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">security-check</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v3</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> SSL/TLS Validation</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run security:check:tls</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Security Headers Check</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run security:check:headers</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Dependency Scan</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm audit --audit-level=high</span></span></code></pre></div>
+        <hr />
+        <h2 id="-metrics--tracking">📈 Metrics &amp; Tracking</h2>
+        <h3 id="track-these-metrics">Track These Metrics</h3>
+        <pre><code>PR Review Metrics
+├─ PRs reviewed with checklist: 100%
+├─ Average review time: &lt; 15 min
+├─ Security issues caught in review: [track trends]
+└─ False positives: [track trends]
+
+Release Metrics
+├─ Pre-release checklists completed: 100%
+├─ Release duration: &lt; 30 min
+├─ Security issues in production: 0
+└─ Post-release rollbacks due to security: 0</code></pre>
+        <h3 id="dashboard-example">Dashboard Example</h3>
+        <pre><code>Security Checklist Compliance
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PR Security Reviews:
+  Last 30 days: 45 PRs reviewed
+  Completion rate: 100% ✅
+  Average score: 95%
+  Issues found: 12
+  Issues resolved: 11
+  
+Pre-Release Checklists:
+  Last 5 releases: 100% completion
+  Average time: 42 minutes
+  No security issues in production ✅
+  
+Team Training:
+  New reviewers trained: 8
+  Avg reviewer confidence: 8.5/10</code></pre>
+        <hr />
+        <h2 id="-maintaining-checklists">🔄 Maintaining Checklists</h2>
+        <h3 id="update-checklist-when">Update Checklist When:</h3>
+        <ul>
+        <li>✅ New security threat emerges</li>
+        <li>✅ New tools or technologies are adopted</li>
+        <li>✅ Security incident occurs (add lessons learned)</li>
+        <li>✅ Compliance requirements change</li>
+        <li>✅ Quarterly security review (planned)</li>
+        <li>✅ Major architecture changes</li>
+        </ul>
+        <h3 id="versioning">Versioning</h3>
+        <p><strong>Current Version:</strong> 1.0.0 (November 13,
+        2025)</p>
+        <p>Changes are tracked in:</p>
+        <ul>
+        <li>Commit messages in git history</li>
+        <li>Version history in each checklist file</li>
+        <li>Security team meeting minutes</li>
+        </ul>
+        <hr />
+        <h2 id="-integration-with-other-documentation">📚 Integration
+        with Other Documentation</h2>
+        <p>These checklists reference and support:</p>
+        <ul>
+        <li><p><strong><a href="./pr-security-review.html">PR Security
+        Review</a></strong> ← Links to:</p>
+        <ul>
+        <li><a href="../api-communication/api-security.html">API
+        Security Guide</a></li>
+        <li><a href="../auth/overview.html">Authentication &amp;
+        Authorization</a></li>
+        <li><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention</a></li>
+        <li><a href="../api-communication/error-logging.html">Error
+        Logging</a></li>
+        </ul></li>
+        <li><p><strong><a href="./pre-release-security.html">Pre-Release
+        Checklist</a></strong> ← Links to:</p>
+        <ul>
+        <li><a href="../platform/headers-and-nginx.html">Security
+        Headers</a></li>
+        <li><a href="../platform/ci-secrets.html">CI/CD
+        Security</a></li>
+        <li><a href="../platform/dependencies.html">Dependency
+        Management</a></li>
+        <li><a href="../compliance/overview.html">Compliance &amp;
+        Standards</a></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-faq">❓ FAQ</h2>
+        <h3 id="q-should-we-skip-items-marked-na">Q: Should we skip
+        items marked N/A?</h3>
+        <p><strong>A:</strong> Yes. If a PR only changes documentation,
+        you can skip code-related items. Document which items were
+        skipped and why.</p>
+        <h3 id="q-how-long-should-a-pr-review-take">Q: How long should a
+        PR review take?</h3>
+        <p><strong>A:</strong> 5-15 minutes depending on complexity. Use
+        this as a guide—quality matters more than speed.</p>
+        <h3 id="q-what-if-we-find-a-security-issue">Q: What if we find a
+        security issue?</h3>
+        <p><strong>A:</strong> Assign an issue, discuss with the author,
+        and re-review after fixes. Block merge until resolved (unless
+        accepted risk).</p>
+        <h3 id="q-can-we-customize-the-checklists">Q: Can we customize
+        the checklists?</h3>
+        <p><strong>A:</strong> Yes! Customize based on your team's
+        needs, but maintain consistency. Document customizations in your
+        security documentation.</p>
+        <h3 id="q-how-often-should-we-update-the-checklists">Q: How
+        often should we update the checklists?</h3>
+        <p><strong>A:</strong> Quarterly reviews at minimum. Update
+        immediately if new threats or incidents occur.</p>
+        <hr />
+        <h2 id="-contributing">🤝 Contributing</h2>
+        <p>Found an issue or want to improve a checklist?</p>
+        <ol type="1">
+        <li><strong>Create an issue</strong> describing the change</li>
+        <li><strong>Reference</strong> the specific checklist and
+        item</li>
+        <li><strong>Include evidence</strong> of the security
+        concern</li>
+        <li><strong>Request review</strong> from security team</li>
+        </ol>
+        <hr />
+        <h2 id="-support--questions">📞 Support &amp; Questions</h2>
+        <p>For questions about using these checklists:</p>
+        <ul>
+        <li><strong>For PR reviews:</strong> Ask in #security channel or
+        mention @security-team</li>
+        <li><strong>For releases:</strong> Contact DevOps lead or
+        security team</li>
+        <li><strong>For updates:</strong> Submit issue or PR with
+        proposed changes</li>
+        </ul>
+        <hr />
+        <h2 id="-compliance--standards">🔐 Compliance &amp;
+        Standards</h2>
+        <p>These checklists implement controls from:</p>
+        <ul>
+        <li><strong>OWASP ASVS v4.0</strong> — Level 2 standard
+        controls</li>
+        <li><strong>OWASP Top 10 2021</strong> — All 10
+        vulnerabilities</li>
+        <li><strong>GDPR</strong> — Data protection requirements</li>
+        <li><strong>PCI DSS</strong> — Payment security (where
+        applicable)</li>
+        <li><strong>SOC 2</strong> — Security controls</li>
+        </ul>
+        <p>See <a href="../compliance/overview.html">Compliance &amp;
+        Standards</a> for detailed mapping.</p>
+        <hr />
+        <h2 id="-checklist-templates">📋 Checklist Templates</h2>
+        <h3 id="minimal-pr-review-for-docs-only-prs">Minimal PR Review
+        (For docs-only PRs)</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Security Review (Docs-Only)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> No hardcoded secrets in documentation</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> Security information is accurate</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> No sensitive examples or real credentials</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> Links to security docs are correct</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>Reviewed by: _________________ Date: _________</span></code></pre></div>
+        <h3 id="standard-pr-review-code-changes">Standard PR Review
+        (Code changes)</h3>
+        <p>→ Use full <strong><a href="./pr-security-review.html">PR
+        Security Review Checklist</a></strong></p>
+        <h3 id="quick-pre-release-check-minor-update">Quick Pre-Release
+        Check (Minor update)</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quick Pre-Release Check</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> npm audit passes (no high/critical)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> Security headers verified (curl -I)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> 401/403 error handling works</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[ ]</span> No console errors in production</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>Verified by: _________________ Date: _________</span></code></pre></div>
+        <h3 id="full-pre-release-check-major-release">Full Pre-Release
+        Check (Major release)</h3>
+        <p>→ Use full <strong><a
+        href="./pre-release-security.html">Pre-Release Security
+        Checklist</a></strong></p>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Version:</strong> 1.0.0<br />
+        <strong>Maintained By:</strong> StockEase Security Team<br />
+        <strong>Review Cycle:</strong> Quarterly<br />
+        <strong>Classification:</strong> Internal - Security Team &amp;
+        Developers</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

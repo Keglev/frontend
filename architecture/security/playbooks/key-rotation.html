@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>key-rotation - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="key-rotation--rollout-playbook">Key Rotation &amp;
+        Rollout Playbook</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Key rotation is the process of replacing cryptographic
+        signing keys used for JWT tokens. This playbook documents the
+        rotation strategy, rollout procedures, and rollback processes
+        for StockEase Frontend's authentication keys.</p>
+        <hr />
+        <h2 id="why-rotate-keys">Why Rotate Keys?</h2>
+        <h3 id="security-reasons">Security Reasons</h3>
+        <h4 id="1-compromise-mitigation">1. <strong>Compromise
+        Mitigation</strong></h4>
+        <pre><code>If signing key is leaked:
+├─ Attacker can forge valid JWT tokens
+├─ Attacker impersonates any user
+├─ System is completely compromised
+└─ Action: Rotate key immediately to invalidate forged tokens</code></pre>
+        <p><strong>Scenario:</strong></p>
+        <pre><code>Date: 2025-11-10
+Event: Developer accidentally commits signing key to GitHub
+
+Actions:
+├─ Key rotated immediately
+├─ All existing tokens invalidated
+├─ Attackers cannot forge new tokens
+├─ System remains secure</code></pre>
+        <h4 id="2-insider-threat-mitigation">2. <strong>Insider Threat
+        Mitigation</strong></h4>
+        <pre><code>If employee with key access leaves:
+├─ Former employee could create tokens
+├─ Access to systems they shouldn&#39;t have
+├─ Audit trail difficult to track
+└─ Action: Rotate key on departure</code></pre>
+        <h4 id="3-regular-maintenance-planned">3. <strong>Regular
+        Maintenance (Planned)</strong></h4>
+        <pre><code>Every 90 days:
+├─ Rotate keys as preventive measure
+├─ Limit window of compromise
+├─ Maintain security hygiene
+└─ Ensure proper procedures work</code></pre>
+        <h3 id="compliance-reasons">Compliance Reasons</h3>
+        <ul>
+        <li><strong>HIPAA:</strong> Requires regular key rotation</li>
+        <li><strong>PCI DSS:</strong> Requires annual key rotation</li>
+        <li><strong>SOC 2:</strong> Documents key rotation
+        procedures</li>
+        <li><strong>ISO 27001:</strong> Key management requirements</li>
+        </ul>
+        <hr />
+        <h2 id="current-key-architecture">Current Key Architecture</h2>
+        <h3 id="jwt-signing-in-stockease">JWT Signing in StockEase</h3>
+        <p><strong>Backend (Node.js example):</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Key storage (should be in environment variable)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> JWT_SECRET <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET</span><span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Token generation (on login)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> generateToken <span class="op">=</span> (userId) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> payload <span class="op">=</span> {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">sub</span><span class="op">:</span> userId<span class="op">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">iat</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>)<span class="op">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">exp</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>) <span class="op">+</span> (<span class="dv">60</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">24</span>) <span class="co">// 24 hours</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">sign</span>(payload<span class="op">,</span> JWT_SECRET<span class="op">,</span> { <span class="dt">algorithm</span><span class="op">:</span> <span class="st">&#39;HS256&#39;</span> })<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">// Token verification (on each request)</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET<span class="op">,</span> { <span class="dt">algorithms</span><span class="op">:</span> [<span class="st">&#39;HS256&#39;</span>] })<span class="op">;</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Invalid token&#39;</span>)<span class="op">;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Frontend Storage:</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/services/apiClient.ts</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> token <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (token) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  config<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">Authorization</span> <span class="op">=</span> <span class="vs">`Bearer </span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="key-properties">Key Properties</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Property</th>
+        <th>Value</th>
+        <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Key Type</td>
+        <td>HMAC-SHA256</td>
+        <td>Symmetric (same key signs &amp; verifies)</td>
+        </tr>
+        <tr class="even">
+        <td>Key Length</td>
+        <td>32+ bytes</td>
+        <td>Minimum for HS256</td>
+        </tr>
+        <tr class="odd">
+        <td>Storage</td>
+        <td>Environment variable</td>
+        <td><code>JWT_SECRET</code></td>
+        </tr>
+        <tr class="even">
+        <td>Rotation</td>
+        <td>Manual</td>
+        <td>No automated rotation yet</td>
+        </tr>
+        <tr class="odd">
+        <td>Expiration</td>
+        <td>24 hours</td>
+        <td>Token expiration time</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="key-rotation-strategies">Key Rotation Strategies</h2>
+        <h3 id="strategy-1-immediate-rotation-emergency">Strategy 1:
+        Immediate Rotation (Emergency)</h3>
+        <p><strong>Use Case:</strong> Key compromise, security
+        incident</p>
+        <p><strong>Timeline:</strong></p>
+        <pre><code>T+0:00   Key compromised discovered
+T+0:05   Immediate rotation initiated
+T+0:15   New key deployed to all servers
+T+0:20   Old key revocation list created
+T+0:30   All tokens invalidated (force re-login)
+T+0:45   Verify all users re-authenticated
+T+1:00   Post-incident analysis begins</code></pre>
+        <p><strong>Process:</strong></p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Generate new key</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> crypto <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;crypto&#39;</span>)<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> newKey <span class="op">=</span> crypto<span class="op">.</span><span class="fu">randomBytes</span>(<span class="dv">32</span>)<span class="op">.</span><span class="fu">toString</span>(<span class="st">&#39;hex&#39;</span>)<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;New JWT Secret:&#39;</span><span class="op">,</span> newKey)<span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Store in secure location (not in code!)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Deploy to primary server</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Update environment variable: JWT_SECRET = newKey</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Restart application</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Create revocation list</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">// All tokens issued with old key are now invalid</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Force all users to re-login</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/force-reauth&#39;</span><span class="op">,</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  res<span class="op">.</span><span class="fu">json</span>({</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">message</span><span class="op">:</span> <span class="st">&#39;Re-authentication required&#39;</span><span class="op">,</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">reason</span><span class="op">:</span> <span class="st">&#39;Security update&#39;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. Clear client tokens</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">// Send notification: &quot;Please login again&quot;</span></span></code></pre></div>
+        <p><strong>Advantages:</strong></p>
+        <ul>
+        <li>✅ Immediate security recovery</li>
+        <li>✅ Old tokens completely invalidated</li>
+        <li>✅ No grace period for attackers</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+        <li>⚠️ All users must re-login</li>
+        <li>⚠️ Service disruption</li>
+        <li>⚠️ High support burden</li>
+        </ul>
+        <hr />
+        <h3 id="strategy-2-graceful-rotation-planned">Strategy 2:
+        Graceful Rotation (Planned)</h3>
+        <p><strong>Use Case:</strong> Regular maintenance, no security
+        incident</p>
+        <p><strong>Timeline:</strong></p>
+        <pre><code>Week 1:  Generate new key (keep both active)
+         New tokens signed with new key
+         Old tokens still accepted
+         
+Week 2:  Monitor dual-key environment
+         Gradual user login (new tokens)
+         Old sessions continue (old key)
+         
+Week 3:  Deprecate old key
+         Stop accepting old key tokens
+         Force remaining users to re-login
+         
+Week 4:  Archive and destroy old key
+         Verify no old tokens active
+         Document rotation completion</code></pre>
+        <p><strong>Process:</strong></p>
+        <p><strong>Phase 1: Dual-Key Setup</strong></p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Backend maintains both keys</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> JWT_SECRET_CURRENT <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET_NEW</span><span class="op">;</span>  <span class="co">// New key</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> JWT_SECRET_PREVIOUS <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET_OLD</span><span class="op">;</span> <span class="co">// Old key</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Sign with NEW key</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> generateToken <span class="op">=</span> (userId) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">sign</span>(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">sub</span><span class="op">:</span> userId<span class="op">,</span> <span class="dt">iat</span><span class="op">:</span> <span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() }<span class="op">,</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    JWT_SECRET_CURRENT<span class="op">,</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">algorithm</span><span class="op">:</span> <span class="st">&#39;HS256&#39;</span> }</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">// Verify with EITHER key</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Try new key first</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_CURRENT<span class="op">,</span> { <span class="dt">algorithms</span><span class="op">:</span> [<span class="st">&#39;HS256&#39;</span>] })<span class="op">;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fall back to old key</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> {</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_PREVIOUS<span class="op">,</span> { <span class="dt">algorithms</span><span class="op">:</span> [<span class="st">&#39;HS256&#39;</span>] })<span class="op">;</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">catch</span> (error) {</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>      <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Invalid token&#39;</span>)<span class="op">;</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Phase 2: Migration Period</strong></p>
+        <pre><code>Monitor token usage:
+├─ New tokens: JWT_SECRET_CURRENT
+├─ Old tokens: JWT_SECRET_PREVIOUS
+├─ Acceptance rate: Track which key is used
+└─ Timeline: Wait until 90% migrated</code></pre>
+        <p><strong>Dashboard Metrics:</strong></p>
+        <pre><code>Token Usage (Daily)
+├─ New key tokens: 98%
+├─ Old key tokens: 2%
+├─ Expiration: 7 days until old key disabled
+└─ Status: Ready to deprecate</code></pre>
+        <p><strong>Phase 3: Deprecation</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Only accept NEW key</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_CURRENT<span class="op">,</span> { <span class="dt">algorithms</span><span class="op">:</span> [<span class="st">&#39;HS256&#39;</span>] })<span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Old key tokens will fail</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Users with old tokens forced to re-login</span></span></code></pre></div>
+        <p><strong>Phase 4: Key Destruction</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Remove old key from environment</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Ensure only current key in secrets management</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Archive old key for audit purposes (encrypted)</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Document rotation completion</span></span></code></pre></div>
+        <p><strong>Advantages:</strong></p>
+        <ul>
+        <li>✅ Minimal service disruption</li>
+        <li>✅ Graceful migration</li>
+        <li>✅ Users only re-login if necessary</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+        <li>⚠️ Takes 3-4 weeks</li>
+        <li>⚠️ Complex dual-key logic</li>
+        <li>⚠️ Longer exposure window</li>
+        </ul>
+        <hr />
+        <h3 id="strategy-3-rolling-rotation-continuous">Strategy 3:
+        Rolling Rotation (Continuous)</h3>
+        <p><strong>Use Case:</strong> High-security environments,
+        automated systems</p>
+        <p><strong>Concept:</strong></p>
+        <pre><code>Rotate keys quarterly without user notice
+
+Week 1:  Rotate 25% of users to new key
+Week 2:  Rotate 50% of users to new key
+Week 3:  Rotate 75% of users to new key
+Week 4:  Rotate 100% of users to new key
+
+No users forced to re-login
+Transparent rotation process</code></pre>
+        <p><strong>Requirements:</strong></p>
+        <ul>
+        <li>Dual-key support in backend</li>
+        <li>Automated token refresh in frontend</li>
+        <li>Scheduling system for rotation phases</li>
+        </ul>
+        <p><strong>Implementation:</strong></p>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Assign users to &quot;rotation cohorts&quot;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> getUserCohort <span class="op">=</span> (userId) <span class="kw">=&gt;</span> {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="pp">parseInt</span>(userId) <span class="op">%</span> <span class="dv">4</span><span class="op">;</span> <span class="co">// Groups users 0-3</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Rotate one cohort per week</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> getActiveKey <span class="op">=</span> (userId) <span class="kw">=&gt;</span> {</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> cohort <span class="op">=</span> <span class="fu">getUserCohort</span>(userId)<span class="op">;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> week <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>((<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">-</span> rotationStartDate) <span class="op">/</span> (<span class="dv">7</span> <span class="op">*</span> <span class="dv">24</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">1000</span>))<span class="op">;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (week <span class="op">&gt;=</span> cohort) {</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> JWT_SECRET_NEW<span class="op">;</span>    <span class="co">// User&#39;s key rotated</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> JWT_SECRET_CURRENT<span class="op">;</span> <span class="co">// User still on old key</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co">// On token refresh, always use new key</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> generateToken <span class="op">=</span> (userId) <span class="kw">=&gt;</span> {</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">sign</span>(</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">sub</span><span class="op">:</span> userId<span class="op">,</span> <span class="dt">cohort</span><span class="op">:</span> <span class="fu">getUserCohort</span>(userId) }<span class="op">,</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    JWT_SECRET_NEW<span class="op">,</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    { <span class="dt">algorithm</span><span class="op">:</span> <span class="st">&#39;HS256&#39;</span> }</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Advantages:</strong></p>
+        <ul>
+        <li>✅ No user disruption</li>
+        <li>✅ Completely transparent</li>
+        <li>✅ Automated process</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+        <li>⚠️ Complex implementation</li>
+        <li>⚠️ Requires dual-key period</li>
+        <li>⚠️ Needs good monitoring</li>
+        </ul>
+        <hr />
+        <h2 id="rollout-procedures">Rollout Procedures</h2>
+        <h3 id="step-by-step-rollout">Step-by-Step Rollout</h3>
+        <h4 id="1-prepare-new-key">1. Prepare New Key</h4>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate cryptographically secure random key</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-e</span> <span class="st">&quot;console.log(require(&#39;crypto&#39;).randomBytes(32).toString(&#39;hex&#39;))&quot;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Output (example):</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># a7f3b9c2e1d4f6a8b5c7d9e2f4a6b8c0e2d4f6a8b9c1d3e5f7a9b0c2d4e5f6</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Store in secure location:</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - Vault (HashiCorp Vault)</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - AWS Secrets Manager</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># - GitHub Secrets (for CI/CD)</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># - Environment variable (.env.production)</span></span></code></pre></div>
+        <p><strong>Security Checklist:</strong></p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Key generated with
+        sufficient entropy (32+ bytes)</label></li>
+        <li><label><input type="checkbox" />Key not logged or
+        printed</label></li>
+        <li><label><input type="checkbox" />Key stored in secrets
+        management</label></li>
+        <li><label><input type="checkbox" />Key access logged and
+        audited</label></li>
+        <li><label><input type="checkbox" />Key backup created
+        (encrypted)</label></li>
+        </ul>
+        <h4 id="2-deploy-dual-key-configuration">2. Deploy Dual-Key
+        Configuration</h4>
+        <p><strong>Backend Configuration:</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// .env.production</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>JWT_SECRET_CURRENT<span class="op">=</span>new_key_hex_string</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>JWT_SECRET_PREVIOUS<span class="op">=</span>old_key_hex_string</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">// app.js</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> JWT_SECRET_CURRENT <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET_CURRENT</span><span class="op">;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> JWT_SECRET_PREVIOUS <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET_PREVIOUS</span><span class="op">;</span></span></code></pre></div>
+        <p><strong>Deployment:</strong></p>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Update environment variables in production</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> secrets versions add JWT_SECRET_PREVIOUS <span class="at">--data-file</span><span class="op">=</span>- <span class="op">&lt;&lt;&lt;</span> <span class="va">$OLD_KEY</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> secrets versions add JWT_SECRET_CURRENT <span class="at">--data-file</span><span class="op">=</span>- <span class="op">&lt;&lt;&lt;</span> <span class="va">$NEW_KEY</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Restart application</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout restart deployment/api-server</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Verify both keys active</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> https://api.stockease.com/health/keys</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Response: { current: &#39;new_key...&#39;, previous: &#39;old_key...&#39; }</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Monitor token verification</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Watch for errors with old/new keys</span></span></code></pre></div>
+        <h4 id="3-monitor-dual-key-period">3. Monitor Dual-Key
+        Period</h4>
+        <p><strong>Metrics to Track:</strong></p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Logging on token verification</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_CURRENT)<span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    metrics<span class="op">.</span><span class="fu">increment</span>(<span class="st">&#39;token.verified&#39;</span><span class="op">,</span> { <span class="dt">key</span><span class="op">:</span> <span class="st">&#39;current&#39;</span> })<span class="op">;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> decoded<span class="op">;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> {</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_PREVIOUS)<span class="op">;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>      metrics<span class="op">.</span><span class="fu">increment</span>(<span class="st">&#39;token.verified&#39;</span><span class="op">,</span> { <span class="dt">key</span><span class="op">:</span> <span class="st">&#39;previous&#39;</span> })<span class="op">;</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> decoded<span class="op">;</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">catch</span> (error) {</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>      metrics<span class="op">.</span><span class="fu">increment</span>(<span class="st">&#39;token.invalid&#39;</span>)<span class="op">;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">throw</span> error<span class="op">;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Dashboard:</strong></p>
+        <pre><code>Token Verification (Last 24h)
+├─ Current key:  2,847 ✅ (98.2%)
+├─ Previous key: 52 ✅ (1.8%)
+├─ Invalid:      2 ❌ (0.06%)
+└─ Status: Ready to deprecate previous key</code></pre>
+        <p><strong>Success Criteria:</strong></p>
+        <ul>
+        <li>Previous key usage &lt; 5%</li>
+        <li>No errors with current key</li>
+        <li>Average latency unchanged</li>
+        <li>Zero downtime events</li>
+        </ul>
+        <p><strong>Timeline:</strong></p>
+        <ul>
+        <li>Monitoring period: 1-2 weeks</li>
+        <li>Extend if issues detected</li>
+        <li>Continue with deprecation if healthy</li>
+        </ul>
+        <h4 id="4-deprecate-previous-key">4. Deprecate Previous Key</h4>
+        <p><strong>Disable Old Key:</strong></p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Update app to only accept current key</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> JWT_SECRET_CURRENT<span class="op">,</span> { <span class="dt">algorithms</span><span class="op">:</span> [<span class="st">&#39;HS256&#39;</span>] })<span class="op">;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Old key tokens will be rejected</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Users redirected to login</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Deployment:</strong></p>
+        <div class="sourceCode" id="cb23"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove previous key from configuration</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only current key</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Update environment</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> secrets versions destroy JWT_SECRET_PREVIOUS</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart application</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout restart deployment/api-server</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Monitor error rates</span></span></code></pre></div>
+        <p><strong>User Impact:</strong></p>
+        <pre><code>User with old token:
+├─ Makes API request
+├─ Token verification fails
+├─ Response: 401 Unauthorized
+├─ Frontend interceptor removes token
+├─ User redirected to login
+└─ User re-authenticates (forced logout)
+
+Estimated users affected:
+├─ Previous key usage: 1-2%
+├─ = ~100-200 users (in 10k user base)
+├─ Support spike: Expect login help requests
+└─ Duration: 1-2 hours</code></pre>
+        <h4 id="5-verify-and-document">5. Verify and Document</h4>
+        <p><strong>Verification:</strong></p>
+        <div class="sourceCode" id="cb25"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Confirm no old key tokens in system</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-cli</span> keys <span class="st">&quot;token:*&quot;</span> <span class="kw">|</span> <span class="cf">while</span> <span class="bu">read</span> <span class="va">key</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">TOKEN</span><span class="op">=</span><span class="va">$(</span><span class="ex">redis-cli</span> get <span class="va">$key</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.token&#39;</span><span class="va">)</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">jwt</span> decode <span class="va">$TOKEN</span> <span class="at">--secret</span><span class="op">=</span><span class="va">$OLD_KEY</span> <span class="dv">2</span><span class="op">&gt;</span>/dev/null <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">&quot;Found old key token: </span><span class="va">$key</span><span class="st">&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected output: (empty - no old tokens)</span></span></code></pre></div>
+        <p><strong>Documentation:</strong></p>
+        <div class="sourceCode" id="cb26"><pre
+        class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Key Rotation - November 13, 2025</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Timeline</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-13 09:00 - New key generated</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-13 10:00 - Dual-key deployment started</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-13 11:00 - Dual-key active (both keys accepting tokens)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-20 14:00 - Dual-key monitoring complete (2,847 current key, 52 previous key)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-20 15:00 - Previous key deprecated</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-20 16:00 - Verification completed</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2025-11-21 09:00 - Post-rotation audit</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## Key Metrics</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Dual-key period: 7 days</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Previous key usage at deprecation: 1.8%</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Users forced to re-login: ~52</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Support impact: Minimal</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Zero-downtime: Yes ✅</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## New Key Details</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Generation date: 2025-11-13</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Generated by: automation@stockease.com</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Algorithm: HS256</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Key size: 256 bits (32 bytes)</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Expiration policy: Rotate in 90 days</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Old Key Archive</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Stored: Encrypted vault</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Retention: 1 year (compliance)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Access: Limited to security team</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Destruction date: 2026-11-13</span></code></pre></div>
+        <hr />
+        <h2 id="emergency-rollback">Emergency Rollback</h2>
+        <h3 id="scenario-new-key-causes-issues">Scenario: New Key Causes
+        Issues</h3>
+        <p><strong>Problem:</strong></p>
+        <pre><code>After key rotation:
+├─ High error rates
+├─ Users cannot login
+├─ System degradation
+└─ Need to rollback</code></pre>
+        <p><strong>Rollback Procedure:</strong></p>
+        <div class="sourceCode" id="cb28"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Identify problem</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Spike in 401 errors or token failures</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Immediate action</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch back to previous key</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Update to dual-key with roles swapped</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JWT_SECRET_CURRENT</span><span class="op">=</span><span class="va">$OLD_KEY</span>  <span class="co"># Restore old key</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">JWT_SECRET_PREVIOUS</span><span class="op">=</span><span class="va">$NEW_KEY</span> <span class="co"># Keep new key for fallback</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Restart service</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout restart deployment/api-server</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Monitor recovery</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Token verification errors should drop to zero</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Investigate</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Why did new key cause issues?</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Was it generated correctly?</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Was deployment correct?</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Generate new key again</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Once root cause is fixed</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Follow full rotation procedure again</span></span></code></pre></div>
+        <p><strong>Timeline:</strong></p>
+        <pre><code>T+0:00   Issue detected
+T+0:05   Alert triggered
+T+0:15   Rollback started
+T+0:25   Rollback completed, monitoring
+T+0:35   Errors normalized
+T+1:00   All systems stable
+T+2:00   Investigation begins</code></pre>
+        <p><strong>Success Criteria:</strong></p>
+        <ul>
+        <li>Token verification errors &lt; 0.1%</li>
+        <li>Users can login successfully</li>
+        <li>API response times normal</li>
+        <li>Zero downtime during rollback</li>
+        </ul>
+        <hr />
+        <h2 id="monitoring--metrics">Monitoring &amp; Metrics</h2>
+        <h3 id="key-rotation-metrics">Key Rotation Metrics</h3>
+        <div class="sourceCode" id="cb30"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Track during rotation process</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> {</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.start_time&#39;</span><span class="op">:</span> timestamp<span class="op">,</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.duration_days&#39;</span><span class="op">:</span> number<span class="op">,</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.tokens_current_key&#39;</span><span class="op">:</span> count<span class="op">,</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.tokens_previous_key&#39;</span><span class="op">:</span> count<span class="op">,</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.tokens_invalid&#39;</span><span class="op">:</span> count<span class="op">,</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.user_relogins&#39;</span><span class="op">:</span> count<span class="op">,</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.errors&#39;</span><span class="op">:</span> count<span class="op">,</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;key.rotation.success&#39;</span><span class="op">:</span> boolean</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Example dashboard</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="vs">Key Rotation Status</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Duration: 7 days (target: 7-14 days)</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Current key tokens: 98.2% ✅</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Previous key tokens: 1.8% (target: &lt; 5%)</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Invalid tokens: 0.06% (target: &lt; 0.1%)</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Users forced to login: 52 (1.8%)</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="vs">├─ Errors: 0</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="vs">└─ Status: On track for deprecation</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="vs">`</span>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="alerts-to-set-up">Alerts to Set Up</h3>
+        <div class="sourceCode" id="cb31"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Alert if previous key usage doesn&#39;t decrease</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (previousKeyUsagePercent <span class="op">&gt;</span> <span class="dv">10</span> <span class="op">&amp;&amp;</span> daysIntoRotation <span class="op">&gt;</span> <span class="dv">7</span>) {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">alert</span>(<span class="st">&#39;Previous key usage still high - investigate&#39;</span>)<span class="op">;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Alert if token verification errors spike</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (tokenVerificationErrors <span class="op">&gt;</span> avgErrors <span class="op">*</span> <span class="dv">2</span>) {</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">alert</span>(<span class="st">&#39;Spike in token verification errors&#39;</span>)<span class="op">;</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co">// Alert if old key tokens still exist after deprecation</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (deprecationComplete <span class="op">&amp;&amp;</span> oldKeyTokensFound) {</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">alert</span>(<span class="st">&#39;Old key tokens still in system after deprecation&#39;</span>)<span class="op">;</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="checklist-for-key-rotation">Checklist for Key
+        Rotation</h2>
+        <h3 id="-before-rotation">✅ Before Rotation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />New key generated
+        securely</label></li>
+        <li><label><input type="checkbox" />Key stored in secrets
+        management</label></li>
+        <li><label><input type="checkbox" />Backup of old key created
+        (encrypted)</label></li>
+        <li><label><input type="checkbox" />Dual-key verification code
+        tested</label></li>
+        <li><label><input type="checkbox" />Monitoring dashboards
+        ready</label></li>
+        <li><label><input type="checkbox" />Communication plan
+        prepared</label></li>
+        <li><label><input type="checkbox" />Rollback procedure
+        documented</label></li>
+        <li><label><input type="checkbox" />Scheduled during low-traffic
+        period</label></li>
+        </ul>
+        <h3 id="-during-rotation">✅ During Rotation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />New key deployed to all
+        servers</label></li>
+        <li><label><input type="checkbox" />Both keys active and
+        verified</label></li>
+        <li><label><input type="checkbox" />Monitoring metrics
+        healthy</label></li>
+        <li><label><input type="checkbox" />No spike in
+        errors</label></li>
+        <li><label><input type="checkbox" />Token generation
+        working</label></li>
+        <li><label><input type="checkbox" />Old and new tokens
+        accepted</label></li>
+        <li><label><input type="checkbox" />Gradual migration
+        observed</label></li>
+        </ul>
+        <h3 id="-after-rotation">✅ After Rotation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Previous key
+        deprecated</label></li>
+        <li><label><input type="checkbox" />No old key tokens in
+        system</label></li>
+        <li><label><input type="checkbox" />All users migrated to new
+        key</label></li>
+        <li><label><input type="checkbox" />Error rates
+        normalized</label></li>
+        <li><label><input type="checkbox" />Audit log
+        complete</label></li>
+        <li><label><input type="checkbox" />Documentation
+        updated</label></li>
+        <li><label><input type="checkbox" />Post-rotation analysis
+        done</label></li>
+        <li><label><input type="checkbox" />Next rotation
+        scheduled</label></li>
+        </ul>
+        <hr />
+        <h2 id="key-rotation-schedule">Key Rotation Schedule</h2>
+        <h3 id="recommended-schedule">Recommended Schedule</h3>
+        <p><strong>Production Keys:</strong></p>
+        <pre><code>Rotation Frequency: Every 90 days
+Last Rotation: 2025-11-13
+Next Rotation: 2026-02-11
+Scheduled: 2nd Thursday of quarter at 02:00 UTC</code></pre>
+        <p><strong>Critical Incident Rotation:</strong></p>
+        <pre><code>Trigger: Key compromise or suspected breach
+Timeline: Immediate (&lt; 1 hour)
+Notification: All users notified of forced re-login
+Follow-up: Post-incident analysis within 24 hours</code></pre>
+        <p><strong>Emergency Procedures:</strong></p>
+        <pre><code>If key leaked:
+├─ Activate emergency rotation (&lt; 15 min)
+├─ Deploy to all servers
+├─ Invalidate all existing tokens
+├─ Force all users to re-login
+└─ Post-incident review (within 24h)</code></pre>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong>JWT Tokens:</strong> See <a
+        href="../auth/jwt-tokens.html">JWT Token Handling</a></li>
+        <li><strong>Token Revocation:</strong> See <a
+        href="./revoke-tokens.html">Token Revocation &amp; Forced
+        Logout</a></li>
+        <li><strong>Authentication:</strong> See <a
+        href="../auth/authentication.html">Authentication Flow</a></li>
+        <li><strong>Secrets Management:</strong> See <a
+        href="../frontend/secrets-config.html">Secrets &amp;
+        Configuration</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Operational Procedures<br />
+        <strong>Priority:</strong> High (Security Incident
+        Response)<br />
+        <strong>Maintainer:</strong> Security &amp; Infrastructure
+        Team</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

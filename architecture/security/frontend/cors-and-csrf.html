@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>cors-and-csrf - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="cors--csrf-protection">CORS &amp; CSRF Protection</h1>
+        <h2 id="overview">Overview</h2>
+        <p>This document covers CORS (Cross-Origin Resource Sharing)
+        validation and CSRF (Cross-Site Request Forgery) protection in
+        StockEase Frontend. Note that StockEase uses a
+        <strong>cookie-less architecture</strong> (token-based auth),
+        which significantly reduces CSRF risk.</p>
+        <hr />
+        <h2 id="cors-cross-origin-resource-sharing">CORS (Cross-Origin
+        Resource Sharing)</h2>
+        <h3 id="what-is-cors">What is CORS?</h3>
+        <p>CORS is a security mechanism that allows web pages to make
+        requests to different domains.</p>
+        <p><strong>Problem CORS solves:</strong></p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Frontend at https://frontend.stockease.com</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Backend at https://api.stockease.com</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Browser blocks this by default (same-origin policy)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fetch</span>(<span class="st">&#39;https://api.stockease.com/api/products&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ CORS Error: Access-Control-Allow-Origin missing</span></span></code></pre></div>
+        <h3 id="how-cors-works">How CORS Works</h3>
+        <pre><code>Frontend Request Flow:
+
+Browser                    Frontend Server        Backend API
+  │                             │                      │
+  │ fetch(&#39;/api/products&#39;)      │                      │
+  ├────────────────────────────&gt;│                      │
+  │                             │ GET /api/products    │
+  │                             │ Origin: frontend.com │
+  │                             │─────────────────────&gt;│
+  │                             │                      │
+  │                             │ Check: Is origin     │
+  │                             │ in allowed list?     │
+  │                             │  ✓ Yes              │
+  │                             │                      │
+  │                             │ 200 OK               │
+  │                             │ CORS Headers         │
+  │                             │&lt;─────────────────────┤
+  │ Return response to JS       │                      │
+  │&lt;────────────────────────────┤                      │</code></pre>
+        <h3 id="cors-headers">CORS Headers</h3>
+        <p><strong>Request Headers (Browser Adds
+        Automatically):</strong></p>
+        <pre class="http"><code>GET /api/products HTTP/1.1
+Host: api.stockease.com
+Origin: https://frontend.stockease.com</code></pre>
+        <p><strong>Response Headers (Backend Must Send):</strong></p>
+        <pre class="http"><code>HTTP/1.1 200 OK
+
+Access-Control-Allow-Origin: https://frontend.stockease.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400</code></pre>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Header</th>
+        <th>Purpose</th>
+        <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>Access-Control-Allow-Origin</code></td>
+        <td>Which origins allowed</td>
+        <td><code>https://frontend.stockease.com</code> or
+        <code>*</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>Access-Control-Allow-Methods</code></td>
+        <td>Which HTTP methods allowed</td>
+        <td><code>GET, POST, PUT, DELETE</code></td>
+        </tr>
+        <tr class="odd">
+        <td><code>Access-Control-Allow-Headers</code></td>
+        <td>Which headers allowed</td>
+        <td><code>Authorization, Content-Type</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>Access-Control-Allow-Credentials</code></td>
+        <td>Allow cookies</td>
+        <td><code>true</code> or omitted</td>
+        </tr>
+        <tr class="odd">
+        <td><code>Access-Control-Max-Age</code></td>
+        <td>Cache preflight response</td>
+        <td><code>86400</code> (24 hours)</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="cors-implementation-in-stockease">CORS Implementation in
+        StockEase</h3>
+        <p><strong>Frontend Side:</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/services/apiClient.ts</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> apiClient <span class="op">=</span> axios<span class="op">.</span><span class="fu">create</span>({</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  baseURL<span class="op">:</span> import<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">VITE_API_BASE_URL</span><span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  timeout<span class="op">:</span> <span class="dv">120000</span><span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Axios automatically includes Origin header</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Browser enforces CORS rules</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">// No frontend code needed for CORS validation</span></span></code></pre></div>
+        <p><strong>Backend Side (Responsibility):</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Backend MUST validate CORS</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Frontend cannot control CORS enforcement</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/api/products&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;GET&#39;</span>])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_products():</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Backend checks Origin header</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    origin <span class="op">=</span> request.headers.get(<span class="st">&#39;Origin&#39;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If origin not in whitelist, don&#39;t add CORS headers</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> origin <span class="kw">not</span> <span class="kw">in</span> ALLOWED_ORIGINS:</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># No CORS headers → Browser blocks response</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> products, <span class="dv">200</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If origin in whitelist, add CORS headers</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> make_response(products, <span class="dv">200</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    response.headers[<span class="st">&#39;Access-Control-Allow-Origin&#39;</span>] <span class="op">=</span> origin</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    response.headers[<span class="st">&#39;Access-Control-Allow-Methods&#39;</span>] <span class="op">=</span> <span class="st">&#39;GET, POST&#39;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    response.headers[<span class="st">&#39;Access-Control-Allow-Headers&#39;</span>] <span class="op">=</span> <span class="st">&#39;Authorization, Content-Type&#39;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response</span></code></pre></div>
+        <h3 id="cors-preflight-requests">CORS Preflight Requests</h3>
+        <p>For complex requests, browser sends preflight first:</p>
+        <p><strong>Preflight (OPTIONS) Request:</strong></p>
+        <pre class="http"><code>OPTIONS /api/products HTTP/1.1
+Host: api.stockease.com
+Origin: https://frontend.stockease.com
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Authorization, Content-Type</code></pre>
+        <p><strong>Backend Response:</strong></p>
+        <pre class="http"><code>HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://frontend.stockease.com
+Access-Control-Allow-Methods: POST
+Access-Control-Allow-Headers: Authorization, Content-Type</code></pre>
+        <p><strong>Then Actual Request:</strong></p>
+        <pre class="http"><code>POST /api/products HTTP/1.1
+Host: api.stockease.com
+Origin: https://frontend.stockease.com
+Authorization: Bearer token123
+Content-Type: application/json
+
+{ &quot;name&quot;: &quot;Product A&quot; }</code></pre>
+        <h3 id="cors-issues--solutions">CORS Issues &amp; Solutions</h3>
+        <h4 id="issue-cors-error-in-browser">Issue: CORS Error in
+        Browser</h4>
+        <p><strong>Symptom:</strong></p>
+        <pre><code>Access to XMLHttpRequest at &#39;https://api.stockease.com/api/products&#39;
+from origin &#39;https://frontend.stockease.com&#39; has been blocked by CORS policy:
+No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code></pre>
+        <p><strong>Causes:</strong></p>
+        <ol type="1">
+        <li>Backend not adding CORS headers</li>
+        <li>Origin not in backend's allowed list</li>
+        <li>Backend CORS configuration error</li>
+        </ol>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Backend adds CORS headers</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Not frontend&#39;s responsibility</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>response.headers[<span class="st">&#39;Access-Control-Allow-Origin&#39;</span>] <span class="op">=</span> <span class="st">&#39;https://frontend.stockease.com&#39;</span></span></code></pre></div>
+        <h4 id="issue-preflight-fails">Issue: Preflight Fails</h4>
+        <p><strong>Symptom:</strong></p>
+        <pre><code>Response to preflight request doesn&#39;t pass CORS policy:
+No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code></pre>
+        <p><strong>Causes:</strong></p>
+        <ul>
+        <li>Backend doesn't handle OPTIONS requests</li>
+        <li>Preflight response missing CORS headers</li>
+        </ul>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Handle OPTIONS request</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/api/products&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;OPTIONS&#39;</span>, <span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> options_products():</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">&#39;OPTIONS&#39;</span>:</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        response <span class="op">=</span> make_response(<span class="st">&#39;&#39;</span>, <span class="dv">204</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        response.headers[<span class="st">&#39;Access-Control-Allow-Origin&#39;</span>] <span class="op">=</span> request.headers.get(<span class="st">&#39;Origin&#39;</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        response.headers[<span class="st">&#39;Access-Control-Allow-Methods&#39;</span>] <span class="op">=</span> <span class="st">&#39;POST&#39;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        response.headers[<span class="st">&#39;Access-Control-Allow-Headers&#39;</span>] <span class="op">=</span> <span class="st">&#39;Authorization, Content-Type&#39;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> response</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle POST...</span></span></code></pre></div>
+        <h3 id="testing-cors">Testing CORS</h3>
+        <p><strong>Using curl:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Send preflight</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> <span class="at">-X</span> OPTIONS https://api.stockease.com/api/products <span class="dt">\</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Origin: https://frontend.stockease.com&quot;</span> <span class="dt">\</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Access-Control-Request-Method: GET&quot;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Should see:</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Access-Control-Allow-Origin: https://frontend.stockease.com</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Access-Control-Allow-Methods: GET</span></span></code></pre></div>
+        <p><strong>In Browser DevTools:</strong></p>
+        <ol type="1">
+        <li>Open DevTools (F12)</li>
+        <li>Go to Network tab</li>
+        <li>Look for OPTIONS requests (preflight)</li>
+        <li>Check response headers for CORS headers</li>
+        </ol>
+        <hr />
+        <h2 id="csrf-cross-site-request-forgery">CSRF (Cross-Site
+        Request Forgery)</h2>
+        <h3 id="what-is-csrf">What is CSRF?</h3>
+        <p>CSRF is an attack where a malicious website tricks a user
+        into making requests to another site where they're logged
+        in.</p>
+        <p><strong>Example Attack:</strong></p>
+        <pre><code>User logs into https://stockease.com
+User has valid session/token
+
+User visits malicious website: https://evil.com
+
+Evil website contains:
+&lt;form action=&quot;https://stockease.com/api/products&quot; method=&quot;POST&quot;&gt;
+  &lt;input name=&quot;name&quot; value=&quot;Malware Product&quot;&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;fake&quot;&gt;
+&lt;/form&gt;
+&lt;script&gt;
+  document.forms[0].submit();  // Auto-submit form
+&lt;/script&gt;
+
+Browser automatically includes user&#39;s session cookies with request
+Request is processed as if user intentionally made it
+Attacker successfully created product under user&#39;s account</code></pre>
+        <h3 id="csrf-protection-methods">CSRF Protection Methods</h3>
+        <h4 id="method-1-samesite-cookies-modern">Method 1: SameSite
+        Cookies (Modern)</h4>
+        <p><strong>Browser enforces this automatically:</strong></p>
+        <pre class="http"><code>Set-Cookie: session=xyz; SameSite=Strict; HttpOnly</code></pre>
+        <p><strong>How it works:</strong></p>
+        <ul>
+        <li><code>SameSite=Strict</code> — Cookie never sent to
+        cross-origin requests</li>
+        <li><code>SameSite=Lax</code> — Cookie sent on top-level
+        navigation only</li>
+        <li><code>SameSite=None</code> — Cookie sent everywhere
+        (requires Secure flag)</li>
+        </ul>
+        <p><strong>Protection:</strong></p>
+        <pre><code>evil.com submits form to stockease.com
+Browser sees: Cookie from stockease.com
+Check: Is this a same-site request? NO
+Action: Don&#39;t send cookie
+Result: Request fails (no authentication)</code></pre>
+        <h4 id="method-2-csrf-tokens-traditional">Method 2: CSRF Tokens
+        (Traditional)</h4>
+        <p><strong>Without tokens:</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span> <span class="er">action</span><span class="ot">=</span><span class="st">&quot;/api/products&quot;</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;POST&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;name&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;Product&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span></code></pre></div>
+        <p><strong>With tokens:</strong></p>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span> <span class="er">action</span><span class="ot">=</span><span class="st">&quot;/api/products&quot;</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;POST&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;name&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;Product&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">type</span><span class="ot">=</span><span class="st">&quot;hidden&quot;</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;csrf_token&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;unique-random-token&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span></code></pre></div>
+        <p><strong>How it works:</strong></p>
+        <ol type="1">
+        <li>Server generates unique token per session</li>
+        <li>Server embeds token in form</li>
+        <li>User submits form with token</li>
+        <li>Server verifies token matches session</li>
+        <li>If token missing/invalid, request rejected</li>
+        </ol>
+        <p><strong>Why it works:</strong></p>
+        <pre><code>Attacker can see form HTML
+But attacker cannot read CSRF token
+Token is unique to victim&#39;s session
+Attacker submits without valid token
+Request fails</code></pre>
+        <h3 id="csrf-protection-in-stockease">CSRF Protection in
+        StockEase</h3>
+        <p><strong>Current Implementation: Token-Based Auth</strong></p>
+        <p>StockEase uses JWT tokens (not cookies):</p>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Authentication via Authorization header</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>Authorization<span class="op">:</span> Bearer jwt<span class="op">-</span>token<span class="op">-</span><span class="dv">123</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Stored in localStorage (not cookies)</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;token&#39;</span><span class="op">,</span> jwtToken)<span class="op">;</span></span></code></pre></div>
+        <p><strong>Why this is CSRF-safe:</strong></p>
+        <ol type="1">
+        <li>Tokens not auto-sent (unlike cookies)</li>
+        <li>Tokens stored in JavaScript (localStorage)</li>
+        <li>Attacker cannot access localStorage from different
+        domain</li>
+        <li>Request must include header with token</li>
+        </ol>
+        <p><strong>CSRF Attack Attempt:</strong></p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Attacker tries to make request to stockease.com</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">// From evil.com</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fetch</span>(<span class="st">&#39;https://stockease.com/api/products&#39;</span><span class="op">,</span> {</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">method</span><span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">body</span><span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({ <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;Malware&#39;</span> })</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ Fails because:</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Token not in Authorization header</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Browser blocks CORS (no CORS headers from backend)</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Request cannot access localStorage from evil.com</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ Result: Request fails, attack prevented</span></span></code></pre></div>
+        <h3 id="when-csrf-still-applies-if-using-cookies">When CSRF
+        Still Applies (If Using Cookies)</h3>
+        <p><strong>If backend switches to cookies:</strong></p>
+        <pre class="http"><code>Set-Cookie: session=abc123; Path=/; HttpOnly</code></pre>
+        <p><strong>Then CSRF tokens would be needed:</strong></p>
+        <div class="sourceCode" id="cb24"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span> <span class="er">action</span><span class="ot">=</span><span class="st">&quot;/api/products&quot;</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;POST&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">type</span><span class="ot">=</span><span class="st">&quot;hidden&quot;</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;csrf_token&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;xyz-token&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span></code></pre></div>
+        <p><strong>Or SameSite attribute:</strong></p>
+        <pre class="http"><code>Set-Cookie: session=abc123; SameSite=Strict; HttpOnly</code></pre>
+        <h3 id="testing-csrf-protection">Testing CSRF Protection</h3>
+        <p><strong>Current Setup (Token-Based):</strong></p>
+        <div class="sourceCode" id="cb26"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Simulate CSRF attack from console on evil.com</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Try to submit to stockease.com</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">// This will fail:</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fetch</span>(<span class="st">&#39;https://stockease.com/api/products&#39;</span><span class="op">,</span> {</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  method<span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  headers<span class="op">:</span> {</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;Content-Type&#39;</span><span class="op">:</span> <span class="st">&#39;application/json&#39;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  body<span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({ name<span class="op">:</span> <span class="st">&#39;Attack&#39;</span> })</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Fails because:</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Authorization header missing</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. CORS blocks (origin doesn&#39;t match)</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ Safe</span></span></code></pre></div>
+        <p><strong>If Switched to Cookies:</strong></p>
+        <div class="sourceCode" id="cb27"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Create form with CSRF token --&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span> <span class="er">action</span><span class="ot">=</span><span class="st">&quot;https://stockease.com/api/products&quot;</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;POST&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;csrf_token&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;random-token-from-backend&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;name&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;Malware&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">button</span> <span class="er">type</span><span class="ot">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Click me<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Attacker cannot get csrf_token from backend --&gt;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Request without token fails --&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="securing-api-requests">Securing API Requests</h2>
+        <h3 id="safe-request-pattern-current-implementation">Safe
+        Request Pattern (Current Implementation)</h3>
+        <div class="sourceCode" id="cb28"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Store token in localStorage after login</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;token&#39;</span><span class="op">,</span> jwtToken)<span class="op">;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Request interceptor attaches token</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>apiClient<span class="op">.</span><span class="at">interceptors</span><span class="op">.</span><span class="at">request</span><span class="op">.</span><span class="fu">use</span>((config) <span class="kw">=&gt;</span> {</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (token) {</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    config<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">Authorization</span> <span class="op">=</span> <span class="vs">`Bearer </span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> config<span class="op">;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Backend validates token signature</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Backend checks CORS origin</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. Backend processes request</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ CSRF Safe because:</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">// - Token required in header (not auto-sent)</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co">// - Attacker cannot read localStorage (XSS protected)</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="co">// - Attacker cannot forge token (backend validates signature)</span></span></code></pre></div>
+        <h3 id="request-validation-checklist">Request Validation
+        Checklist</h3>
+        <p>Frontend ensures:</p>
+        <ul>
+        <li>✅ Token included in Authorization header</li>
+        <li>✅ Content-Type header set correctly</li>
+        <li>✅ Request timeout configured (120 seconds)</li>
+        </ul>
+        <p>Backend ensures:</p>
+        <ul>
+        <li>✅ Token signature valid</li>
+        <li>✅ Origin in allowed list</li>
+        <li>✅ Method allowed for endpoint</li>
+        <li>✅ User has required role</li>
+        <li>✅ CSRF token valid (if using cookies)</li>
+        </ul>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <ul>
+        <li>✅ Keep JWT tokens short-lived</li>
+        <li>✅ Use HTTPS everywhere</li>
+        <li>✅ Validate CORS on backend</li>
+        <li>✅ Use Authorization header (not cookies if possible)</li>
+        <li>✅ Implement SameSite cookies if using cookies</li>
+        <li>✅ Validate token signature on backend</li>
+        <li>✅ Check user role/permissions on backend</li>
+        <li>✅ Use specific allowed origins (not <code>*</code>)</li>
+        <li>✅ Monitor CORS violations</li>
+        </ul>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <ul>
+        <li>❌ Use <code>Access-Control-Allow-Origin: *</code> with
+        credentials</li>
+        <li>❌ Trust client-side origin validation</li>
+        <li>❌ Allow unlimited origins</li>
+        <li>❌ Skip backend CORS validation</li>
+        <li>❌ Store tokens in cookies without SameSite</li>
+        <li>❌ Skip CSRF token validation (if using cookies)</li>
+        <li>❌ Make token lifetime too long</li>
+        <li>❌ Log tokens in error messages</li>
+        </ul>
+        <hr />
+        <h2 id="related-files">Related Files</h2>
+        <ul>
+        <li><strong>API Client:</strong>
+        <code>src/services/apiClient.ts</code></li>
+        <li><strong>Auth Service:</strong>
+        <code>src/api/auth.ts</code></li>
+        <li><strong>nginx Config:</strong>
+        <code>ops/nginx/nginx.conf</code></li>
+        <li><strong>Error Handling:</strong> See <a
+        href="../api-communication/api-security.html">API
+        Security</a></li>
+        <li><strong>XSS Prevention:</strong> See <a
+        href="./xss-and-sanitization.html">XSS &amp;
+        Sanitization</a></li>
+        </ul>
+        <hr />
+        <h2 id="references">References</h2>
+        <ul>
+        <li><a
+        href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">OWASP
+        CSRF Prevention Cheat Sheet</a></li>
+        <li><a
+        href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Origin_Resource_Sharing_Cheat_Sheet.html">OWASP
+        CORS Cheat Sheet</a></li>
+        <li><a
+        href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">MDN
+        CORS Documentation</a></li>
+        <li><a
+        href="https://web.dev/samesite-cookies-explained/">SameSite
+        Cookie Explained</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Production-Ready (Token-Based)<br />
+        <strong>Note:</strong> CSRF risk is minimal due to token-based
+        authentication architecture</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

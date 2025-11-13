@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>structure - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="test-structure--organization">Test Structure &amp;
+        Organization</h1>
+        <h2 id="test-directory-layout">Test Directory Layout</h2>
+        <pre><code>src/__tests__/
+├── api/                          # API service tests
+│   ├── ProductService.test.ts    (40+ tests)
+│   ├── auth.test.ts              (20+ tests)
+│   ├── client.test.ts            (30+ tests)
+│   └── integration/
+│       └── apiWorkflow.integration.test.ts
+│
+├── components/                   # Component tests
+│   ├── __snapshots__/
+│   │   ├── Button.test.tsx.snap
+│   │   └── Header.test.tsx.snap
+│   ├── Buttons.test.tsx          (15+ tests)
+│   ├── Header.test.tsx           (20+ tests)
+│   ├── Sidebar.test.tsx          (15+ tests)
+│   ├── ErrorBoundary.test.tsx    (10+ tests)
+│   ├── SkeletonLoader.test.tsx   (10+ tests)
+│   └── pages/
+│       ├── LoginPage.test.tsx    (20+ tests)
+│       ├── ListStockPage.test.tsx (25+ tests)
+│       ├── AddProductPage.test.tsx (20+ tests)
+│       ├── ChangeProductDetailsPage.test.tsx (15+ tests)
+│       ├── AdminDashboard.test.tsx (20+ tests)
+│       └── UserDashboard.test.tsx (10+ tests)
+│
+├── services/                     # Service &amp; hook tests
+│   ├── apiClient.test.ts         (25+ tests)
+│   ├── hooks/
+│   │   ├── useProducts.test.ts   (25+ tests)
+│   │   ├── useForm.test.ts       (30+ tests)
+│   │   ├── useAuth.test.ts       (20+ tests)
+│   │   ├── useDebounce.test.ts   (10+ tests)
+│   │   └── useLocalStorage.test.ts (12+ tests)
+│   └── integration/
+│       └── serviceWorkflow.test.ts
+│
+├── utils/                        # Utility function tests
+│   ├── validation.test.ts        (15+ tests)
+│   ├── helpers.test.ts           (15+ tests)
+│   └── formatters.test.ts        (10+ tests)
+│
+├── integration/                  # Integration tests
+│   ├── productWorkflow.integration.test.ts
+│   ├── authFlow.integration.test.ts
+│   └── dashboardIntegration.test.ts
+│
+├── mocks/
+│   ├── server.ts                 # MSW server setup
+│   ├── handlers.ts               # HTTP request handlers
+│   └── data.ts                   # Mock data factories
+│
+└── setup.ts                      # Global test setup</code></pre>
+        <hr />
+        <h2 id="test-file-statistics">Test File Statistics</h2>
+        <h3 id="api-service-tests-90-tests">API Service Tests (90+
+        tests)</h3>
+        <pre><code>src/__tests__/api/
+├── ProductService.test.ts (40 tests)
+│   ├── getProducts (8 tests)
+│   ├── getProductById (5 tests)
+│   ├── createProduct (8 tests)
+│   ├── updateProduct (8 tests)
+│   ├── deleteProduct (4 tests)
+│   ├── searchProducts (4 tests)
+│   └── batch operations (3 tests)
+│
+├── auth.test.ts (20 tests)
+│   ├── login (8 tests)
+│   ├── logout (2 tests)
+│   ├── token extraction (5 tests)
+│   └── token validation (5 tests)
+│
+├── client.test.ts (30 tests)
+│   ├── configuration (5 tests)
+│   ├── request interceptor (10 tests)
+│   ├── response interceptor (10 tests)
+│   └── error handling (5 tests)
+│
+└── integration/
+    └── apiWorkflow.integration.test.ts (20 tests)
+        ├── CRUD workflow (8 tests)
+        └── error scenarios (12 tests)</code></pre>
+        <h3 id="component-tests-120-tests">Component Tests (120+
+        tests)</h3>
+        <pre><code>src/__tests__/components/
+├── Buttons.test.tsx (15 tests)
+│   ├── Rendering (3 tests)
+│   ├── Props (5 tests)
+│   ├── Events (4 tests)
+│   └── Accessibility (3 tests)
+│
+├── Header.test.tsx (20 tests)
+│   ├── Rendering (3 tests)
+│   ├── Navigation (5 tests)
+│   ├── User menu (6 tests)
+│   ├── Responsive (4 tests)
+│   └── Accessibility (2 tests)
+│
+├── pages/ (80+ tests)
+│   ├── LoginPage.test.tsx (20 tests)
+│   ├── ListStockPage.test.tsx (25 tests)
+│   ├── AddProductPage.test.tsx (20 tests)
+│   └── AdminDashboard.test.tsx (15+ tests)
+│
+└── Snapshots (5+ tests)
+    ├── Button.test.tsx.snap
+    └── Header.test.tsx.snap</code></pre>
+        <h3 id="service--hook-tests-97-tests">Service &amp; Hook Tests
+        (97+ tests)</h3>
+        <pre><code>src/__tests__/services/
+├── apiClient.test.ts (25 tests)
+│   ├── Configuration (5 tests)
+│   ├── Request handling (8 tests)
+│   ├── Response handling (8 tests)
+│   └── Error handling (4 tests)
+│
+├── hooks/ (72+ tests)
+│   ├── useProducts.test.ts (25 tests)
+│   │   ├── Fetch on mount (5 tests)
+│   │   ├── Loading states (4 tests)
+│   │   ├── Error handling (6 tests)
+│   │   └── Refetch (10 tests)
+│   │
+│   ├── useForm.test.ts (30 tests)
+│   │   ├── Initialization (3 tests)
+│   │   ├── Value updates (5 tests)
+│   │   ├── Validation (10 tests)
+│   │   ├── Submission (8 tests)
+│   │   └── Reset (4 tests)
+│   │
+│   ├── useAuth.test.ts (12 tests)
+│   ├── useDebounce.test.ts (3 tests)
+│   └── useLocalStorage.test.ts (2 tests)
+│
+└── integration/
+    └── serviceWorkflow.test.ts</code></pre>
+        <h3 id="utility-tests-40-tests">Utility Tests (40+ tests)</h3>
+        <pre><code>src/__tests__/utils/
+├── validation.test.ts (15 tests)
+│   ├── Email validation (3 tests)
+│   ├── Product validation (5 tests)
+│   ├── Form validation (4 tests)
+│   └── Type guards (3 tests)
+│
+├── helpers.test.ts (15 tests)
+│   ├── Array helpers (4 tests)
+│   ├── Object helpers (5 tests)
+│   ├── String helpers (3 tests)
+│   └── Date helpers (3 tests)
+│
+└── formatters.test.ts (10 tests)
+    ├── Number formatting (3 tests)
+    ├── Date formatting (4 tests)
+    └── Currency formatting (3 tests)</code></pre>
+        <h3 id="integration-tests-30-tests">Integration Tests (30+
+        tests)</h3>
+        <pre><code>src/__tests__/integration/
+├── productWorkflow.integration.test.ts (12 tests)
+│   ├── Full CRUD workflow (5 tests)
+│   ├── Bulk operations (4 tests)
+│   └── Error scenarios (3 tests)
+│
+├── authFlow.integration.test.ts (10 tests)
+│   ├── Login flow (4 tests)
+│   ├── Session management (3 tests)
+│   └── Token refresh (3 tests)
+│
+└── dashboardIntegration.test.ts (8 tests)
+    ├── Data loading (3 tests)
+    ├── User interactions (3 tests)
+    └── State updates (2 tests)</code></pre>
+        <hr />
+        <h2 id="test-coverage-by-category">Test Coverage by
+        Category</h2>
+        <h3 id="api-coverage">API Coverage</h3>
+        <pre><code>ProductService.ts
+├── getProducts:        100%
+├── getProductById:     100%
+├── createProduct:      95%
+├── updateProduct:      100%
+├── deleteProduct:      100%
+├── searchProducts:     100%
+└── batch ops:          90%
+Overall:               98%
+
+auth.ts
+├── login:              95%
+├── logout:             100%
+├── token extraction:   95%
+└── validation:         90%
+Overall:               95%
+
+apiClient.ts
+├── Configuration:      100%
+├── Interceptors:       95%
+├── Error handling:     90%
+└── Token injection:    95%
+Overall:               95%</code></pre>
+        <h3 id="component-coverage">Component Coverage</h3>
+        <pre><code>Buttons.tsx:           95%
+Header.tsx:            92%
+Sidebar.tsx:           88%
+ErrorBoundary.tsx:     85%
+SkeletonLoader.tsx:    90%
+
+LoginPage.tsx:         85%
+ListStockPage.tsx:     88%
+AddProductPage.tsx:    90%
+AdminDashboard.tsx:    82%
+UserDashboard.tsx:     80%
+
+Overall Components:    88%</code></pre>
+        <h3 id="services-coverage">Services Coverage</h3>
+        <pre><code>useProducts:           90%
+useForm:               92%
+useAuth:               88%
+useDebounce:           95%
+useLocalStorage:       85%
+Custom Hooks:          90%
+
+Utility functions:     85%
+Helpers:               88%
+Formatters:            86%
+Validators:            92%
+
+Overall Services:      89%</code></pre>
+        <hr />
+        <h2 id="test-execution-timeline">Test Execution Timeline</h2>
+        <h3 id="local-test-run-82-seconds">Local Test Run (8.2
+        seconds)</h3>
+        <pre><code>✓ Unit Tests (320 tests)          2.1s  (fastest)
+✓ Service Tests (97 tests)        1.8s
+✓ Component Tests (120 tests)     2.8s
+✓ Integration Tests (30 tests)    1.0s
+✓ Utility Tests (40 tests)        0.5s
+───────────────────────────────
+  Total: 607 tests              8.2s</code></pre>
+        <h3 id="cicd-pipeline-12-seconds">CI/CD Pipeline (12
+        seconds)</h3>
+        <pre><code>Setup &amp; Install               2.0s
+Lint                          1.5s
+Build                         2.0s
+Run Tests (607)               4.2s
+Coverage Report               1.3s
+Upload Coverage               1.0s
+───────────────────────────────
+Total CI/CD Time              12s</code></pre>
+        <hr />
+        <h2 id="test-statistics-summary">Test Statistics Summary</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Metric</th>
+        <th>Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Total Test Files</td>
+        <td>25+</td>
+        </tr>
+        <tr class="even">
+        <td>Total Test Cases</td>
+        <td>607+</td>
+        </tr>
+        <tr class="odd">
+        <td>Unit Tests</td>
+        <td>320+</td>
+        </tr>
+        <tr class="even">
+        <td>Component Tests</td>
+        <td>120+</td>
+        </tr>
+        <tr class="odd">
+        <td>Integration Tests</td>
+        <td>30+</td>
+        </tr>
+        <tr class="even">
+        <td>Snapshot Tests</td>
+        <td>5+</td>
+        </tr>
+        <tr class="odd">
+        <td>Mock Handlers</td>
+        <td>15+</td>
+        </tr>
+        <tr class="even">
+        <td>Coverage Avg</td>
+        <td>83%</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        Testing overview</li>
+        <li><strong><a href="./patterns.html">Patterns</a></strong> -
+        Testing patterns</li>
+        <li><strong><a
+        href="./setup-configuration.html">Setup</a></strong> -
+        Configuration</li>
+        <li><strong><a href="./coverage.html">Coverage</a></strong> -
+        Coverage goals</li>
+        <li><strong><a href="./running-tests.html">Running
+        Tests</a></strong> - Commands</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

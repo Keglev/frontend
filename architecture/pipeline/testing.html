@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>testing - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="stage-1-testing--quality-checks">Stage 1: Testing &amp;
+        Quality Checks</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The testing stage runs on all commits and pull requests. It
+        ensures code quality through linting and comprehensive test
+        validation.</p>
+        <p><strong>Duration</strong>: 30-40 seconds<br />
+        <strong>Runs on</strong>: All PRs and pushes to master/main</p>
+        <hr />
+        <h2 id="test-job-flow">Test Job Flow</h2>
+        <div class="mermaid">
+        sequenceDiagram
+            participant GH as GitHub Actions
+            participant CI as Ubuntu Runner
+            participant Node as Node.js 20
+            participant NPM as npm
+            participant Test as Test Suite
+
+            GH->>CI: Trigger test job
+            CI->>Node: Setup Node.js 20
+            Node->>NPM: Install dependencies
+            NPM->>CI: Ready
+            CI->>NPM: Run linter
+            NPM->>Test: eslint .
+            Test-->>NPM: Lint results
+            CI->>NPM: Run tests
+            NPM->>Test: vitest --run
+            Test-->>NPM: 478 tests passed
+            CI->>NPM: Generate coverage
+            NPM-->>CI: Coverage report
+            CI->>GH: Report results
+        </div>
+        <hr />
+        <h2 id="pipeline-configuration">Pipeline Configuration</h2>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Test &amp; Build &amp; Deploy Frontend</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> master</span><span class="kw">,</span><span class="at"> main </span><span class="kw">]</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull_request</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> master</span><span class="kw">,</span><span class="at"> main </span><span class="kw">]</span></span></code></pre></div>
+        <h3 id="triggers">Triggers</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Event</th>
+        <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Push to master/main</strong></td>
+        <td>Run tests → Build → Deploy</td>
+        </tr>
+        <tr class="even">
+        <td><strong>PR to master/main</strong></td>
+        <td>Run tests → Report results</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Push to other branches</strong></td>
+        <td>No action</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="test-job-steps">Test Job Steps</h2>
+        <h3 id="1-checkout-repository">1. Checkout Repository</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span></code></pre></div>
+        <ul>
+        <li>Clones repository</li>
+        <li>Sets up git context</li>
+        </ul>
+        <h3 id="2-setup-nodejs">2. Setup Node.js</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-node@v4</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">node-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;20&#39;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cache</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;npm&#39;</span></span></code></pre></div>
+        <ul>
+        <li>Uses Node.js v20 (LTS)</li>
+        <li>Caches npm dependencies (faster installs)</li>
+        </ul>
+        <h3 id="3-install-dependencies">3. Install Dependencies</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm ci</span></span></code></pre></div>
+        <ul>
+        <li>Clean install</li>
+        <li>Uses package-lock.json</li>
+        <li>Reproducible builds</li>
+        </ul>
+        <h3 id="4-run-linter">4. Run Linter</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run lint</span></span></code></pre></div>
+        <p><strong>ESLint Configuration</strong>:</p>
+        <ul>
+        <li>Code style checks</li>
+        <li>Unused variable detection</li>
+        <li>Type errors (TypeScript integration)</li>
+        <li>Fails if issues found</li>
+        </ul>
+        <h3 id="5-run-tests">5. Run Tests</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm test 2&gt;&amp;1 | tee test-output.log</span></span></code></pre></div>
+        <p><strong>Test Execution</strong>:</p>
+        <ul>
+        <li>Vitest with 478+ tests</li>
+        <li>Outputs to log file</li>
+        <li>All tests must pass</li>
+        <li>No skipped tests allowed</li>
+        </ul>
+        <h3 id="6-verify-test-results">6. Verify Test Results</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Check test results</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    if grep -q &quot;Test Files.*passed\|Tests.*passed&quot; test-output.log; then</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      echo &quot;✓ Tests completed successfully&quot;</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    else</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      echo &quot;✗ Tests failed&quot;</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      exit 1</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    fi</span></code></pre></div>
+        <ul>
+        <li>Parses test output</li>
+        <li>Ensures all tests passed</li>
+        <li>Fails pipeline if test count doesn't match</li>
+        </ul>
+        <h3 id="7-generate-coverage-report-optional">7. Generate
+        Coverage Report (Optional)</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run test:coverage</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">continue-on-error</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+        <ul>
+        <li>Optional for CI (continues on error)</li>
+        <li>Produces coverage HTML</li>
+        <li>Failures don't block pipeline</li>
+        </ul>
+        <hr />
+        <h2 id="test-results">Test Results</h2>
+        <pre><code>Test Summary:
+├─ Test Files: 59 passed
+├─ Tests: 478 passed
+├─ Duration: 30-40 seconds
+└─ Status: PASSED ✓</code></pre>
+        <hr />
+        <h2 id="performance-optimization">Performance Optimization</h2>
+        <h3 id="caching-strategy">Caching Strategy</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cache</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;npm&#39;</span><span class="co">  # Cache node_modules between runs</span></span></code></pre></div>
+        <p><strong>Effect</strong>:</p>
+        <ul>
+        <li>First build: 60-90 seconds (installs npm packages)</li>
+        <li>Subsequent builds: 30-40 seconds (uses cache)</li>
+        </ul>
+        <h3 id="parallel-execution">Parallel Execution</h3>
+        <p>Tests run in parallel by default via Vitest:</p>
+        <ul>
+        <li>Multiple test files run simultaneously</li>
+        <li>Faster execution (~30-40s for full suite)</li>
+        <li>Can be limited with <code>--threads</code> flag if
+        needed</li>
+        </ul>
+        <hr />
+        <h2 id="github-actions-ui">GitHub Actions UI</h2>
+        <p>View pipeline results:</p>
+        <ol type="1">
+        <li>Go to repository "Actions" tab</li>
+        <li>Click workflow run</li>
+        <li>View detailed logs per step</li>
+        <li>Download artifacts (coverage reports, logs)</li>
+        </ol>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Main Pipeline Overview</a></li>
+        <li><a href="./build-deploy.html">Build &amp;
+        Deployment</a></li>
+        <li><a href="./troubleshooting.html">Troubleshooting</a></li>
+        <li><a href="../src/tests.html">Testing Strategy</a></li>
+        <li><a href="https://vitest.dev/">Vitest Documentation</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Framework</strong>: Vitest<br />
+        <strong>Test Count</strong>: 478+ tests<br />
+        <strong>Pass Rate</strong>: 100%</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

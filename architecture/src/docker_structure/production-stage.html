@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>production-stage - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="production-stage-stage-2-nginx">Production Stage (Stage
+        2: nginx)</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The production stage serves the built application via nginx.
+        It contains only the compiled assets (~2-5MB), making the final
+        image lightweight (~45MB total with nginx).</p>
+        <hr />
+        <h2 id="stage-2-configuration">Stage 2 Configuration</h2>
+        <h3 id="base-image">Base Image</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> nginx:stable-alpine</span></code></pre></div>
+        <p><strong>Why nginx?</strong></p>
+        <ul>
+        <li>Lightweight web server (~41MB)</li>
+        <li>Optimized for static file serving</li>
+        <li>Excellent SPA routing support</li>
+        <li>High performance and reliability</li>
+        </ul>
+        <hr />
+        <h2 id="stage-2-steps">Stage 2 Steps</h2>
+        <h3 id="1-remove-default-content">1. Remove Default Content</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="fu">rm</span> <span class="at">-rf</span> /usr/share/nginx/html/<span class="pp">*</span></span></code></pre></div>
+        <p>Removes nginx's default welcome page to prepare for
+        application files.</p>
+        <h3 id="2-copy-built-files">2. Copy Built Files</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> /app/dist /usr/share/nginx/html</span></code></pre></div>
+        <p>Copies only the optimized <code>dist/</code> directory from
+        the builder stage:</p>
+        <ul>
+        <li>~2-5MB of compiled assets</li>
+        <li>No Node.js, no build tools, no source code</li>
+        <li>No tests, no documentation</li>
+        </ul>
+        <h3 id="3-copy-nginx-configuration">3. Copy nginx
+        Configuration</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> ops/nginx/nginx.conf /etc/nginx/conf.d/default.conf</span></code></pre></div>
+        <p>Configures nginx for:</p>
+        <ul>
+        <li>SPA routing (serves <code>index.html</code> for non-static
+        requests)</li>
+        <li>Cache headers (long-lived caching for static assets)</li>
+        <li>GZIP compression</li>
+        <li>Security headers</li>
+        </ul>
+        <p>See <a
+        href="./configuration.html#spa-routing">Configuration</a> for
+        details.</p>
+        <h3 id="4-expose-port">4. Expose Port</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 80</span></code></pre></div>
+        <p>Opens port 80 for HTTP traffic. Container will listen on this
+        port.</p>
+        <h3 id="5-start-nginx">5. Start nginx</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;nginx&quot;</span>, <span class="st">&quot;-g&quot;</span>, <span class="st">&quot;daemon off;&quot;</span>]</span></code></pre></div>
+        <p><strong>Why <code>daemon off;</code>?</strong></p>
+        <ul>
+        <li>Runs nginx in foreground mode</li>
+        <li>Essential for Docker container lifecycle</li>
+        <li>Container stays running while nginx runs</li>
+        <li>Container stops when nginx stops</li>
+        </ul>
+        <hr />
+        <h2 id="final-image-content">Final Image Content</h2>
+        <pre><code>Image size: ~45MB total
+├── nginx binary: ~40MB
+├── Compiled assets: ~2-5MB
+│   ├── index.html
+│   ├── assets/index.js (bundled app code)
+│   ├── assets/vendor.js (React, dependencies)
+│   └── assets/index.css (styles)
+└── nginx configuration</code></pre>
+        <p><strong>NOT included</strong>:</p>
+        <ul>
+        <li>Node.js runtime</li>
+        <li>npm or build tools</li>
+        <li>Source code</li>
+        <li>Tests</li>
+        <li>Documentation</li>
+        <li>Development dependencies</li>
+        </ul>
+        <hr />
+        <h2 id="health-checks">Health Checks</h2>
+        <h3 id="docker-health-check">Docker Health Check</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">HEALTHCHECK</span> <span class="op">--interval=30s</span> <span class="op">--timeout=5s</span> <span class="op">--start-period=5s</span> <span class="op">--retries=3</span> \</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">CMD</span> <span class="ex">curl</span> <span class="at">-f</span> http://localhost/index.html <span class="kw">||</span> <span class="bu">exit</span> 1</span></code></pre></div>
+        <p>Automatically checks if container is healthy:</p>
+        <ul>
+        <li>Every 30 seconds</li>
+        <li>5 second timeout</li>
+        <li>Start checking after 5 seconds</li>
+        <li>Mark unhealthy after 3 failures</li>
+        </ul>
+        <h3 id="kubernetes-probes">Kubernetes Probes</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">startupProbe</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">httpGet</span><span class="kw">:</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /index.html</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">failureThreshold</span><span class="kw">:</span><span class="at"> </span><span class="dv">30</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">periodSeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">readinessProbe</span><span class="kw">:</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">httpGet</span><span class="kw">:</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /index.html</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">initialDelaySeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">periodSeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">livenessProbe</span><span class="kw">:</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">httpGet</span><span class="kw">:</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /index.html</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">initialDelaySeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">periodSeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">30</span></span></code></pre></div>
+        <hr />
+        <h2 id="runtime-performance">Runtime Performance</h2>
+        <pre><code>Startup time: &lt;2 seconds
+Memory usage: 50-100MB
+Response time: &lt;100ms (static assets from memory cache)
+Concurrent connections: 1000+ (via nginx)
+Typical load: Can handle thousands of concurrent users</code></pre>
+        <hr />
+        <h2 id="security-features">Security Features</h2>
+        <h3 id="security-defaults">Security Defaults</h3>
+        <ul>
+        <li>Runs as non-root user (nginx user)</li>
+        <li>Alpine Linux minimizes attack surface</li>
+        <li>No unnecessary packages or build tools</li>
+        <li>Read-only filesystem option available</li>
+        </ul>
+        <h3 id="security-headers">Security Headers</h3>
+        <p>nginx configuration includes:</p>
+        <ul>
+        <li><code>X-Frame-Options: SAMEORIGIN</code> (clickjacking
+        protection)</li>
+        <li><code>X-Content-Type-Options: nosniff</code> (MIME sniffing
+        protection)</li>
+        <li><code>Content-Security-Policy</code> (script injection
+        protection)</li>
+        <li><code>Strict-Transport-Security</code> (HTTPS
+        enforcement)</li>
+        </ul>
+        <hr />
+        <h2 id="customization-options">Customization Options</h2>
+        <h3 id="add-custom-nginx-config">Add Custom nginx Config</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="bu">echo</span> <span class="st">&#39;server { ... }&#39;</span> <span class="op">&gt;</span> /etc/nginx/conf.d/custom.conf</span></code></pre></div>
+        <h3 id="mount-custom-configuration">Mount Custom
+        Configuration</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-v</span> <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>/nginx.conf:/etc/nginx/conf.d/default.conf ...</span></code></pre></div>
+        <h3 id="environment-variable-substitution">Environment Variable
+        Substitution</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">envsubst</span> <span class="op">&lt;</span> /app/nginx.conf.template <span class="op">&gt;</span> /etc/nginx/conf.d/default.conf</span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Docker Overview</a></li>
+        <li><a href="./build-stage.html">Build Stage</a></li>
+        <li><a href="./configuration.html">Configuration</a></li>
+        <li><a href="./local-usage.html">Local Usage</a></li>
+        <li><a href="https://nginx.org/en/docs/">nginx Official
+        Docs</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>nginx Version</strong>: Stable Alpine<br />
+        <strong>Final Image Size</strong>: ~45MB</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

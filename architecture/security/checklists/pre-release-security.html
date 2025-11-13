@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>pre-release-security - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="pre-release-security-checklist">Pre-Release Security
+        Checklist</h1>
+        <h2 id="overview">Overview</h2>
+        <p>This checklist is designed for <strong>DevOps teams, SRE, and
+        release managers</strong> to verify production-readiness and
+        security hardening before deploying StockEase Frontend to
+        production environments.</p>
+        <p><strong>Purpose:</strong> Ensure all security controls are
+        active, properly configured, and verified before release<br />
+        <strong>Timing:</strong> Execute BEFORE every production release
+        (1-2 days before deployment)<br />
+        <strong>Responsibility:</strong> DevOps/SRE team with security
+        team oversight<br />
+        <strong>Tools Required:</strong> Server access, SSL certificate
+        tools, monitoring dashboards, log analysis tools</p>
+        <hr />
+        <h2 id="-https--tls-security">🔐 HTTPS &amp; TLS Security</h2>
+        <h3 id="a1-certificate--protocol-configuration">A1: Certificate
+        &amp; Protocol Configuration</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>SSL/TLS
+        Certificate</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />SSL certificate is valid and
+        not expired</label></li>
+        <li><label><input type="checkbox" />Certificate is issued for
+        the correct domain</label></li>
+        <li><label><input type="checkbox" />Certificate includes all
+        required SANs (Subject Alternative Names)</label></li>
+        <li><label><input type="checkbox" />Certificate chain is
+        complete and properly ordered</label></li>
+        <li><label><input type="checkbox" />HTTPS is enforced on all
+        endpoints</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>TLS Protocol
+        Version</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />TLS 1.2 or higher is
+        enforced</label></li>
+        <li><label><input type="checkbox" />TLS 1.0 and 1.1 are
+        disabled</label></li>
+        <li><label><input type="checkbox" />SSLv3 and older are
+        disabled</label></li>
+        <li><label><input type="checkbox" />Protocol downgrade attacks
+        are prevented</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Cipher
+        Suites</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Strong cipher suites are
+        configured</label></li>
+        <li><label><input type="checkbox" />Weak ciphers (RC4, DES, MD5)
+        are disabled</label></li>
+        <li><label><input type="checkbox" />Cipher order is enforced
+        (server-side preference)</label></li>
+        <li><label><input type="checkbox" />Perfect Forward Secrecy
+        (PFS) ciphers are prioritized</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>HSTS
+        Configuration</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Strict-Transport-Security
+        header is set</label></li>
+        <li><label><input type="checkbox" />HSTS max-age is at least
+        31536000 (1 year)</label></li>
+        <li><label><input type="checkbox" />includeSubDomains is enabled
+        (if applicable)</label></li>
+        <li><label><input type="checkbox" />preload flag is set (for
+        HSTS preload list)</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="a2-hostname--redirect-configuration">A2: Hostname &amp;
+        Redirect Configuration</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Hostname
+        verification</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Server listens on intended
+        hostname</label></li>
+        <li><label><input type="checkbox" />SSL certificate matches
+        hostname</label></li>
+        <li><label><input type="checkbox" />Wildcard certificates are
+        appropriate (e.g., *.stockease.com)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>HTTP
+        redirect</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />HTTP (port 80) redirects to
+        HTTPS (port 443)</label></li>
+        <li><label><input type="checkbox" />Redirect is permanent (301)
+        not temporary (302)</label></li>
+        <li><label><input type="checkbox" />Redirect preserves path and
+        query parameters</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="️-security-headers-configuration">🛡️ Security Headers
+        Configuration</h2>
+        <h3 id="b1-http-security-headers">B1: HTTP Security Headers</h3>
+        <ul class="task-list">
+        <li><label><input
+        type="checkbox" /><strong>Content-Security-Policy
+        (CSP)</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />CSP header is present (not
+        just meta tag)</label></li>
+        <li><label><input type="checkbox" />CSP is in enforce mode (not
+        just report-only)</label></li>
+        <li><label><input type="checkbox" />CSP directives are
+        restrictive (no 'unsafe-inline' or 'unsafe-eval')</label></li>
+        <li><label><input type="checkbox" />Nonce or hash-based inline
+        scripts (if used)</label></li>
+        <li><label><input type="checkbox" />Script-src includes only
+        trusted origins</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>X-Content-Type-Options</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Header is set to
+        <code>nosniff</code></label></li>
+        <li><label><input type="checkbox" />Prevents MIME type sniffing
+        attacks</label></li>
+        <li><label><input type="checkbox" />Verified with Content-Type:
+        application/octet-stream test</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>X-Frame-Options</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Header is set to
+        <code>DENY</code> (prevents all framing)</label></li>
+        <li><label><input type="checkbox" />Prevents clickjacking
+        attacks</label></li>
+        <li><label><input type="checkbox" />Verified in browser
+        developer tools</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>X-XSS-Protection</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Header is set to
+        <code>1; mode=block</code></label></li>
+        <li><label><input type="checkbox" />Enables XSS filter in older
+        browsers</label></li>
+        <li><label><input type="checkbox" />Modern browsers fallback to
+        CSP</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>Referrer-Policy</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Header is set to
+        <code>strict-origin</code> or
+        <code>no-referrer</code></label></li>
+        <li><label><input type="checkbox" />Prevents leaking referrer
+        information to third-parties</label></li>
+        <li><label><input type="checkbox" />Appropriate for privacy
+        requirements</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>Permissions-Policy</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Geolocation, microphone,
+        camera are restricted</label></li>
+        <li><label><input type="checkbox" />Payment Request API is
+        restricted</label></li>
+        <li><label><input type="checkbox" />USB is
+        restricted</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="b2-additional-security-headers">B2: Additional Security
+        Headers</h3>
+        <ul class="task-list">
+        <li><label><input
+        type="checkbox" /><strong>Cache-Control</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />HTML is not cached
+        (Cache-Control: no-cache, no-store)</label></li>
+        <li><label><input type="checkbox" />JavaScript/CSS have
+        appropriate cache headers</label></li>
+        <li><label><input type="checkbox" />Sensitive pages have
+        no-store directive</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Cross-Origin
+        Headers</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Cross-Origin-Opener-Policy
+        is set to <code>same-origin</code></label></li>
+        <li><label><input type="checkbox" />Cross-Origin-Embedder-Policy
+        is configured (if needed)</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-environment--secrets-configuration">🔑 Environment
+        &amp; Secrets Configuration</h2>
+        <h3 id="c1-environment-variables--secrets">C1: Environment
+        Variables &amp; Secrets</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>API
+        Configuration</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />VITE_API_BASE_URL is
+        correctly set to production API</label></li>
+        <li><label><input type="checkbox" />API base URL uses HTTPS (not
+        HTTP)</label></li>
+        <li><label><input type="checkbox" />Base URL is not localhost or
+        development domain</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Application
+        Secrets</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No hardcoded API keys or
+        tokens in code</label></li>
+        <li><label><input type="checkbox" />No secrets in build
+        artifacts</label></li>
+        <li><label><input type="checkbox" />No secrets in environment
+        files (.env)</label></li>
+        <li><label><input type="checkbox" />GitHub Secrets are properly
+        configured for CI/CD</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Third-party
+        Integrations</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Any third-party API keys are
+        environment-based</label></li>
+        <li><label><input type="checkbox" />API keys are rotated
+        according to schedule</label></li>
+        <li><label><input type="checkbox" />API key scopes are minimal
+        (least privilege)</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="c2-secret-rotation--management">C2: Secret Rotation
+        &amp; Management</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Key rotation
+        schedule</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />JWT signing keys are rotated
+        regularly (documented)</label></li>
+        <li><label><input type="checkbox" />API keys are rotated
+        quarterly (or per vendor policy)</label></li>
+        <li><label><input type="checkbox" />Secret rotation procedure is
+        documented</label></li>
+        <li><label><input type="checkbox" />Rotation is tested before
+        production deployment</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-authentication--authorization">📊 Authentication &amp;
+        Authorization</h2>
+        <h3 id="d1-authentication-configuration">D1: Authentication
+        Configuration</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Token
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />JWT tokens are validated on
+        every request (backend)</label></li>
+        <li><label><input type="checkbox" />Token expiration is
+        enforced</label></li>
+        <li><label><input type="checkbox" />Token signature is
+        verified</label></li>
+        <li><label><input type="checkbox" />Token algorithm is secure
+        (HS256+, RS256)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Login
+        security</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Failed login attempts are
+        logged</label></li>
+        <li><label><input type="checkbox" />Rate limiting is enforced on
+        login endpoint</label></li>
+        <li><label><input type="checkbox" />Account lockout policies are
+        configured (if applicable)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Session
+        management</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Session timeout is
+        configured (e.g., 30 minutes)</label></li>
+        <li><label><input type="checkbox" />Idle sessions are
+        terminated</label></li>
+        <li><label><input type="checkbox" />Logout properly invalidates
+        tokens</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="d2-authorization-enforcement">D2: Authorization
+        Enforcement</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Role-based access
+        control (RBAC)</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />User roles are correctly
+        assigned</label></li>
+        <li><label><input type="checkbox" />Admin role is properly
+        restricted</label></li>
+        <li><label><input type="checkbox" />Role changes are
+        logged</label></li>
+        <li><label><input type="checkbox" />Default role is least
+        privileged</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>API endpoint
+        protection</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All protected endpoints
+        require valid token</label></li>
+        <li><label><input type="checkbox" />401 responses are returned
+        for missing/invalid tokens</label></li>
+        <li><label><input type="checkbox" />403 responses are returned
+        for insufficient permissions</label></li>
+        <li><label><input type="checkbox" />Unauthorized access attempts
+        are logged</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-cors--cross-origin-security">🌐 CORS &amp; Cross-Origin
+        Security</h2>
+        <h3 id="e1-cors-configuration">E1: CORS Configuration</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Allowed
+        Origins</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />CORS
+        Access-Control-Allow-Origin is configured</label></li>
+        <li><label><input type="checkbox" />Only approved origins are
+        listed (no wildcards with credentials)</label></li>
+        <li><label><input type="checkbox" />Localhost/development
+        origins are not in production</label></li>
+        <li><label><input type="checkbox" />Third-party origins are
+        explicitly approved</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Allowed Methods
+        &amp; Headers</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Access-Control-Allow-Methods
+        is restrictive (GET, POST, etc.)</label></li>
+        <li><label><input type="checkbox" />Access-Control-Allow-Headers
+        is limited</label></li>
+        <li><label><input type="checkbox" />Authorization header is
+        listed (if needed)</label></li>
+        <li><label><input type="checkbox" />Credentials are only allowed
+        for same-origin or approved origins</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Preflight
+        Handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />OPTIONS requests return
+        correct CORS headers</label></li>
+        <li><label><input type="checkbox" />Preflight caching (Max-Age)
+        is configured appropriately</label></li>
+        <li><label><input type="checkbox" />Preflight bypass is not used
+        for security-critical endpoints</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-data-protection--privacy">🔒 Data Protection &amp;
+        Privacy</h2>
+        <h3 id="f1-data-in-transit">F1: Data in Transit</h3>
+        <ul class="task-list">
+        <li><label><input
+        type="checkbox" /><strong>Encryption</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All data transmitted over
+        HTTPS</label></li>
+        <li><label><input type="checkbox" />No HTTP endpoints (even for
+        status/health checks)</label></li>
+        <li><label><input type="checkbox" />API responses are encrypted
+        (via HTTPS)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Sensitive data
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Tokens are not transmitted
+        in URLs</label></li>
+        <li><label><input type="checkbox" />Passwords are never
+        transmitted in plain text</label></li>
+        <li><label><input type="checkbox" />API keys are not exposed in
+        responses</label></li>
+        <li><label><input type="checkbox" />PII is not logged
+        unnecessarily</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="f2-data-at-rest">F2: Data at Rest</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Local
+        storage</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Only non-sensitive data
+        stored in localStorage</label></li>
+        <li><label><input type="checkbox" />Tokens stored securely
+        (preferably httpOnly cookies)</label></li>
+        <li><label><input type="checkbox" />Sensitive data is not stored
+        in localStorage</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Database &amp;
+        Backend</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Sensitive data is encrypted
+        at rest (backend responsibility)</label></li>
+        <li><label><input type="checkbox" />Database access is
+        restricted to authorized services</label></li>
+        <li><label><input type="checkbox" />Database backups are
+        encrypted</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="f3-logging--monitoring">F3: Logging &amp;
+        Monitoring</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Log
+        configuration</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Sensitive data (tokens,
+        passwords) is redacted from logs</label></li>
+        <li><label><input type="checkbox" />API keys are masked in
+        logs</label></li>
+        <li><label><input type="checkbox" />PII is not logged
+        unnecessarily</label></li>
+        <li><label><input type="checkbox" />Error details don't expose
+        system information</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Log
+        retention</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Security events are
+        logged</label></li>
+        <li><label><input type="checkbox" />Logs are retained for audit
+        purposes</label></li>
+        <li><label><input type="checkbox" />Logs are protected from
+        unauthorized access/modification</label></li>
+        <li><label><input type="checkbox" />Expired logs are securely
+        deleted</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-dependencies--vulnerabilities">📦 Dependencies &amp;
+        Vulnerabilities</h2>
+        <h3 id="g1-dependency-scanning">G1: Dependency Scanning</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Vulnerability
+        assessment</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />npm audit shows no critical
+        or high vulnerabilities</label></li>
+        <li><label><input type="checkbox" />All dependencies are
+        up-to-date (or have documented exceptions)</label></li>
+        <li><label><input type="checkbox" />No abandoned or unmaintained
+        packages</label></li>
+        <li><label><input type="checkbox" />License scan shows
+        acceptable licenses</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Supply chain
+        security</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Dependencies are from
+        trusted sources (npm registry)</label></li>
+        <li><label><input type="checkbox" />Package integrity is
+        verified (checksums)</label></li>
+        <li><label><input type="checkbox" />No transitive dependencies
+        with issues</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="g2-build--deployment">G2: Build &amp; Deployment</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Build artifact
+        security</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No secrets in build
+        output</label></li>
+        <li><label><input type="checkbox" />Source maps are not deployed
+        (or restricted)</label></li>
+        <li><label><input type="checkbox" />Test files are not included
+        in production build</label></li>
+        <li><label><input type="checkbox" />Minification and obfuscation
+        are enabled</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Docker/Container
+        security</strong> (if applicable)</label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Container image is scanned
+        for vulnerabilities</label></li>
+        <li><label><input type="checkbox" />Base image is minimal and
+        up-to-date</label></li>
+        <li><label><input type="checkbox" />No hardcoded secrets in
+        Dockerfile</label></li>
+        <li><label><input type="checkbox" />Non-root user is used in
+        container</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-deployment--infrastructure">🚀 Deployment &amp;
+        Infrastructure</h2>
+        <h3 id="h1-deployment-configuration">H1: Deployment
+        Configuration</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Web server
+        configuration</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />nginx/Apache is hardened
+        (only necessary modules enabled)</label></li>
+        <li><label><input type="checkbox" />Directory listing is
+        disabled</label></li>
+        <li><label><input type="checkbox" />Symbolic links are
+        disabled</label></li>
+        <li><label><input type="checkbox" />Unused HTTP methods are
+        disabled (TRACE, DELETE, etc.)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Access
+        controls</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Only necessary ports are
+        open</label></li>
+        <li><label><input type="checkbox" />Firewall rules restrict
+        access appropriately</label></li>
+        <li><label><input type="checkbox" />Rate limiting is
+        configured</label></li>
+        <li><label><input type="checkbox" />DDoS mitigation is enabled
+        (if applicable)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Reverse
+        proxy/CDN</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Reverse proxy (nginx,
+        Cloudflare, etc.) is configured</label></li>
+        <li><label><input type="checkbox" />Security headers are applied
+        at proxy level</label></li>
+        <li><label><input type="checkbox" />Origin server is not
+        directly accessible</label></li>
+        <li><label><input type="checkbox" />Origin IP is masked (if
+        using CDN)</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="h2-infrastructure-security">H2: Infrastructure
+        Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Server
+        hardening</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Operating system is
+        up-to-date with security patches</label></li>
+        <li><label><input type="checkbox" />Unnecessary services are
+        disabled</label></li>
+        <li><label><input type="checkbox" />SSH keys are used (no
+        password authentication)</label></li>
+        <li><label><input type="checkbox" />Root login is
+        disabled</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Network
+        security</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />VPC/security groups are
+        configured correctly</label></li>
+        <li><label><input type="checkbox" />Database is not accessible
+        from the internet</label></li>
+        <li><label><input type="checkbox" />Admin panel/management tools
+        are restricted by IP</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-deployment-verification">📝 Deployment
+        Verification</h2>
+        <h3 id="i1-health-check--monitoring">I1: Health Check &amp;
+        Monitoring</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Service
+        availability</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Application starts without
+        errors</label></li>
+        <li><label><input type="checkbox" />Health check endpoint
+        returns 200 OK</label></li>
+        <li><label><input type="checkbox" />All main pages load
+        correctly</label></li>
+        <li><label><input type="checkbox" />API communication is
+        functional</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error
+        monitoring</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Error tracking (Sentry,
+        etc.) is configured</label></li>
+        <li><label><input type="checkbox" />No errors in application
+        logs on startup</label></li>
+        <li><label><input type="checkbox" />No warnings related to
+        security</label></li>
+        <li><label><input type="checkbox" />Monitoring dashboard shows
+        expected metrics</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="i2-security-verification">I2: Security Verification</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Security header
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />curl -I <a
+        href="https://app.stockease.com">https://app.stockease.com</a> |
+        grep -i security</label></li>
+        <li><label><input type="checkbox" />CSP headers are
+        present</label></li>
+        <li><label><input type="checkbox" />HSTS header is
+        set</label></li>
+        <li><label><input type="checkbox" />X-Frame-Options is
+        configured</label></li>
+        <li><label><input type="checkbox" />X-Content-Type-Options is
+        set to nosniff</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>SSL/TLS
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />nmap --script
+        ssl-enum-ciphers -p 443 app.stockease.com</label></li>
+        <li><label><input type="checkbox" />No weak ciphers
+        detected</label></li>
+        <li><label><input type="checkbox" />TLS 1.2+ is
+        enforced</label></li>
+        <li><label><input type="checkbox" />SSL Labs A rating (if tested
+        publicly)</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>CORS
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />curl -H "Origin: <a
+        href="https://app.stockease.com&quot;">https://app.stockease.com"</a>
+        -H "Access-Control-Request-Method: POST" -I <a
+        href="https://api.stockease.com/api/products">https://api.stockease.com/api/products</a></label></li>
+        <li><label><input type="checkbox" />Correct CORS headers in
+        response</label></li>
+        <li><label><input type="checkbox" />Only approved origins are
+        allowed</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="i3-functional-testing">I3: Functional Testing</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Authentication
+        flow</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Login works
+        correctly</label></li>
+        <li><label><input type="checkbox" />Session persists across page
+        reloads</label></li>
+        <li><label><input type="checkbox" />Logout clears
+        authentication</label></li>
+        <li><label><input type="checkbox" />Token refresh (if
+        implemented) works</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Data
+        access</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />User can access their own
+        data</label></li>
+        <li><label><input type="checkbox" />User cannot access other
+        user's data</label></li>
+        <li><label><input type="checkbox" />Admin can access admin
+        features</label></li>
+        <li><label><input type="checkbox" />Non-admin users cannot
+        access admin features</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error
+        scenarios</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Network errors show friendly
+        messages</label></li>
+        <li><label><input type="checkbox" />Invalid input shows
+        validation errors (not system errors)</label></li>
+        <li><label><input type="checkbox" />401/403 errors are handled
+        gracefully</label></li>
+        <li><label><input type="checkbox" />500 errors show generic
+        message (no stack trace)</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-rollback--contingency">🔄 Rollback &amp;
+        Contingency</h2>
+        <h3 id="j1-rollback-plan">J1: Rollback Plan</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Rollback procedure
+        documented</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Previous version is
+        available</label></li>
+        <li><label><input type="checkbox" />Database migrations are
+        reversible</label></li>
+        <li><label><input type="checkbox" />Configuration changes can be
+        reverted</label></li>
+        <li><label><input type="checkbox" />Rollback has been
+        tested</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Incident
+        response</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />On-call rotation is
+        active</label></li>
+        <li><label><input type="checkbox" />Escalation procedures are
+        documented</label></li>
+        <li><label><input type="checkbox" />Communication plan for
+        incidents exists</label></li>
+        <li><label><input type="checkbox" />Post-incident review process
+        is defined</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-release-checklist-summary">📋 Release Checklist
+        Summary</h2>
+        <h3 id="pre-deployment-72-hours-before">Pre-Deployment (72 hours
+        before)</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Security review
+        completed</label></li>
+        <li><label><input type="checkbox" />All tests
+        passing</label></li>
+        <li><label><input type="checkbox" />Vulnerabilities
+        resolved</label></li>
+        <li><label><input type="checkbox" />Deployment plan
+        reviewed</label></li>
+        <li><label><input type="checkbox" />Rollback plan
+        verified</label></li>
+        </ul>
+        <h3 id="day-before-deployment">Day Before Deployment</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Staging environment passes
+        all security checks</label></li>
+        <li><label><input type="checkbox" />Monitoring and alerting
+        configured</label></li>
+        <li><label><input type="checkbox" />Incident response team
+        notified</label></li>
+        <li><label><input type="checkbox" />Maintenance window scheduled
+        (if needed)</label></li>
+        </ul>
+        <h3 id="deployment-day">Deployment Day</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All health checks
+        pass</label></li>
+        <li><label><input type="checkbox" />Security headers
+        verified</label></li>
+        <li><label><input type="checkbox" />Authentication/authorization
+        working</label></li>
+        <li><label><input type="checkbox" />No unusual errors in
+        logs</label></li>
+        <li><label><input type="checkbox" />Team is
+        monitoring</label></li>
+        </ul>
+        <h3 id="post-deployment-within-24-hours">Post-Deployment (within
+        24 hours)</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All functionality verified
+        in production</label></li>
+        <li><label><input type="checkbox" />No security-related
+        errors</label></li>
+        <li><label><input type="checkbox" />Performance metrics are
+        normal</label></li>
+        <li><label><input type="checkbox" />User access logs appear
+        normal</label></li>
+        <li><label><input type="checkbox" />Release notes are
+        published</label></li>
+        </ul>
+        <hr />
+        <h2 id="-sign-off">👥 Sign-Off</h2>
+        <h3 id="pre-release-verification-team">Pre-Release Verification
+        Team</h3>
+        <p><strong>Security Lead:</strong> _________________
+        <strong>Date:</strong> _________<br />
+        <strong>DevOps Lead:</strong> _________________
+        <strong>Date:</strong> _________<br />
+        <strong>Product Manager:</strong> _________________
+        <strong>Date:</strong> _________</p>
+        <h3 id="approval-status">Approval Status</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />✅ <strong>Approved for
+        Release</strong> — All checks passed</label></li>
+        <li><label><input type="checkbox" />⚠️ <strong>Approved with
+        Exceptions</strong> — Documented below</label></li>
+        <li><label><input type="checkbox" />❌ <strong>Blocked</strong>
+        — Issues must be resolved</label></li>
+        </ul>
+        <h3 id="exceptions-if-applicable">Exceptions (if
+        applicable)</h3>
+        <pre><code>[Document any exceptions, mitigations, or accepted risks]</code></pre>
+        <hr />
+        <h2 id="-deployment-metrics">📊 Deployment Metrics</h2>
+        <p>After release, monitor these metrics:</p>
+        <pre><code>Security Metrics
+├─ 401 Error Rate (should be &lt; 1%)
+├─ 403 Error Rate (should be &lt; 0.5%)
+├─ Failed Login Attempts (monitor for brute force)
+└─ SSL Certificate Expiration (alert at 30 days)
+
+Performance Metrics
+├─ Average Response Time (should be &lt; 500ms)
+├─ 95th Percentile Response Time (should be &lt; 2s)
+├─ Error Rate (should be &lt; 0.1%)
+└─ Availability (target: 99.9%)</code></pre>
+        <hr />
+        <h2 id="-reference-links">📚 Reference Links</h2>
+        <ul>
+        <li><a href="../overview.html">StockEase Security
+        Documentation</a></li>
+        <li><a href="../compliance/overview.html">Compliance &amp;
+        Standards</a></li>
+        <li><a href="../platform/headers-and-nginx.html">Security
+        Headers Configuration</a></li>
+        <li><a href="../platform/ci-secrets.html">CI/CD Secrets &amp;
+        Pipeline Security</a></li>
+        <li><a href="../platform/dependencies.html">Dependency
+        Management</a></li>
+        <li><a href="../api-communication/api-security.html">API
+        Security Guide</a></li>
+        </ul>
+        <hr />
+        <h2 id="-release-checklist-updates">🔄 Release Checklist
+        Updates</h2>
+        <p>This checklist should be:</p>
+        <ul>
+        <li><strong>Used for every production release</strong></li>
+        <li><strong>Updated when infrastructure changes</strong> (nginx,
+        Docker, etc.)</li>
+        <li><strong>Reviewed quarterly</strong> with security team</li>
+        <li><strong>Adjusted for new security threats</strong> as they
+        emerge</li>
+        <li><strong>Customized</strong> for different deployment targets
+        (staging, production, etc.)</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Version:</strong> 1.0.0<br />
+        <strong>Maintained By:</strong> StockEase Security &amp; DevOps
+        Team<br />
+        <strong>Review Frequency:</strong> For every production
+        deployment<br />
+        <strong>Classification:</strong> Internal - DevOps &amp;
+        Security Team</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

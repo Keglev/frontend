@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>sast - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="static-application-security-testing-sast">Static
+        Application Security Testing (SAST)</h1>
+        <p><strong>Version:</strong> 1.0.0<br />
+        <strong>Last Updated:</strong> 2024<br />
+        <strong>Status:</strong> Active</p>
+        <h2 id="overview">Overview</h2>
+        <p>Static Application Security Testing (SAST) is a white-box
+        testing methodology that analyzes source code without execution
+        to identify security vulnerabilities early in the development
+        cycle. The StockEase Frontend uses <strong>ESLint with
+        TypeScript support</strong> to enforce security patterns and ban
+        dangerous code patterns.</p>
+        <h2 id="table-of-contents">Table of Contents</h2>
+        <ol type="1">
+        <li><a href="#sast-architecture">SAST Architecture</a></li>
+        <li><a href="#eslint-configuration">ESLint
+        Configuration</a></li>
+        <li><a href="#security-rules--violations">Security Rules &amp;
+        Violations</a></li>
+        <li><a href="#dangerous-code-patterns">Dangerous Code
+        Patterns</a></li>
+        <li><a href="#type-safety">Type Safety</a></li>
+        <li><a href="#custom-rules">Custom Rules</a></li>
+        <li><a href="#integration-with-development">Integration with
+        Development</a></li>
+        <li><a href="#cicd-integration">CI/CD Integration</a></li>
+        </ol>
+        <h2 id="sast-architecture">SAST Architecture</h2>
+        <h3 id="analysis-approach">Analysis Approach</h3>
+        <pre><code>Source Code
+    ↓
+ESLint Parser (TypeScript)
+    ↓
+Rule Evaluation
+    ├─ Security Rules
+    ├─ Type Safety
+    ├─ React Best Practices
+    └─ Code Quality
+    ↓
+Violation Detection
+    ├─ Critical (Security)
+    ├─ Error (Type Safety)
+    └─ Warning (Code Quality)
+    ↓
+Developer Feedback
+    ├─ Editor Highlighting
+    ├─ Build Failure
+    └─ CI/CD Blocking</code></pre>
+        <h3 id="current-eslint-setup">Current ESLint Setup</h3>
+        <p><strong>Plugins:</strong></p>
+        <ul>
+        <li><code>@eslint/js</code> - ECMAScript linting rules</li>
+        <li><code>typescript-eslint</code> - TypeScript support and
+        type-aware rules</li>
+        <li><code>eslint-plugin-react-hooks</code> - React Hooks
+        patterns</li>
+        <li><code>eslint-plugin-react-refresh</code> - Fast Refresh
+        safety</li>
+        </ul>
+        <p><strong>Coverage:</strong></p>
+        <ul>
+        <li>All <code>.ts</code> and <code>.tsx</code> files</li>
+        <li>Excludes: <code>dist/</code> directory (build output)</li>
+        </ul>
+        <h2 id="eslint-configuration">ESLint Configuration</h2>
+        <h3 id="current-configuration-eslintconfigjs">Current
+        Configuration (<code>eslint.config.js</code>)</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> js <span class="im">from</span> <span class="st">&#39;@eslint/js&#39;</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> globals <span class="im">from</span> <span class="st">&#39;globals&#39;</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> reactHooks <span class="im">from</span> <span class="st">&#39;eslint-plugin-react-hooks&#39;</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> reactRefresh <span class="im">from</span> <span class="st">&#39;eslint-plugin-react-refresh&#39;</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tseslint <span class="im">from</span> <span class="st">&#39;typescript-eslint&#39;</span><span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> tseslint<span class="op">.</span><span class="fu">config</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  { <span class="dt">ignores</span><span class="op">:</span> [<span class="st">&#39;dist&#39;</span>] }<span class="op">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">extends</span><span class="op">:</span> [</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      js<span class="op">.</span><span class="at">configs</span><span class="op">.</span><span class="at">recommended</span><span class="op">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>tseslint<span class="op">.</span><span class="at">configs</span><span class="op">.</span><span class="at">recommended</span><span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">files</span><span class="op">:</span> [<span class="st">&#39;**/*.{ts,tsx}&#39;</span>]<span class="op">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">languageOptions</span><span class="op">:</span> {</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">ecmaVersion</span><span class="op">:</span> <span class="dv">2020</span><span class="op">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">globals</span><span class="op">:</span> globals<span class="op">.</span><span class="at">browser</span><span class="op">,</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">plugins</span><span class="op">:</span> {</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;react-hooks&#39;</span><span class="op">:</span> reactHooks<span class="op">,</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;react-refresh&#39;</span><span class="op">:</span> reactRefresh<span class="op">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">rules</span><span class="op">:</span> {</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>reactHooks<span class="op">.</span><span class="at">configs</span><span class="op">.</span><span class="at">recommended</span><span class="op">.</span><span class="at">rules</span><span class="op">,</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;react-refresh/only-export-components&#39;</span><span class="op">:</span> [</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;warn&#39;</span><span class="op">,</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        { <span class="dt">allowConstantExport</span><span class="op">:</span> <span class="kw">true</span> }<span class="op">,</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      ]<span class="op">,</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <h3 id="recommended-security-enhancements">Recommended Security
+        Enhancements</h3>
+        <p>To strengthen SAST coverage, the following ESLint security
+        plugins should be considered:</p>
+        <h4 id="1-eslint-plugin-security">1.
+        <strong>eslint-plugin-security</strong></h4>
+        <p>Adds security-focused rules for detecting common
+        vulnerabilities.</p>
+        <p><strong>Installation:</strong></p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--save-dev</span> eslint-plugin-security</span></code></pre></div>
+        <p><strong>Configuration Addition:</strong></p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> security <span class="im">from</span> <span class="st">&#39;eslint-plugin-security&#39;</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> tseslint<span class="op">.</span><span class="fu">config</span>({</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">plugins</span><span class="op">:</span> {</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">security</span><span class="op">:</span> security<span class="op">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rules</span><span class="op">:</span> {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;security/detect-object-injection&#39;</span><span class="op">:</span> <span class="st">&#39;warn&#39;</span><span class="op">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;security/detect-unsafe-regex&#39;</span><span class="op">:</span> <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;security/detect-non-literal-regexp&#39;</span><span class="op">:</span> <span class="st">&#39;warn&#39;</span><span class="op">,</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h4 id="2-eslint-plugin-no-unsanitized">2.
+        <strong>eslint-plugin-no-unsanitized</strong></h4>
+        <p>Detects DOM-based XSS vulnerabilities and unsanitized HTML
+        operations.</p>
+        <p><strong>Installation:</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--save-dev</span> eslint-plugin-no-unsanitized</span></code></pre></div>
+        <p><strong>Configuration Addition:</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> noUnsanitized <span class="im">from</span> <span class="st">&#39;eslint-plugin-no-unsanitized&#39;</span><span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> tseslint<span class="op">.</span><span class="fu">config</span>({</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">plugins</span><span class="op">:</span> {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;no-unsanitized&#39;</span><span class="op">:</span> noUnsanitized<span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rules</span><span class="op">:</span> {</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;no-unsanitized/method&#39;</span><span class="op">:</span> <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;no-unsanitized/property&#39;</span><span class="op">:</span> <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h4 id="3-eslint-plugin-import">3.
+        <strong>eslint-plugin-import</strong></h4>
+        <p>Validates secure import patterns and prevents vulnerable
+        dependencies.</p>
+        <p><strong>Installation:</strong></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">--save-dev</span> eslint-plugin-import</span></code></pre></div>
+        <p><strong>Configuration Addition:</strong></p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> importPlugin <span class="im">from</span> <span class="st">&#39;eslint-plugin-import&#39;</span><span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> tseslint<span class="op">.</span><span class="fu">config</span>({</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">plugins</span><span class="op">:</span> {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">import</span><span class="op">:</span> importPlugin<span class="op">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rules</span><span class="op">:</span> {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;import/no-restricted-paths&#39;</span><span class="op">:</span> [</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      { <span class="dt">zones</span><span class="op">:</span> [{ <span class="dt">target</span><span class="op">:</span> <span class="st">&#39;./src/api&#39;</span><span class="op">,</span> <span class="dt">from</span><span class="op">:</span> <span class="st">&#39;./src/pages&#39;</span> }] }<span class="op">,</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h2 id="security-rules--violations">Security Rules &amp;
+        Violations</h2>
+        <h3 id="critical-security-rules">Critical Security Rules</h3>
+        <h4 id="1-eval--dynamic-code-execution-">1. <strong>Eval &amp;
+        Dynamic Code Execution</strong> ❌</h4>
+        <p><strong>Rule:</strong> <code>no-eval</code></p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Dynamic code execution</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> code <span class="op">=</span> <span class="st">&quot;return user.role === &#39;admin&#39;&quot;</span><span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> result <span class="op">=</span> <span class="pp">eval</span>(code)<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Function constructor</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> func <span class="op">=</span> <span class="kw">new</span> <span class="bu">Function</span>(<span class="st">&#39;user&#39;</span><span class="op">,</span> <span class="st">&#39;return user.role === &quot;admin&quot;&#39;</span>)<span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: setTimeout with string</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="pp">setTimeout</span>(<span class="st">&#39;updateUI()&#39;</span><span class="op">,</span> <span class="dv">1000</span>)<span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use proper function calls</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> result <span class="op">=</span> user<span class="op">.</span><span class="at">role</span> <span class="op">===</span> <span class="st">&#39;admin&#39;</span><span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use function references</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">updateUI</span>() { <span class="co">/* ... */</span> }</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="pp">setTimeout</span>(updateUI<span class="op">,</span> <span class="dv">1000</span>)<span class="op">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use arrow functions</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="pp">setTimeout</span>(() <span class="kw">=&gt;</span> <span class="fu">updateUI</span>()<span class="op">,</span> <span class="dv">1000</span>)<span class="op">;</span></span></code></pre></div>
+        <p><strong>Rationale:</strong></p>
+        <ul>
+        <li>Dynamic code execution bypasses type checking</li>
+        <li>Enables code injection attacks</li>
+        <li>Difficult to analyze statically</li>
+        <li>No performance benefit in modern JavaScript</li>
+        </ul>
+        <hr />
+        <h4 id="2-innerhtml--dom-xss-">2. <strong>innerHTML &amp; DOM
+        XSS</strong> ❌</h4>
+        <p><strong>Rule:</strong>
+        <code>no-unsanitized/property</code></p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Direct innerHTML assignment</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> userInput<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> <span class="vs">`&lt;p&gt;</span><span class="sc">${</span>userInput<span class="sc">}</span><span class="vs">&lt;/p&gt;`</span><span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: insertAdjacentHTML</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="fu">insertAdjacentHTML</span>(<span class="st">&#39;beforeend&#39;</span><span class="op">,</span> userInput)<span class="op">;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: outerHTML</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="at">outerHTML</span> <span class="op">=</span> untrustedData<span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use textContent for text</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> userInput<span class="op">;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use createElement &amp; appendChild</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> p <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;p&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>p<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> userInput<span class="op">;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="fu">appendChild</span>(p)<span class="op">;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: React handles escaping</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">&lt;</span>p<span class="op">&gt;</span>{userInput}<span class="op">&lt;/</span>p<span class="op">&gt;;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use DOMPurify for intentional HTML</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> DOMPurify <span class="im">from</span> <span class="st">&#39;dompurify&#39;</span><span class="op">;</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> DOMPurify<span class="op">.</span><span class="fu">sanitize</span>(untrustedHTML)<span class="op">;</span></span></code></pre></div>
+        <p><strong>Rationale:</strong></p>
+        <ul>
+        <li>Most common DOM XSS vulnerability</li>
+        <li>userInput can contain script tags</li>
+        <li>React naturally escapes text content</li>
+        <li>HTML should be pre-rendered, not dynamic</li>
+        </ul>
+        <p><strong>Test Coverage:</strong></p>
+        <ul>
+        <li><code>src/__tests__/security/xss/dom-based-xss.test.ts</code></li>
+        <li><code>src/__tests__/security/components/error-boundary.test.ts</code></li>
+        </ul>
+        <hr />
+        <h4 id="3-dangerouslysetinnerhtml-in-react-">3.
+        <strong>dangerouslySetInnerHTML in React</strong> ❌</h4>
+        <p><strong>Rule:</strong> Custom TypeScript rule
+        (type-aware)</p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: dangerouslySetInnerHTML with user input</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">UserComment</span>({ comment }<span class="op">:</span> Props) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">&lt;</span>div dangerouslySetInnerHTML<span class="op">=</span>{{ __html<span class="op">:</span> comment }} <span class="op">/&gt;;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Dynamic HTML from API</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> html <span class="op">=</span> <span class="cf">await</span> api<span class="op">.</span><span class="fu">getContent</span>()<span class="op">;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">&lt;</span>div dangerouslySetInnerHTML<span class="op">=</span>{{ __html<span class="op">:</span> html }} <span class="op">/&gt;;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Render as text</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">UserComment</span>({ comment }<span class="op">:</span> Props) {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">&lt;</span>div<span class="op">&gt;</span>{comment}<span class="op">&lt;/</span>div<span class="op">&gt;;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use DOMPurify for trusted HTML</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> DOMPurify <span class="im">from</span> <span class="st">&#39;dompurify&#39;</span><span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">RichContent</span>({ html }<span class="op">:</span> Props) {</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">&lt;</span>div dangerouslySetInnerHTML<span class="op">=</span>{{ __html<span class="op">:</span> DOMPurify<span class="op">.</span><span class="fu">sanitize</span>(html) }} <span class="op">/&gt;;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use markdown library</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> MarkdownIt <span class="im">from</span> <span class="st">&#39;markdown-it&#39;</span><span class="op">;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> md <span class="op">=</span> <span class="kw">new</span> <span class="fu">MarkdownIt</span>()<span class="op">;</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> safe <span class="op">=</span> DOMPurify<span class="op">.</span><span class="fu">sanitize</span>(md<span class="op">.</span><span class="fu">render</span>(input))<span class="op">;</span></span></code></pre></div>
+        <p><strong>Rationale:</strong></p>
+        <ul>
+        <li>Named <code>dangerously</code> to alert developers</li>
+        <li>Bypasses React's automatic escaping</li>
+        <li>Only safe with pre-rendered HTML or sanitized input</li>
+        <li>Requires security review</li>
+        </ul>
+        <hr />
+        <h4 id="4-script-tag-injection-">4. <strong>Script Tag
+        Injection</strong> ❌</h4>
+        <p><strong>Rule:</strong> Custom pattern detection</p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Creating script elements dynamically</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> script <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;script&#39;</span>)<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>script<span class="op">.</span><span class="at">src</span> <span class="op">=</span> userInput<span class="op">;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(script)<span class="op">;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Script content from user</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> script <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;script&#39;</span>)<span class="op">;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>script<span class="op">.</span><span class="at">textContent</span> <span class="op">=</span> userSuppliedCode<span class="op">;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">document</span><span class="op">.</span><span class="at">body</span><span class="op">.</span><span class="fu">appendChild</span>(script)<span class="op">;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Event handler HTML attribute</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> element <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;img&#39;</span>)<span class="op">;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">&#39;onerror&#39;</span><span class="op">,</span> userCode)<span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Load scripts via build configuration</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">// In vite.config.ts or index.html</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>script src<span class="op">=</span><span class="st">&quot;/analytics.js&quot;</span><span class="op">&gt;&lt;/</span>script<span class="op">&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use function references for event handlers</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> element <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">&#39;img&#39;</span>)<span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>element<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">&#39;error&#39;</span><span class="op">,</span> handleError)<span class="op">;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: CSP-compliant event handling</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">handleError</span>(event<span class="op">:</span> <span class="bu">Event</span>) {</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Image failed to load&#39;</span>)<span class="op">;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Test Coverage:</strong></p>
+        <ul>
+        <li><code>src/__tests__/security/xss/event-handler-injection.test.ts</code></li>
+        <li><code>src/__tests__/security/csp/nonce-validation.test.ts</code></li>
+        </ul>
+        <hr />
+        <h4 id="5-unsafe-regex-">5. <strong>Unsafe Regex</strong>
+        ❌</h4>
+        <p><strong>Rule:</strong>
+        <code>security/detect-unsafe-regex</code></p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Regex with catastrophic backtracking</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> emailRegex <span class="op">=</span> <span class="ss">/</span><span class="sc">^(([^&lt;&gt;()[\]\\.,;:\s@&quot;]+(\.[^&lt;&gt;()[\]\\.,;:\s@&quot;]+)*)|(</span><span class="ss">&quot;.</span><span class="sc">+</span><span class="ss">&quot;</span><span class="sc">))</span><span class="ss">@</span><span class="sc">((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$</span><span class="ss">/</span><span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Nested quantifiers</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> pattern <span class="op">=</span> <span class="ss">/</span><span class="sc">^(</span><span class="ss">a</span><span class="sc">+)+</span><span class="ss">b</span><span class="sc">$</span><span class="ss">/</span><span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Alternation without anchors</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> pattern <span class="op">=</span> <span class="ss">/</span><span class="sc">(</span><span class="ss">a</span><span class="sc">|</span><span class="ss">a</span><span class="sc">)*</span><span class="ss">b/</span><span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use built-in validation</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> email <span class="op">=</span> <span class="st">&#39;user@example.com&#39;</span><span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isValid <span class="op">=</span> email<span class="op">.</span><span class="fu">includes</span>(<span class="st">&#39;@&#39;</span>) <span class="op">&amp;&amp;</span> email<span class="op">.</span><span class="fu">includes</span>(<span class="st">&#39;.&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use libraries (email-validator)</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { validate <span class="im">as</span> validateEmail } <span class="im">from</span> <span class="st">&#39;email-validator&#39;</span><span class="op">;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isValid <span class="op">=</span> <span class="fu">validateEmail</span>(email)<span class="op">;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Simple bounded regex</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> pattern <span class="op">=</span> <span class="ss">/</span><span class="sc">^\d{1,3}$</span><span class="ss">/</span><span class="op">;</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Anchored alternation</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> pattern <span class="op">=</span> <span class="ss">/</span><span class="sc">^(</span><span class="ss">option1</span><span class="sc">|</span><span class="ss">option2</span><span class="sc">|</span><span class="ss">option3</span><span class="sc">)$</span><span class="ss">/</span><span class="op">;</span></span></code></pre></div>
+        <p><strong>Rationale:</strong></p>
+        <ul>
+        <li>ReDoS (Regular Expression Denial of Service) attacks</li>
+        <li>Can cause exponential backtracking</li>
+        <li>Input validation should use libraries or simple
+        patterns</li>
+        <li>Complex validation belongs on backend</li>
+        </ul>
+        <hr />
+        <h4 id="6-dynamic-imports-from-user-input-">6. <strong>Dynamic
+        Imports from User Input</strong> ❌</h4>
+        <p><strong>Rule:</strong>
+        <code>security/detect-object-injection</code></p>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Dynamic import from user input</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">loadComponent</span>(name<span class="op">:</span> <span class="dt">string</span>) {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> Component <span class="op">=</span> <span class="cf">await</span> <span class="im">import</span>(<span class="vs">`./components/</span><span class="sc">${</span>name<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Component<span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Object property access without keys validation</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> handlers<span class="op">:</span> <span class="bu">Record</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">,</span> <span class="bu">Function</span><span class="op">&gt;</span> <span class="op">=</span> { <span class="co">/* ... */</span> }<span class="op">;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> handler <span class="op">=</span> handlers[userInput]<span class="op">;</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">handler</span>()<span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Whitelist allowed imports</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">loadComponent</span>(name<span class="op">:</span> <span class="st">&#39;Button&#39;</span> <span class="op">|</span> <span class="st">&#39;Modal&#39;</span> <span class="op">|</span> <span class="st">&#39;Card&#39;</span>) {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> componentMap <span class="op">=</span> {</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    Button<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./components/Button&#39;</span>)<span class="op">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    Modal<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./components/Modal&#39;</span>)<span class="op">,</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    Card<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./components/Card&#39;</span>)<span class="op">,</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> componentMap[name]()<span class="op">;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Enum-based mapping</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> ComponentType {</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  BUTTON <span class="op">=</span> <span class="st">&#39;Button&#39;</span><span class="op">,</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  MODAL <span class="op">=</span> <span class="st">&#39;Modal&#39;</span><span class="op">,</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">loadComponent</span>(type<span class="op">:</span> ComponentType) {</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> map<span class="op">:</span> <span class="bu">Record</span><span class="op">&lt;</span>ComponentType<span class="op">,</span> () <span class="kw">=&gt;</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">any</span><span class="op">&gt;&gt;</span> <span class="op">=</span> {</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    [ComponentType<span class="op">.</span><span class="at">BUTTON</span>]<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./Button&#39;</span>)<span class="op">,</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    [ComponentType<span class="op">.</span><span class="at">MODAL</span>]<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="im">import</span>(<span class="st">&#39;./Modal&#39;</span>)<span class="op">,</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> map[<span class="kw">type</span>]()<span class="op">;</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Explicit handler registration</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EventDispatcher {</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">private</span> handlers <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">,</span> <span class="bu">Function</span><span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">register</span>(event<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> handler<span class="op">:</span> <span class="bu">Function</span>) {</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">.</span><span class="at">handlers</span><span class="op">.</span><span class="fu">set</span>(<span class="bu">event</span><span class="op">,</span> handler)<span class="op">;</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dispatch</span>(event<span class="op">:</span> <span class="dt">string</span>) {</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> handler <span class="op">=</span> <span class="kw">this</span><span class="op">.</span><span class="at">handlers</span><span class="op">.</span><span class="fu">get</span>(<span class="bu">event</span>)<span class="op">;</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (handler) <span class="fu">handler</span>()<span class="op">;</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Rationale:</strong></p>
+        <ul>
+        <li>Prevents path traversal attacks</li>
+        <li>Ensures only intended modules can be loaded</li>
+        <li>Improves code maintainability</li>
+        <li>Enables better static analysis</li>
+        </ul>
+        <hr />
+        <h3 id="data-handling-rules">Data Handling Rules</h3>
+        <h4 id="7-url-parameter-injection-">7. <strong>URL Parameter
+        Injection</strong> ❌</h4>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Building URLs from untrusted input</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> url <span class="op">=</span> <span class="vs">`https://api.example.com/users/</span><span class="sc">${</span>userId<span class="sc">}</span><span class="vs">/posts/</span><span class="sc">${</span>postId<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Query parameters without encoding</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> url <span class="op">=</span> <span class="vs">`https://api.example.com/search?q=</span><span class="sc">${</span>userQuery<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use URL constructor</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> url <span class="op">=</span> <span class="kw">new</span> <span class="fu">URL</span>(<span class="st">&#39;https://api.example.com/users&#39;</span>)<span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>url<span class="op">.</span><span class="at">pathname</span> <span class="op">=</span> <span class="vs">`/users/</span><span class="sc">${</span><span class="pp">encodeURIComponent</span>(userId)<span class="sc">}</span><span class="vs">/posts/</span><span class="sc">${</span><span class="pp">encodeURIComponent</span>(postId)<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use query parameter methods</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> url <span class="op">=</span> <span class="kw">new</span> <span class="fu">URL</span>(<span class="st">&#39;https://api.example.com/search&#39;</span>)<span class="op">;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>url<span class="op">.</span><span class="at">searchParams</span><span class="op">.</span><span class="fu">set</span>(<span class="st">&#39;q&#39;</span><span class="op">,</span> userQuery)<span class="op">;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use fetch with options</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">fetch</span>(<span class="st">&#39;/api/users&#39;</span><span class="op">,</span> {</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  method<span class="op">:</span> <span class="st">&#39;POST&#39;</span><span class="op">,</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  body<span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({ userId<span class="op">,</span> postId })<span class="op">,</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <p><strong>Test Coverage:</strong></p>
+        <ul>
+        <li><code>src/__tests__/security/headers/cors-origins-auth.test.ts</code></li>
+        </ul>
+        <hr />
+        <h4 id="8-credential-exposure-in-logs-">8. <strong>Credential
+        Exposure in Logs</strong> ❌</h4>
+        <p><strong>Violation Pattern:</strong></p>
+        <div class="sourceCode" id="cb23"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Logging auth headers</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Authorization:&#39;</span><span class="op">,</span> headers)<span class="op">;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Logging entire response</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Response:&#39;</span><span class="op">,</span> apiResponse)<span class="op">;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ DANGEROUS: Error with stack trace containing tokens</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="cf">catch</span> (error) {</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Request failed:&#39;</span><span class="op">,</span> token<span class="op">,</span> error)<span class="op">;</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Safe Alternative:</strong></p>
+        <div class="sourceCode" id="cb24"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Log only necessary information</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Request method:&#39;</span><span class="op">,</span> method)<span class="op">;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Response status:&#39;</span><span class="op">,</span> status)<span class="op">;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use logger with sanitization</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> logger <span class="op">=</span> {</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log</span>(obj<span class="op">:</span> <span class="dt">any</span>) {</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> sanitized <span class="op">=</span> { <span class="op">...</span>obj }<span class="op">;</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">delete</span> sanitized<span class="op">.</span><span class="at">token</span><span class="op">;</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">delete</span> sanitized<span class="op">.</span><span class="at">authorization</span><span class="op">;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">delete</span> sanitized<span class="op">.</span><span class="at">password</span><span class="op">;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(sanitized)<span class="op">;</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ SAFE: Use structured logging with redaction</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pino <span class="im">from</span> <span class="st">&#39;pino&#39;</span><span class="op">;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> logger <span class="op">=</span> <span class="fu">pino</span>({</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  redact<span class="op">:</span> [<span class="st">&#39;*.token&#39;</span><span class="op">,</span> <span class="st">&#39;*.authorization&#39;</span><span class="op">,</span> <span class="st">&#39;*.password&#39;</span>]</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <p><strong>Test Coverage:</strong></p>
+        <ul>
+        <li><code>src/__tests__/security/secrets/logging-security.test.ts</code></li>
+        </ul>
+        <hr />
+        <h2 id="dangerous-code-patterns">Dangerous Code Patterns</h2>
+        <h3 id="pattern-reference-table">Pattern Reference Table</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Pattern</th>
+        <th>Severity</th>
+        <th>Rule</th>
+        <th>Safe Alternative</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>eval()</code></td>
+        <td>Critical</td>
+        <td><code>no-eval</code></td>
+        <td>Function calls, switch statements</td>
+        </tr>
+        <tr class="even">
+        <td><code>.innerHTML = user</code></td>
+        <td>Critical</td>
+        <td><code>no-unsanitized</code></td>
+        <td><code>.textContent</code>, React JSX</td>
+        </tr>
+        <tr class="odd">
+        <td><code>dangerouslySetInnerHTML</code></td>
+        <td>Critical</td>
+        <td>TypeScript rule</td>
+        <td>Escape content, use libraries</td>
+        </tr>
+        <tr class="even">
+        <td>Dynamic script loading</td>
+        <td>Critical</td>
+        <td>Custom rule</td>
+        <td>CSP, build configuration</td>
+        </tr>
+        <tr class="odd">
+        <td><code>new Function()</code></td>
+        <td>High</td>
+        <td><code>no-eval</code></td>
+        <td>Function references</td>
+        </tr>
+        <tr class="even">
+        <td><code>.insertAdjacentHTML()</code></td>
+        <td>High</td>
+        <td><code>no-unsanitized</code></td>
+        <td><code>.appendChild()</code></td>
+        </tr>
+        <tr class="odd">
+        <td>Non-literal regex</td>
+        <td>Medium</td>
+        <td><code>security/detect-unsafe-regex</code></td>
+        <td>Input validation libraries</td>
+        </tr>
+        <tr class="even">
+        <td>Dynamic imports</td>
+        <td>Medium</td>
+        <td><code>security/detect-object-injection</code></td>
+        <td>Whitelist/enum mapping</td>
+        </tr>
+        <tr class="odd">
+        <td>Unencoded URL params</td>
+        <td>High</td>
+        <td>Custom rule</td>
+        <td>URL constructor, fetch</td>
+        </tr>
+        <tr class="even">
+        <td>Credential in logs</td>
+        <td>High</td>
+        <td>Code review</td>
+        <td>Logger sanitization</td>
+        </tr>
+        <tr class="odd">
+        <td>Event handler attributes</td>
+        <td>High</td>
+        <td>Custom rule</td>
+        <td><code>addEventListener()</code></td>
+        </tr>
+        <tr class="even">
+        <td>Unvalidated API calls</td>
+        <td>Medium</td>
+        <td>Type checking</td>
+        <td>TypeScript interfaces</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="type-safety">Type Safety</h2>
+        <h3 id="typescript-for-security">TypeScript for Security</h3>
+        <p>TypeScript helps prevent entire categories of security
+        vulnerabilities through type checking.</p>
+        <h4 id="strong-typing-for-auth-tokens">Strong Typing for Auth
+        Tokens</h4>
+        <div class="sourceCode" id="cb25"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ BAD: Any type allows errors</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">setToken</span>(token<span class="op">:</span> <span class="dt">any</span>) {</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;auth&#39;</span><span class="op">,</span> token)<span class="op">;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ GOOD: Specific type with validation</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> AuthToken {</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  accessToken<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  refreshToken<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  expiresAt<span class="op">:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">setToken</span>(token<span class="op">:</span> AuthToken) {</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>token<span class="op">.</span><span class="at">accessToken</span> <span class="op">||</span> token<span class="op">.</span><span class="at">expiresAt</span> <span class="op">&lt;</span> <span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>()) {</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Invalid token&#39;</span>)<span class="op">;</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;auth&#39;</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(token))<span class="op">;</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h4 id="literal-types-for-permissions">Literal Types for
+        Permissions</h4>
+        <div class="sourceCode" id="cb26"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ❌ BAD: String type allows invalid values</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">checkPermission</span>(role<span class="op">:</span> <span class="dt">string</span>) {</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> role <span class="op">===</span> <span class="st">&#39;admin&#39;</span><span class="op">;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ GOOD: Literal union type</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> UserRole <span class="op">=</span> <span class="st">&#39;admin&#39;</span> <span class="op">|</span> <span class="st">&#39;user&#39;</span> <span class="op">|</span> <span class="st">&#39;guest&#39;</span><span class="op">;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">checkPermission</span>(role<span class="op">:</span> UserRole) {</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> role <span class="op">===</span> <span class="st">&#39;admin&#39;</span><span class="op">;</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h4 id="branded-types-for-sensitive-data">Branded Types for
+        Sensitive Data</h4>
+        <div class="sourceCode" id="cb27"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ✅ GOOD: Branded type prevents accidental misuse</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> SanitizedInput <span class="op">=</span> <span class="dt">string</span> <span class="op">&amp;</span> { <span class="kw">readonly</span> _sanitized<span class="op">:</span> <span class="kw">true</span> }<span class="op">;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sanitize</span>(input<span class="op">:</span> <span class="dt">string</span>)<span class="op">:</span> SanitizedInput {</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> DOMPurify<span class="op">.</span><span class="fu">sanitize</span>(input) <span class="im">as</span> SanitizedInput<span class="op">;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">renderHTML</span>(html<span class="op">:</span> SanitizedInput) {</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Can only be called with sanitized input</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="op">&lt;</span>div dangerouslySetInnerHTML<span class="op">=</span>{{ __html<span class="op">:</span> html }} <span class="op">/&gt;;</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h2 id="custom-rules">Custom Rules</h2>
+        <h3 id="adding-custom-eslint-rules">Adding Custom ESLint
+        Rules</h3>
+        <h4
+        id="example-no-direct-window-access-for-sensitive-apis">Example:
+        No Direct Window Access for Sensitive APIs</h4>
+        <div class="sourceCode" id="cb28"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">// eslint-rules/no-window-sensitive-apis.js</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>module<span class="op">.</span><span class="at">exports</span> <span class="op">=</span> {</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  meta<span class="op">:</span> {</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    type<span class="op">:</span> <span class="st">&#39;problem&#39;</span><span class="op">,</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    docs<span class="op">:</span> {</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>      description<span class="op">:</span> <span class="st">&#39;Prevent direct access to sensitive window APIs&#39;</span><span class="op">,</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      category<span class="op">:</span> <span class="st">&#39;Security&#39;</span><span class="op">,</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">create</span>(context) {</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">MemberExpression</span>(node) {</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>          node<span class="op">.</span><span class="at">object</span><span class="op">.</span><span class="at">name</span> <span class="op">===</span> <span class="st">&#39;window&#39;</span> <span class="op">&amp;&amp;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>          [<span class="st">&#39;localStorage&#39;</span><span class="op">,</span> <span class="st">&#39;sessionStorage&#39;</span><span class="op">,</span> <span class="st">&#39;location&#39;</span>]<span class="op">.</span><span class="fu">includes</span>(node<span class="op">.</span><span class="at">property</span><span class="op">.</span><span class="at">name</span>)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>        ) {</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>          context<span class="op">.</span><span class="fu">report</span>({</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>            node<span class="op">,</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>            message<span class="op">:</span> <span class="vs">`Use secure storage API instead of </span><span class="sc">${</span>node<span class="op">.</span><span class="at">property</span><span class="op">.</span><span class="at">name</span><span class="sc">}</span><span class="vs">. Use SecureStorage utility.`</span><span class="op">,</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>          })<span class="op">;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Integration:</strong></p>
+        <div class="sourceCode" id="cb29"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">// eslint.config.js</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> customRules <span class="im">from</span> <span class="st">&#39;./eslint-rules/index.js&#39;</span><span class="op">;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> tseslint<span class="op">.</span><span class="fu">config</span>({</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">plugins</span><span class="op">:</span> {</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">custom</span><span class="op">:</span> customRules<span class="op">,</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rules</span><span class="op">:</span> {</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;custom/no-window-sensitive-apis&#39;</span><span class="op">:</span> <span class="st">&#39;error&#39;</span><span class="op">,</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h2 id="integration-with-development">Integration with
+        Development</h2>
+        <h3 id="pre-commit-hooks">Pre-Commit Hooks</h3>
+        <p>Use Husky to run ESLint before commits:</p>
+        <div class="sourceCode" id="cb30"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npx</span> husky add .husky/pre-commit <span class="st">&quot;npm run lint:security&quot;</span></span></code></pre></div>
+        <p><strong>In <code>package.json</code>:</strong></p>
+        <div class="sourceCode" id="cb31"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;scripts&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lint&quot;</span><span class="fu">:</span> <span class="st">&quot;eslint .&quot;</span><span class="fu">,</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lint:security&quot;</span><span class="fu">:</span> <span class="st">&quot;eslint . --rule &#39;{</span><span class="ch">\&quot;</span><span class="st">no-eval</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">error</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">no-unsanitized</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">error</span><span class="ch">\&quot;</span><span class="st">}&#39;&quot;</span><span class="fu">,</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lint:fix&quot;</span><span class="fu">:</span> <span class="st">&quot;eslint . --fix&quot;</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <h3 id="ide-integration">IDE Integration</h3>
+        <h4 id="vs-code">VS Code</h4>
+        <p>Install ESLint extension
+        (<code>dbaeumer.vscode-eslint</code>):</p>
+        <div class="sourceCode" id="cb32"><pre
+        class="sourceCode json"><code class="sourceCode json"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="er">//</span> <span class="er">.vscode/settings.json</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;eslint.validate&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;javascript&quot;</span><span class="ot">,</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;javascriptreact&quot;</span><span class="ot">,</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;typescript&quot;</span><span class="ot">,</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;typescriptreact&quot;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;editor.formatOnSave&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;editor.defaultFormatter&quot;</span><span class="fu">:</span> <span class="st">&quot;dbaeumer.vscode-eslint&quot;</span><span class="fu">,</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;editor.codeActionsOnSave&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source.fixAll.eslint&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+        <h3 id="code-review">Code Review</h3>
+        <p>Security rule violations should be reviewed during code
+        review:</p>
+        <div class="sourceCode" id="cb33"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for security violations only</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> <span class="at">--rule</span> <span class="st">&#39;no-eval: error, no-unsanitized: error&#39;</span></span></code></pre></div>
+        <h2 id="cicd-integration">CI/CD Integration</h2>
+        <h3 id="github-actions">GitHub Actions</h3>
+        <div class="sourceCode" id="cb34"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> SAST</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">push</span><span class="kw">,</span><span class="at"> pull_request</span><span class="kw">]</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">eslint</span><span class="kw">:</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v3</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-node@v3</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">node-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;18&#39;</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm install</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run lint</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run lint:security</span></span></code></pre></div>
+        <h3 id="build-configuration">Build Configuration</h3>
+        <p><strong>In <code>vite.config.ts</code>:</strong></p>
+        <div class="sourceCode" id="cb35"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { defineConfig } <span class="im">from</span> <span class="st">&#39;vite&#39;</span><span class="op">;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> <span class="fu">defineConfig</span>({</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  build<span class="op">:</span> {</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    rollupOptions<span class="op">:</span> {</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>      output<span class="op">:</span> {</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>        validate<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="co">// Enable ESLint during build</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h2 id="security-checklist-for-code-review">Security Checklist
+        for Code Review</h2>
+        <p>When reviewing code for security vulnerabilities:</p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No <code>eval()</code>,
+        <code>Function()</code>, or
+        <code>new Function()</code></label></li>
+        <li><label><input type="checkbox" />No direct
+        <code>.innerHTML</code> assignment from untrusted
+        sources</label></li>
+        <li><label><input
+        type="checkbox" /><code>dangerouslySetInnerHTML</code> is only
+        used with sanitized input</label></li>
+        <li><label><input type="checkbox" />Dynamic script loading
+        doesn't come from user input</label></li>
+        <li><label><input type="checkbox" />URL parameters are properly
+        encoded</label></li>
+        <li><label><input type="checkbox" />Credentials are not logged
+        to console</label></li>
+        <li><label><input type="checkbox" />Event handlers use
+        <code>addEventListener()</code> not HTML attributes</label></li>
+        <li><label><input type="checkbox" />Regular expressions don't
+        have catastrophic backtracking</label></li>
+        <li><label><input type="checkbox" />TypeScript types prevent
+        invalid state</label></li>
+        <li><label><input type="checkbox" />API responses are validated
+        before use</label></li>
+        <li><label><input type="checkbox" />Form inputs are validated
+        client-side</label></li>
+        <li><label><input type="checkbox" />CSRF tokens are included in
+        state-changing requests</label></li>
+        <li><label><input type="checkbox" />CORS headers are properly
+        configured</label></li>
+        <li><label><input type="checkbox" />Sensitive data is not stored
+        in cookies without HttpOnly flag</label></li>
+        </ul>
+        <h2 id="running-sast-scans">Running SAST Scans</h2>
+        <div class="sourceCode" id="cb36"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run ESLint with security focus</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix security violations automatically</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint:fix</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate SAST report</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> <span class="at">--format</span><span class="op">=</span>json <span class="op">&gt;</span> sast-report.json</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run security-only checks</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> <span class="at">--rule</span> <span class="st">&#39;no-eval: error&#39;</span></span></code></pre></div>
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="strategy.html">Testing Strategy</a> - Unit and
+        integration test approach</li>
+        <li><a href="dast.html">DAST Testing</a> - Dynamic security
+        testing</li>
+        <li><a href="../checklists/pr-security-review.html">Security
+        Checklists</a> - PR review checklist</li>
+        </ul>
+        <h2 id="recommended-reading">Recommended Reading</h2>
+        <ul>
+        <li><a
+        href="https://owasp.org/www-community/attacks/Code_Injection">OWASP
+        - Code Injection</a></li>
+        <li><a
+        href="https://cwe.mitre.org/data/definitions/95.html">CWE-95:
+        Improper Neutralization of Directives in Dynamically Evaluated
+        Code</a></li>
+        <li><a
+        href="https://cwe.mitre.org/data/definitions/79.html">CWE-79:
+        Improper Neutralization of Input During Web Page Generation
+        (XSS)</a></li>
+        <li><a
+        href="https://www.typescriptlang.org/docs/handbook/2/types-from-types.html">TypeScript
+        Handbook - Advanced Types</a></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

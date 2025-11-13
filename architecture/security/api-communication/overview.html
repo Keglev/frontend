@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="api-communication-security">API Communication
+        Security</h1>
+        <h2 id="overview">Overview</h2>
+        <p>StockEase Frontend communicates with the backend API using
+        HTTPS with JWT-based authentication. This directory documents
+        security practices, threat mitigation strategies, and best
+        practices for API communication.</p>
+        <hr />
+        <h2 id="security-architecture">Security Architecture</h2>
+        <div class="mermaid">
+        graph TB
+            Client["React Frontend<br/>Browser"]
+            ApiClient["Axios ApiClient<br/>With Interceptors"]
+            AuthService["Auth Service<br/>JWT Handling"]
+            Interceptor["Request Interceptor<br/>Token Attachment"]
+            Response["Response Interceptor<br/>Error Handling"]
+            Backend["Backend API<br/>HTTPS Endpoint"]
+            Token["JWT Token<br/>localStorage"]
+            
+            Client -->|HTTP Requests| ApiClient
+            Client -->|Login/Logout| AuthService
+            AuthService -->|Store/Retrieve| Token
+            ApiClient -->|Attach Bearer Token| Interceptor
+            Interceptor -->|POST/GET/PUT/DELETE| Backend
+            Backend -->|200/4xx/5xx| Response
+            Response -->|Handle 401| Token
+            Response -->|Error Logging| Client
+            
+            style Client fill:#e3f2fd
+            style ApiClient fill:#fff3e0
+            style AuthService fill:#e8f5e9
+            style Backend fill:#f3e5f5
+            style Token fill:#fce4ec
+        </div>
+        <hr />
+        <h2 id="key-components">Key Components</h2>
+        <h3 id="1-axios-api-client-srcservicesapiclientts">1.
+        <strong>Axios API Client</strong>
+        (<code>src/services/apiClient.ts</code>)</h3>
+        <ul>
+        <li>Configured HTTP client with automatic token attachment</li>
+        <li>Request/response logging for debugging</li>
+        <li>401 error handling (unauthorized token cleanup)</li>
+        <li>2-minute request timeout</li>
+        <li>Bearer token automatic injection</li>
+        </ul>
+        <p><strong>See:</strong> <a href="./api-security.html">API
+        Security &amp; Configuration</a></p>
+        <h3 id="2-jwt-authentication-srcapiauthts">2. <strong>JWT
+        Authentication</strong> (<code>src/api/auth.ts</code>)</h3>
+        <ul>
+        <li>User login with username/password</li>
+        <li>JWT token extraction from response</li>
+        <li>Role-based access control (RBAC)</li>
+        <li>Client-side payload decoding</li>
+        <li>Token lifecycle management</li>
+        </ul>
+        <p><strong>See:</strong> <a
+        href="../../auth/overview.html">Authentication &amp; Token
+        Handling</a></p>
+        <h3 id="3-error-handling--logging">3. <strong>Error Handling
+        &amp; Logging</strong></h3>
+        <ul>
+        <li>API error logging and tracking</li>
+        <li>401 unauthorized response handling</li>
+        <li>Network error differentiation</li>
+        <li>Sensitive data protection in logs</li>
+        <li>Error propagation to ErrorBoundary</li>
+        </ul>
+        <p><strong>See:</strong> <a href="./error-logging.html">Error
+        Logging &amp; Monitoring</a></p>
+        <h3 id="4-environment-configuration">4. <strong>Environment
+        Configuration</strong></h3>
+        <ul>
+        <li><code>VITE_API_BASE_URL</code> for backend endpoint</li>
+        <li>Build-time environment variable injection</li>
+        <li>Development proxy for local testing</li>
+        <li>Production HTTPS enforcement</li>
+        </ul>
+        <hr />
+        <h2 id="security-principles">Security Principles</h2>
+        <h3 id="-implemented">✅ Implemented</h3>
+        <ul>
+        <li><strong>Bearer Token Authentication</strong> — JWT tokens
+        sent via Authorization header</li>
+        <li><strong>Automatic Token Attachment</strong> — Request
+        interceptor adds token to all requests</li>
+        <li><strong>401 Error Handling</strong> — Clears token on
+        unauthorized responses</li>
+        <li><strong>Request Logging</strong> — API calls logged for
+        debugging</li>
+        <li><strong>Timeout Protection</strong> — 2-minute timeout
+        prevents hanging requests</li>
+        <li><strong>Environment Isolation</strong> — API endpoint
+        configured per environment</li>
+        </ul>
+        <h3 id="️-considerations">⚠️ Considerations</h3>
+        <ul>
+        <li><p><strong>localStorage Storage</strong> — Tokens in
+        localStorage are accessible to XSS attacks</p>
+        <ul>
+        <li><strong>Recommendation:</strong> Use HttpOnly cookies for
+        better security</li>
+        <li><strong>Current:</strong> localStorage fallback for
+        development flexibility</li>
+        </ul></li>
+        <li><p><strong>Client-Side Payload Decoding</strong> — JWT
+        payload decoded in browser</p>
+        <ul>
+        <li><strong>Expected:</strong> Backend must verify signature
+        (payload is unsigned)</li>
+        <li><strong>Safe:</strong> Payload contains no secrets (only
+        claims like role, user ID)</li>
+        </ul></li>
+        <li><p><strong>Console Logging</strong> — Request/response
+        details logged to console</p>
+        <ul>
+        <li><strong>Risk:</strong> Sensitive headers may appear in
+        logs</li>
+        <li><strong>Mitigation:</strong> Filter sensitive data before
+        logging in production</li>
+        </ul></li>
+        <li><p><strong>CORS Configuration</strong> — Handled by backend,
+        not frontend</p>
+        <ul>
+        <li><strong>Frontend Role:</strong> Sends correct headers via
+        Axios</li>
+        <li><strong>Backend Role:</strong> Validates origin, allows safe
+        CORS headers</li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="api-endpoints">API Endpoints</h2>
+        <h3 id="authentication">Authentication</h3>
+        <pre class="http"><code>POST /api/auth/login
+Content-Type: application/json
+Body: { username: string, password: string }
+Response: { success: boolean, data: string (JWT token) }</code></pre>
+        <h3 id="products-all-require-authorization-header">Products (All
+        require Authorization header)</h3>
+        <pre class="http"><code>GET    /api/products                    — Fetch all products
+GET    /api/products/paged              — Fetch paginated products
+POST   /api/products                    — Create product
+DELETE /api/products/:id                — Delete product
+GET    /api/products/:id                — Get product by ID
+GET    /api/products/search             — Search products by name
+PUT    /api/products/:id/quantity       — Update quantity
+PUT    /api/products/:id/price          — Update price</code></pre>
+        <p><strong>Headers:</strong></p>
+        <pre class="http"><code>Authorization: Bearer &lt;JWT_TOKEN&gt;
+Content-Type: application/json</code></pre>
+        <hr />
+        <h2 id="requestresponse-flow">Request/Response Flow</h2>
+        <h3 id="1-successful-request-with-token">1. Successful Request
+        with Token</h3>
+        <pre><code>Client Request
+  ↓
+Request Interceptor
+  ├─ Retrieve token from localStorage
+  ├─ Attach: Authorization: Bearer &lt;token&gt;
+  ├─ Log request details
+  └─ Send to backend
+  ↓
+Backend Validation
+  ├─ Verify JWT signature
+  ├─ Check token expiration
+  ├─ Extract user claims (role, username)
+  └─ Process request
+  ↓
+Response Interceptor
+  ├─ Log response status/data
+  ├─ Return data to caller
+  └─ Store in component state</code></pre>
+        <h3 id="2-unauthorized-response-401">2. Unauthorized Response
+        (401)</h3>
+        <pre><code>Backend Response: 401 Unauthorized
+  ↓
+Response Interceptor
+  ├─ Detect error.response?.status === 401
+  ├─ Remove token from localStorage
+  ├─ Log warning: &quot;Unauthorized access - redirecting to login&quot;
+  ├─ Throw error to caller
+  └─ Component handles redirect to login</code></pre>
+        <h3 id="3-network-error">3. Network Error</h3>
+        <pre><code>Network Failure (timeout, no connection)
+  ↓
+Response Interceptor
+  ├─ Catch error
+  ├─ Log error details
+  ├─ Throw to caller
+  └─ Component shows &quot;Unexpected error&quot; message</code></pre>
+        <hr />
+        <h2 id="environment-variables">Environment Variables</h2>
+        <h3 id="development">Development</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>http://localhost:8081</span></code></pre></div>
+        <ul>
+        <li>Used for local development with backend running locally</li>
+        <li>Vite proxy forwards <code>/api/*</code> requests to
+        backend</li>
+        </ul>
+        <h3 id="production">Production</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>https://api.stockease.com</span></code></pre></div>
+        <ul>
+        <li>Set at build time via GitHub Actions secrets</li>
+        <li>All requests use HTTPS</li>
+        <li>CORS validated by backend</li>
+        </ul>
+        <h3 id="configuration">Configuration</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// vite.config.ts</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>server<span class="op">:</span> {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  proxy<span class="op">:</span> {</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;/api&#39;</span><span class="op">:</span> {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      target<span class="op">:</span> env<span class="op">.</span><span class="at">VITE_API_BASE_URL</span> <span class="op">||</span> <span class="st">&#39;http://localhost:8081&#39;</span><span class="op">,</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      changeOrigin<span class="op">:</span> <span class="kw">true</span><span class="op">,</span>    <span class="co">// ✅ Ensures Host header matches target</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      secure<span class="op">:</span> <span class="kw">false</span><span class="op">,</span>         <span class="co">// ✅ Allows self-signed certs in dev</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span></span></code></pre></div>
+        <hr />
+        <h2 id="common-scenarios--solutions">Common Scenarios &amp;
+        Solutions</h2>
+        <h3 id="-token-expired-during-request">❓ Token Expired During
+        Request</h3>
+        <p><strong>Scenario:</strong> User's token expires while making
+        an API call</p>
+        <p><strong>Current Behavior:</strong></p>
+        <ol type="1">
+        <li>Request sent with valid token</li>
+        <li>Backend returns 401 (token expired)</li>
+        <li>Response interceptor removes token</li>
+        <li>Component re-renders, showing login screen</li>
+        </ol>
+        <p><strong>Improvement Opportunity:</strong></p>
+        <ul>
+        <li>Implement token refresh mechanism with refresh tokens</li>
+        <li>Automatically retry failed request after refresh</li>
+        <li>Reduce user friction during long sessions</li>
+        </ul>
+        <hr />
+        <h3 id="-cors-errors-in-browser">❓ CORS Errors in Browser</h3>
+        <p><strong>Scenario:</strong> Request from
+        <code>https://frontend.com</code> to
+        <code>https://api.stockease.com</code> fails</p>
+        <p><strong>Cause:</strong> Browser blocks cross-origin requests
+        without proper CORS headers</p>
+        <p><strong>Frontend Role:</strong></p>
+        <ul>
+        <li>Send request with correct headers ✅</li>
+        <li>Cannot override CORS policy (browser enforces)</li>
+        </ul>
+        <p><strong>Backend Responsibility:</strong></p>
+        <ul>
+        <li>Add <code>Access-Control-Allow-Origin</code> header</li>
+        <li>Add <code>Access-Control-Allow-Credentials</code> if cookies
+        used</li>
+        <li>Add <code>Access-Control-Allow-Methods</code> for HTTP
+        verbs</li>
+        <li>Add <code>Access-Control-Allow-Headers</code> for custom
+        headers</li>
+        </ul>
+        <p><strong>Test:</strong></p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> <span class="at">-H</span> <span class="st">&quot;Origin: https://frontend.com&quot;</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">-H</span> <span class="st">&quot;Access-Control-Request-Method: POST&quot;</span> <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">-H</span> <span class="st">&quot;Access-Control-Request-Headers: Authorization&quot;</span> <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>     https://api.stockease.com/api/products</span></code></pre></div>
+        <hr />
+        <h3 id="-sensitive-data-in-logs">❓ Sensitive Data in Logs</h3>
+        <p><strong>Scenario:</strong> Authorization header or response
+        data logged to console</p>
+        <p><strong>Risk:</strong> Token or user data exposed in browser
+        dev tools</p>
+        <p><strong>Current Code:</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> config)<span class="op">;</span>    <span class="co">// ⚠️ Includes full headers</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Response:&#39;</span><span class="op">,</span> response)<span class="op">;</span> <span class="co">// ⚠️ Includes sensitive data</span></span></code></pre></div>
+        <p><strong>Recommended Improvement:</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Filter sensitive headers before logging</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> safeConfig <span class="op">=</span> {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span>config<span class="op">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  headers<span class="op">:</span> {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span>config<span class="op">.</span><span class="at">headers</span><span class="op">,</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    Authorization<span class="op">:</span> <span class="st">&#39;[REDACTED]&#39;</span><span class="op">,</span> <span class="co">// Hide token</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    Cookie<span class="op">:</span> <span class="st">&#39;[REDACTED]&#39;</span><span class="op">,</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> safeConfig)<span class="op">;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">// In production, remove logging entirely</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;development&#39;</span>) {</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Response:&#39;</span><span class="op">,</span> response)<span class="op">;</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./api-security.html">API Security &amp;
+        Configuration</a></strong> — Detailed axios setup, interceptors,
+        and security settings</li>
+        <li><strong><a href="./error-logging.html">Error Logging &amp;
+        Monitoring</a></strong> — Error handling, logging strategies,
+        and troubleshooting</li>
+        <li><strong><a href="../../auth/overview.html">Authentication
+        &amp; Authorization</a></strong> — JWT, token storage,
+        role-based access</li>
+        <li><strong><a
+        href="../../checklists/api-communication.html">Frontend Security
+        Checklist</a></strong> — Pre-deployment security checks</li>
+        <li><strong><a
+        href="../../playbooks/api-security-incident.html">Incident
+        Response Playbook</a></strong> — Response procedures for
+        security issues</li>
+        </ul>
+        <hr />
+        <h2 id="quick-reference">Quick Reference</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Concern</th>
+        <th>Solution</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Token attached to requests</td>
+        <td>Request interceptor with Bearer token</td>
+        <td>✅ Implemented</td>
+        </tr>
+        <tr class="even">
+        <td>401 handling</td>
+        <td>Remove token, redirect to login</td>
+        <td>✅ Implemented</td>
+        </tr>
+        <tr class="odd">
+        <td>Request timeout</td>
+        <td>2-minute timeout configured</td>
+        <td>✅ Implemented</td>
+        </tr>
+        <tr class="even">
+        <td>CORS support</td>
+        <td>Backend handles, frontend sends correct headers</td>
+        <td>✅ Implemented</td>
+        </tr>
+        <tr class="odd">
+        <td>Error logging</td>
+        <td>Console logging (filter sensitive data)</td>
+        <td>⚠️ Needs improvement</td>
+        </tr>
+        <tr class="even">
+        <td>Token refresh</td>
+        <td>Not implemented</td>
+        <td>⏳ Future enhancement</td>
+        </tr>
+        <tr class="odd">
+        <td>HttpOnly cookies</td>
+        <td>Not implemented (using localStorage)</td>
+        <td>⚠️ Recommendation</td>
+        </tr>
+        <tr class="even">
+        <td>Secure production API</td>
+        <td>HTTPS required</td>
+        <td>✅ Enforced</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Author:</strong> StockEase Security Team<br />
+        <strong>Review Cycle:</strong> Quarterly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

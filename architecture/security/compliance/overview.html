@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-compliance--standards">Security Compliance
+        &amp; Standards</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Welcome to the <strong>Compliance &amp; Standards</strong>
+        section. This directory contains security frameworks, compliance
+        mappings, and standards adherence documentation for StockEase
+        Frontend.</p>
+        <p>StockEase Frontend is designed to meet industry-standard
+        security requirements and best practices across multiple
+        compliance frameworks:</p>
+        <ul>
+        <li><strong>OWASP ASVS v4.0</strong> — Application Security
+        Verification Standard</li>
+        <li><strong>OWASP Top 10 2021</strong> — Most critical web
+        application vulnerabilities</li>
+        <li><strong>PCI DSS 3.2.1</strong> — Payment Card Industry
+        security standards</li>
+        <li><strong>GDPR</strong> — General Data Protection Regulation
+        (EU privacy law)</li>
+        <li><strong>SOC 2 Type II</strong> — Trust Service Criteria for
+        security and availability</li>
+        </ul>
+        <hr />
+        <h2 id="-compliance-documentation">📂 Compliance
+        Documentation</h2>
+        <h3 id="owasp-asvs-mapping"><a
+        href="./owasp-asvs-mapping.html">OWASP ASVS Mapping</a></h3>
+        <p><strong>Comprehensive security control mapping to OWASP
+        Application Security Verification Standard (ASVS)
+        v4.0</strong></p>
+        <p>This document provides:</p>
+        <p>✅ <strong>13 Verification Categories</strong> covering all
+        critical security areas:</p>
+        <ul>
+        <li>V1: Architecture, Design &amp; Threat Modeling</li>
+        <li>V2: Authentication Verification</li>
+        <li>V3: Session Management Verification</li>
+        <li>V4: Access Control Verification</li>
+        <li>V5: Validation, Sanitization &amp; Encoding</li>
+        <li>V6: Cryptography Verification</li>
+        <li>V7: Error Handling &amp; Logging</li>
+        <li>V8: Data Protection &amp; Privacy</li>
+        <li>V9: Communications Verification (CORS, HTTPS, Headers)</li>
+        <li>V10: Malicious Code Verification</li>
+        <li>V11: Business Logic Verification</li>
+        <li>V12: File Upload Verification</li>
+        <li>V13: API Verification</li>
+        </ul>
+        <p>✅ <strong>OWASP Top 10 2021 Coverage</strong> — Maps
+        security controls to the 10 most critical web
+        vulnerabilities</p>
+        <p>✅ <strong>Implementation Status</strong> — Clear indication
+        of:</p>
+        <ul>
+        <li>✅ Implemented controls</li>
+        <li>⏳ Planned/In-progress controls</li>
+        <li>❌ Not applicable controls</li>
+        </ul>
+        <p>✅ <strong>Evidence Links</strong> — Direct references
+        to:</p>
+        <ul>
+        <li>Security documentation</li>
+        <li>Test files demonstrating controls</li>
+        <li>Configuration examples</li>
+        <li>Implementation guides</li>
+        </ul>
+        <h3 id="key-highlights">Key Highlights</h3>
+        <h4 id="current-compliance-level">Current Compliance Level</h4>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Framework</th>
+        <th>Level</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>OWASP ASVS</strong></td>
+        <td>Level 2 (Standard)</td>
+        <td>✅ Achieved</td>
+        </tr>
+        <tr class="even">
+        <td><strong>OWASP Top 10</strong></td>
+        <td>All 10 items</td>
+        <td>✅ Mitigated</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>GDPR</strong></td>
+        <td>Frontend compliance</td>
+        <td>✅ Implemented</td>
+        </tr>
+        <tr class="even">
+        <td><strong>PCI DSS</strong></td>
+        <td>If handling payments</td>
+        <td>✅ Backend enforced</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>SOC 2</strong></td>
+        <td>Security &amp; availability</td>
+        <td>✅ Implemented</td>
+        </tr>
+        </tbody>
+        </table>
+        <h4 id="security-controls-by-category">Security Controls by
+        Category</h4>
+        <p><strong>Authentication &amp; Session Management</strong></p>
+        <ul>
+        <li>JWT Bearer token authentication</li>
+        <li>Secure token storage and handling</li>
+        <li>Session cleanup on 401 errors</li>
+        <li>Token expiration enforcement</li>
+        <li>User enumeration prevention</li>
+        </ul>
+        <p><strong>API Security</strong></p>
+        <ul>
+        <li>CORS validation and enforcement</li>
+        <li>HTTPS/TLS for all communications</li>
+        <li>Bearer token on every request</li>
+        <li>Error handling without information disclosure</li>
+        <li>Rate limiting (backend)</li>
+        </ul>
+        <p><strong>Data Protection</strong></p>
+        <ul>
+        <li>Sensitive data masking in logs</li>
+        <li>No credentials in error messages</li>
+        <li>HTTPS encryption in transit</li>
+        <li>Secure error handling</li>
+        <li>PII protection</li>
+        </ul>
+        <p><strong>Code Quality</strong></p>
+        <ul>
+        <li>XSS prevention (input validation, output encoding)</li>
+        <li>Input sanitization</li>
+        <li>Dependency vulnerability scanning</li>
+        <li>No dangerous code patterns (eval, innerHTML)</li>
+        <li>Code review security checklist</li>
+        </ul>
+        <p><strong>Deployment &amp; Operations</strong></p>
+        <ul>
+        <li>Security headers (CSP, HSTS, X-Frame-Options)</li>
+        <li>MIME type sniffing prevention</li>
+        <li>Referrer policy enforcement</li>
+        <li>Secure CI/CD pipeline</li>
+        <li>Secrets management with GitHub Secrets</li>
+        </ul>
+        <hr />
+        <h2 id="-asvs-verification-levels-explained">🎯 ASVS
+        Verification Levels Explained</h2>
+        <h3 id="level-1--opportunistic-baseline">Level 1 — Opportunistic
+        (Baseline)</h3>
+        <p>Fundamental security controls. <strong>Status: ✅
+        Complete</strong></p>
+        <p>All Level 1 controls are implemented, providing basic
+        protection against common vulnerabilities.</p>
+        <h3 id="level-2--standard-target">Level 2 — Standard
+        (Target)</h3>
+        <p>Comprehensive security controls suitable for most
+        applications. <strong>Status: ✅ ~90% Complete</strong></p>
+        <p>Most Level 2 controls are implemented. Remaining items (MFA,
+        advanced encryption) planned.</p>
+        <h3 id="level-3--advanced-aspirational">Level 3 — Advanced
+        (Aspirational)</h3>
+        <p>Enhanced controls for high-security applications.
+        <strong>Status: ⏳ Partial</strong></p>
+        <p>Advanced controls are partially implemented. Full coverage
+        planned for future releases.</p>
+        <hr />
+        <h2 id="-standards--frameworks">📋 Standards &amp;
+        Frameworks</h2>
+        <h3
+        id="owasp-application-security-verification-standard-asvs">OWASP
+        Application Security Verification Standard (ASVS)</h3>
+        <p><strong>What it is:</strong> A community-driven open standard
+        for testing web application security.</p>
+        <p><strong>Why we use it:</strong> Provides comprehensive,
+        repeatable security testing framework aligned with best
+        practices.</p>
+        <p><strong>Coverage:</strong> 13 verification categories
+        covering:</p>
+        <ul>
+        <li>Authentication &amp; Authorization</li>
+        <li>Session Management</li>
+        <li>Input Validation</li>
+        <li>Cryptography</li>
+        <li>Error Handling &amp; Logging</li>
+        <li>API Security</li>
+        <li>And more...</li>
+        </ul>
+        <p><strong>Mapping:</strong> See <a
+        href="./owasp-asvs-mapping.html">OWASP ASVS Mapping</a> for
+        detailed implementation.</p>
+        <hr />
+        <h3 id="owasp-top-10-2021">OWASP Top 10 2021</h3>
+        <p><strong>What it is:</strong> List of the 10 most critical web
+        application security risks.</p>
+        <p><strong>StockEase Coverage:</strong></p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>#</th>
+        <th>Vulnerability</th>
+        <th>Status</th>
+        <th>Mitigation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>A01</td>
+        <td>Broken Access Control</td>
+        <td>✅</td>
+        <td>RBAC, route guards, token validation</td>
+        </tr>
+        <tr class="even">
+        <td>A02</td>
+        <td>Cryptographic Failures</td>
+        <td>✅</td>
+        <td>HTTPS, strong cryptography</td>
+        </tr>
+        <tr class="odd">
+        <td>A03</td>
+        <td>Injection</td>
+        <td>✅</td>
+        <td>Input validation, output encoding</td>
+        </tr>
+        <tr class="even">
+        <td>A04</td>
+        <td>Insecure Design</td>
+        <td>✅</td>
+        <td>Threat modeling, secure architecture</td>
+        </tr>
+        <tr class="odd">
+        <td>A05</td>
+        <td>Security Misconfiguration</td>
+        <td>✅</td>
+        <td>Secure defaults, scanning</td>
+        </tr>
+        <tr class="even">
+        <td>A06</td>
+        <td>Vulnerable Components</td>
+        <td>✅</td>
+        <td>Dependency scanning, automated updates</td>
+        </tr>
+        <tr class="odd">
+        <td>A07</td>
+        <td>Authentication Failures</td>
+        <td>✅</td>
+        <td>JWT, secure token handling</td>
+        </tr>
+        <tr class="even">
+        <td>A08</td>
+        <td>Data Integrity Failures</td>
+        <td>✅</td>
+        <td>Input validation, CSRF protection</td>
+        </tr>
+        <tr class="odd">
+        <td>A09</td>
+        <td>Logging &amp; Monitoring</td>
+        <td>✅</td>
+        <td>Comprehensive logging, no sensitive data</td>
+        </tr>
+        <tr class="even">
+        <td>A10</td>
+        <td>SSRF</td>
+        <td>✅</td>
+        <td>Backend validation, API security</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>Mapping:</strong> See <a
+        href="./owasp-asvs-mapping.html#compliance-summary">OWASP ASVS
+        Mapping - Compliance Summary</a></p>
+        <hr />
+        <h3 id="gdpr-general-data-protection-regulation">GDPR (General
+        Data Protection Regulation)</h3>
+        <p><strong>What it is:</strong> EU regulation protecting
+        personal data and privacy.</p>
+        <p><strong>Frontend Responsibility:</strong></p>
+        <ul>
+        <li>✅ No unnecessary PII collection</li>
+        <li>✅ Secure data in transit (HTTPS)</li>
+        <li>✅ No sensitive data in logs</li>
+        <li>✅ User consent for data collection</li>
+        <li>✅ Secure storage of credentials</li>
+        </ul>
+        <p><strong>Backend Responsibility:</strong></p>
+        <ul>
+        <li>Data retention policies</li>
+        <li>Right to be forgotten (data deletion)</li>
+        <li>Data breach notification</li>
+        <li>Privacy impact assessments</li>
+        </ul>
+        <p><strong>More Info:</strong> <a
+        href="./owasp-asvs-mapping.html#-v8-data-protection-and-privacy">Data
+        Protection &amp; Privacy (V8)</a></p>
+        <hr />
+        <h3
+        id="pci-dss-321-payment-card-industry-data-security-standard">PCI
+        DSS 3.2.1 (Payment Card Industry Data Security Standard)</h3>
+        <p><strong>When it applies:</strong> If the application
+        processes, transmits, or stores payment card data.</p>
+        <p><strong>Key Requirements:</strong></p>
+        <ul>
+        <li>HTTPS/TLS for all card data</li>
+        <li>No storage of sensitive authentication data (CVV, PIN)</li>
+        <li>Secure authentication</li>
+        <li>Access control</li>
+        <li>Regular security testing</li>
+        <li>Security event logging</li>
+        </ul>
+        <p><strong>StockEase Implementation:</strong> Backend
+        responsible for payment processing and PCI compliance. Frontend
+        ensures secure API communication.</p>
+        <p><strong>More Info:</strong> <a
+        href="./owasp-asvs-mapping.html#-v9-communications-verification">Communications
+        Verification (V9)</a></p>
+        <hr />
+        <h3 id="soc-2-type-ii-service-organization-control">SOC 2 Type
+        II (Service Organization Control)</h3>
+        <p><strong>What it is:</strong> Trust Service Criteria for
+        security, availability, processing integrity, and
+        confidentiality.</p>
+        <p><strong>StockEase Coverage:</strong></p>
+        <ul>
+        <li>✅ Security controls implemented</li>
+        <li>✅ Availability monitoring</li>
+        <li>✅ Processing integrity through validation</li>
+        <li>✅ Confidentiality through encryption</li>
+        <li>✅ Regular security reviews</li>
+        </ul>
+        <hr />
+        <h2 id="-compliance-review-cycle">🔄 Compliance Review
+        Cycle</h2>
+        <h3 id="quarterly-reviews">Quarterly Reviews</h3>
+        <p><strong>Q1 (January-March)</strong></p>
+        <ul>
+        <li>OWASP Top 10 assessment</li>
+        <li>Dependency vulnerability audit</li>
+        <li>Authentication flow review</li>
+        </ul>
+        <p><strong>Q2 (April-June)</strong></p>
+        <ul>
+        <li>API security testing</li>
+        <li>CORS policy audit</li>
+        <li>Data protection review</li>
+        </ul>
+        <p><strong>Q3 (July-September)</strong></p>
+        <ul>
+        <li>Input validation testing</li>
+        <li>Error handling review</li>
+        <li>Incident response drill</li>
+        </ul>
+        <p><strong>Q4 (October-December)</strong></p>
+        <ul>
+        <li>Full ASVS audit</li>
+        <li>Penetration testing</li>
+        <li>Documentation updates</li>
+        </ul>
+        <hr />
+        <h2 id="-compliance-checklist">✅ Compliance Checklist</h2>
+        <h3 id="before-every-release">Before Every Release</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Run npm audit for
+        dependencies</label></li>
+        <li><label><input type="checkbox" />Security code review
+        checklist passed</label></li>
+        <li><label><input type="checkbox" />No secrets committed to
+        repository</label></li>
+        <li><label><input type="checkbox" />HTTPS enforced in all
+        environments</label></li>
+        <li><label><input type="checkbox" />Error messages don't expose
+        sensitive data</label></li>
+        <li><label><input type="checkbox" />Authentication tests
+        passing</label></li>
+        <li><label><input type="checkbox" />CORS policies
+        validated</label></li>
+        </ul>
+        <h3 id="monthly">Monthly</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Review security logs for
+        anomalies</label></li>
+        <li><label><input type="checkbox" />Check for critical CVEs in
+        dependencies</label></li>
+        <li><label><input type="checkbox" />Verify Renovate updates
+        applied</label></li>
+        <li><label><input type="checkbox" />Test 401 error
+        handling</label></li>
+        <li><label><input type="checkbox" />Validate CORS
+        headers</label></li>
+        </ul>
+        <h3 id="quarterly">Quarterly</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Full security
+        assessment</label></li>
+        <li><label><input type="checkbox" />Update ASVS mapping if
+        needed</label></li>
+        <li><label><input type="checkbox" />Review and update security
+        documentation</label></li>
+        <li><label><input type="checkbox" />Penetration testing (if
+        applicable)</label></li>
+        <li><label><input type="checkbox" />Compliance
+        audit</label></li>
+        </ul>
+        <hr />
+        <h2 id="-getting-started-with-compliance">🚀 Getting Started
+        with Compliance</h2>
+        <h3 id="im-a-developer">I'm a Developer</h3>
+        <ol type="1">
+        <li><strong>Read:</strong> <a
+        href="./owasp-asvs-mapping.html">OWASP ASVS Mapping</a> —
+        Understand security requirements</li>
+        <li><strong>Use:</strong> Security checklist during code
+        review</li>
+        <li><strong>Test:</strong> Run security test suite before
+        commit</li>
+        <li><strong>Check:</strong> npm audit regularly for
+        vulnerabilities</li>
+        </ol>
+        <h3 id="im-a-security-team-member">I'm a Security Team
+        Member</h3>
+        <ol type="1">
+        <li><strong>Review:</strong> <a
+        href="./owasp-asvs-mapping.html">OWASP ASVS Mapping</a> — Audit
+        implementation</li>
+        <li><strong>Verify:</strong> Evidence links point to valid
+        implementations</li>
+        <li><strong>Test:</strong> Penetration testing based on ASVS
+        categories</li>
+        <li><strong>Document:</strong> Update mapping when new controls
+        added</li>
+        </ol>
+        <h3 id="im-a-compliance-officer">I'm a Compliance Officer</h3>
+        <ol type="1">
+        <li><strong>Assess:</strong> Review compliance level against
+        requirements</li>
+        <li><strong>Audit:</strong> Use ASVS mapping for control
+        verification</li>
+        <li><strong>Plan:</strong> Identify gaps and create remediation
+        plan</li>
+        <li><strong>Report:</strong> Document compliance status for
+        stakeholders</li>
+        </ol>
+        <hr />
+        <h2 id="-compliance-dashboard">📊 Compliance Dashboard</h2>
+        <h3 id="security-control-implementation">Security Control
+        Implementation</h3>
+        <pre><code>Implemented:     ✅ 47/52 controls (90%)
+In Progress:     ⏳ 3/52 controls (6%)
+Not Applicable:  ⚪ 2/52 controls (4%)</code></pre>
+        <h3 id="by-verification-category">By Verification Category</h3>
+        <pre><code>V1  Architecture:        ✅ 2/2
+V2  Authentication:      ✅ 4/5
+V3  Session Management:  ✅ 4/4
+V4  Access Control:      ✅ 4/4
+V5  Validation:          ✅ 3/3
+V6  Cryptography:        ✅ 4/4
+V7  Error Handling:      ✅ 3/3
+V8  Data Protection:     ✅ 3/3
+V9  Communications:      ✅ 5/5
+V10 Malicious Code:      ✅ 2/2
+V11 Business Logic:      ⏳ 1/2
+V12 File Upload:         ✅ 2/2
+V13 API:                 ✅ 4/4</code></pre>
+        <hr />
+        <h2 id="-external-references">🔗 External References</h2>
+        <h3 id="owasp-resources">OWASP Resources</h3>
+        <ul>
+        <li><a
+        href="https://owasp.org/www-project-application-security-verification-standard/">OWASP
+        ASVS</a></li>
+        <li><a href="https://owasp.org/www-project-top-ten/">OWASP Top
+        10</a></li>
+        <li><a
+        href="https://owasp.org/www-project-web-security-testing-guide/">OWASP
+        Testing Guide</a></li>
+        </ul>
+        <h3 id="compliance-frameworks">Compliance Frameworks</h3>
+        <ul>
+        <li><a href="https://gdpr-info.eu/">GDPR Regulation</a></li>
+        <li><a href="https://www.pcisecuritystandards.org/">PCI
+        DSS</a></li>
+        <li><a
+        href="https://us.aicpa.org/interestareas/informationsystems/assurance/aicpasoc2report">SOC
+        2 Trust Service Criteria</a></li>
+        </ul>
+        <h3 id="security-standards">Security Standards</h3>
+        <ul>
+        <li><a href="https://www.nist.gov/cyberframework">NIST
+        Cybersecurity Framework</a></li>
+        <li><a
+        href="https://www.iso.org/isoiec-27001-information-security-management.html">ISO/IEC
+        27001</a></li>
+        <li><a href="https://cwe.mitre.org/top25/">CWE Top 25</a></li>
+        </ul>
+        <hr />
+        <h2 id="-questions--support">📞 Questions &amp; Support</h2>
+        <p>For compliance-related questions:</p>
+        <ul>
+        <li><strong>Security Team:</strong> <a
+        href="mailto:security@stockease.com">security@stockease.com</a></li>
+        <li><strong>Compliance Officer:</strong> <a
+        href="mailto:compliance@stockease.com">compliance@stockease.com</a></li>
+        <li><strong>Documentation Issues:</strong> Create an issue on
+        GitHub</li>
+        </ul>
+        <hr />
+        <h2 id="-contributing">🤝 Contributing</h2>
+        <p>Found a compliance gap or want to improve documentation?</p>
+        <ol type="1">
+        <li>Review <a href="./owasp-asvs-mapping.html">OWASP ASVS
+        Mapping</a></li>
+        <li>Identify the gap or improvement</li>
+        <li>Create a pull request with evidence</li>
+        <li>Request security team review</li>
+        </ol>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Enterprise-Grade Compliance
+        Documentation<br />
+        <strong>Verification Level:</strong> OWASP ASVS Level 2
+        (Standard)<br />
+        <strong>Classification:</strong> Internal - Security Team &amp;
+        Developers<br />
+        <strong>Review Cycle:</strong> Quarterly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

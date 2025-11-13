@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>shared-components - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="shared-components">Shared Components</h1>
+        <h2 id="purpose">Purpose</h2>
+        <p>Reusable UI components used across multiple pages.</p>
+        <p><strong>Location</strong>: <code>src/components/</code></p>
+        <hr />
+        <h2 id="component-directory">Component Directory</h2>
+        <h3 id="1-headertsx">1. Header.tsx</h3>
+        <p><strong>Purpose</strong>: Top navigation bar with site title
+        and user menu</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Navigation links (Home, Products, Admin)</li>
+        <li>User profile dropdown</li>
+        <li>Language selector (i18n)</li>
+        <li>Logout functionality</li>
+        <li>Responsive design</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> HeaderProps {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  isAuthenticated<span class="op">:</span> <span class="dt">boolean</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  userRole<span class="op">?:</span> <span class="st">&#39;admin&#39;</span> <span class="op">|</span> <span class="st">&#39;user&#39;</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  onLogout<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Header </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  isAuthenticated<span class="op">=</span>{isLoggedIn}</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  userRole<span class="op">=</span>{role}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  onLogout<span class="op">=</span>{handleLogout}</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">/&gt;</span></span></code></pre></div>
+        <hr />
+        <h3 id="2-sidebartsx">2. Sidebar.tsx</h3>
+        <p><strong>Purpose</strong>: Left navigation panel with route
+        links</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Route navigation</li>
+        <li>Collapse/expand toggle</li>
+        <li>Active route highlighting</li>
+        <li>Role-based menu items</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> SidebarProps {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  isCollapsed<span class="op">?:</span> <span class="dt">boolean</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  onCollapsedChange<span class="op">?:</span> (collapsed<span class="op">:</span> <span class="dt">boolean</span>) <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [collapsed<span class="op">,</span> setCollapsed] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Sidebar </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  isCollapsed<span class="op">=</span>{collapsed}</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  onCollapsedChange<span class="op">=</span>{setCollapsed}</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">/&gt;</span></span></code></pre></div>
+        <hr />
+        <h3 id="3-footertsx">3. Footer.tsx</h3>
+        <p><strong>Purpose</strong>: Static footer with company info and
+        links</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Company information</li>
+        <li>Legal links (Privacy, Terms)</li>
+        <li>Social media links</li>
+        <li>Copyright notice</li>
+        </ul>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Footer <span class="op">/&gt;</span></span></code></pre></div>
+        <hr />
+        <h3 id="4-buttonstsx">4. Buttons.tsx</h3>
+        <p><strong>Purpose</strong>: Reusable button components</p>
+        <p><strong>Variants</strong>:</p>
+        <ul>
+        <li><code>primary</code> - Main action buttons</li>
+        <li><code>secondary</code> - Secondary actions</li>
+        <li><code>danger</code> - Destructive actions (delete,
+        logout)</li>
+        <li><code>ghost</code> - Minimal style</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> ButtonProps <span class="kw">extends</span> React<span class="op">.</span><span class="at">ButtonHTMLAttributes</span><span class="op">&lt;</span><span class="bu">HTMLButtonElement</span><span class="op">&gt;</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  variant<span class="op">?:</span> <span class="st">&#39;primary&#39;</span> <span class="op">|</span> <span class="st">&#39;secondary&#39;</span> <span class="op">|</span> <span class="st">&#39;danger&#39;</span> <span class="op">|</span> <span class="st">&#39;ghost&#39;</span><span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  size<span class="op">?:</span> <span class="st">&#39;sm&#39;</span> <span class="op">|</span> <span class="st">&#39;md&#39;</span> <span class="op">|</span> <span class="st">&#39;lg&#39;</span><span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  isLoading<span class="op">?:</span> <span class="dt">boolean</span><span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  icon<span class="op">?:</span> React<span class="op">.</span><span class="at">ReactNode</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  children<span class="op">:</span> React<span class="op">.</span><span class="at">ReactNode</span><span class="op">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Button variant<span class="op">=</span><span class="st">&quot;primary&quot;</span> size<span class="op">=</span><span class="st">&quot;lg&quot;</span> onClick<span class="op">=</span>{handleClick}<span class="op">&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  Create Product</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Button variant<span class="op">=</span><span class="st">&quot;danger&quot;</span> isLoading<span class="op">=</span>{saving}<span class="op">&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  Delete</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Button<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h3 id="5-errorboundarytsx">5. ErrorBoundary.tsx</h3>
+        <p><strong>Purpose</strong>: Catch React errors and display
+        fallback UI</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Error logging</li>
+        <li>Fallback UI display</li>
+        <li>Error recovery button</li>
+        <li>Development error details</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> ErrorBoundaryProps {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  children<span class="op">:</span> React<span class="op">.</span><span class="at">ReactNode</span><span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  fallback<span class="op">?:</span> React<span class="op">.</span><span class="at">ReactNode</span><span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  onError<span class="op">?:</span> (error<span class="op">:</span> <span class="bu">Error</span>) <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>ErrorBoundary fallback<span class="op">=</span>{<span class="op">&lt;</span>ErrorPage <span class="op">/&gt;</span>}<span class="op">&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>App <span class="op">/&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>ErrorBoundary<span class="op">&gt;</span></span></code></pre></div>
+        <p><strong>Error Handling Example</strong>:</p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ErrorBoundary <span class="kw">extends</span> React<span class="op">.</span><span class="at">Component</span> {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">componentDidCatch</span>(error<span class="op">:</span> <span class="bu">Error</span><span class="op">,</span> errorInfo<span class="op">:</span> React<span class="op">.</span><span class="at">ErrorInfo</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Error caught:&#39;</span><span class="op">,</span> error)<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setState</span>({ hasError<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> error })<span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">render</span>() {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="kw">this</span><span class="op">.</span><span class="at">state</span><span class="op">.</span><span class="at">hasError</span>) {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="op">&lt;</span>FallbackUI error<span class="op">=</span>{<span class="kw">this</span><span class="op">.</span><span class="at">state</span><span class="op">.</span><span class="at">error</span>} <span class="op">/&gt;;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">this</span><span class="op">.</span><span class="at">props</span><span class="op">.</span><span class="at">children</span><span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h3 id="6-helpmodaltsx">6. HelpModal.tsx</h3>
+        <p><strong>Purpose</strong>: Display help documentation and
+        FAQs</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Modal dialog</li>
+        <li>Searchable help content</li>
+        <li>Multiple language support</li>
+        <li>Close button and overlay click</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> HelpModalProps {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  isOpen<span class="op">:</span> <span class="dt">boolean</span><span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  onClose<span class="op">:</span> () <span class="kw">=&gt;</span> <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  topic<span class="op">?:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [helpOpen<span class="op">,</span> setHelpOpen] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>HelpModal isOpen<span class="op">=</span>{helpOpen} onClose<span class="op">=</span>{() <span class="kw">=&gt;</span> <span class="fu">setHelpOpen</span>(<span class="kw">false</span>)} <span class="op">/&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Button onClick<span class="op">=</span>{() <span class="kw">=&gt;</span> <span class="fu">setHelpOpen</span>(<span class="kw">true</span>)}<span class="op">&gt;</span>Help<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h3 id="7-skeletonloadertsx">7. SkeletonLoader.tsx</h3>
+        <p><strong>Purpose</strong>: Loading placeholder UI</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Animated skeleton</li>
+        <li>Configurable variants</li>
+        <li>Responsive sizing</li>
+        <li>Accessibility compliance</li>
+        </ul>
+        <p><strong>Props</strong>:</p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> SkeletonLoaderProps {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  count<span class="op">?:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  variant<span class="op">?:</span> <span class="st">&#39;text&#39;</span> <span class="op">|</span> <span class="st">&#39;avatar&#39;</span> <span class="op">|</span> <span class="st">&#39;rectangular&#39;</span> <span class="op">|</span> <span class="st">&#39;circular&#39;</span><span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  animation<span class="op">?:</span> <span class="st">&#39;pulse&#39;</span> <span class="op">|</span> <span class="st">&#39;wave&#39;</span><span class="op">;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Usage</strong>:</p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>{loading <span class="op">?</span> (</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>SkeletonLoader count<span class="op">=</span>{<span class="dv">5</span>} variant<span class="op">=</span><span class="st">&quot;rectangular&quot;</span> <span class="op">/&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>) <span class="op">:</span> (</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>ProductList products<span class="op">=</span>{products} <span class="op">/&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>)}</span></code></pre></div>
+        <hr />
+        <h2 id="composition-patterns">Composition Patterns</h2>
+        <h3 id="component-composition">Component Composition</h3>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Complex component built from simpler ones</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Card<span class="op">&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Card<span class="op">.</span><span class="at">Header</span><span class="op">&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Heading<span class="op">&gt;</span>Product<span class="op">&lt;/</span>Heading<span class="op">&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;/</span>Card<span class="op">.</span><span class="at">Header</span><span class="op">&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Card<span class="op">.</span><span class="at">Body</span><span class="op">&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>ProductForm onSubmit<span class="op">=</span>{handleSubmit} <span class="op">/&gt;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;/</span>Card<span class="op">.</span><span class="at">Body</span><span class="op">&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>Card<span class="op">.</span><span class="at">Footer</span><span class="op">&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Button variant<span class="op">=</span><span class="st">&quot;primary&quot;</span><span class="op">&gt;</span>Submit<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Button variant<span class="op">=</span><span class="st">&quot;secondary&quot;</span><span class="op">&gt;</span>Cancel<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;/</span>Card<span class="op">.</span><span class="at">Footer</span><span class="op">&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Card<span class="op">&gt;</span></span></code></pre></div>
+        <h3 id="render-props-pattern">Render Props Pattern</h3>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>ErrorBoundary<span class="op">&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  {({ error<span class="op">,</span> reset }) <span class="kw">=&gt;</span> (</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>      {error <span class="op">&amp;&amp;</span> <span class="op">&lt;</span>ErrorDisplay error<span class="op">=</span>{error} <span class="op">/&gt;</span>}</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>button onClick<span class="op">=</span>{reset}<span class="op">&gt;</span>Retry<span class="op">&lt;/</span>button<span class="op">&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  )}</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>ErrorBoundary<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="props-drilling-prevention">Props Drilling
+        Prevention</h2>
+        <h3 id="context-for-shared-state">Context for Shared State</h3>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Create context for theme</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ThemeContext <span class="op">=</span> <span class="fu">createContext</span><span class="op">&lt;</span>Theme<span class="op">&gt;</span>(<span class="st">&#39;light&#39;</span>)<span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Provider in root</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>ThemeContext<span class="op">.</span><span class="at">Provider</span> value<span class="op">=</span>{theme}<span class="op">&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;</span>App <span class="op">/&gt;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>ThemeContext<span class="op">.</span><span class="at">Provider</span><span class="op">&gt;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Use in any component</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> theme <span class="op">=</span> <span class="fu">useContext</span>(ThemeContext)<span class="op">;</span></span></code></pre></div>
+        <h3 id="redux-for-global-state">Redux for Global State</h3>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Instead of prop drilling</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> user <span class="op">=</span> <span class="fu">useSelector</span>(selectUser)<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> role <span class="op">=</span> user<span class="op">.</span><span class="at">role</span><span class="op">;</span>  <span class="co">// Available anywhere</span></span></code></pre></div>
+        <hr />
+        <h2 id="accessibility-features">Accessibility Features</h2>
+        <h3 id="aria-attributes">ARIA Attributes</h3>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>button</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  aria<span class="op">-</span>label<span class="op">=</span><span class="st">&quot;Close modal&quot;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  aria<span class="op">-</span>pressed<span class="op">=</span>{isPressed}</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  role<span class="op">=</span><span class="st">&quot;button&quot;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  ✕</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>button<span class="op">&gt;</span></span></code></pre></div>
+        <h3 id="keyboard-navigation">Keyboard Navigation</h3>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>div</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  role<span class="op">=</span><span class="st">&quot;listbox&quot;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  onKeyDown<span class="op">=</span>{(e) <span class="kw">=&gt;</span> {</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&#39;ArrowDown&#39;</span>) <span class="fu">selectNext</span>()<span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&#39;ArrowUp&#39;</span>) <span class="fu">selectPrev</span>()<span class="op">;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&#39;Enter&#39;</span>) <span class="fu">confirm</span>()<span class="op">;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  }}</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  {items<span class="op">.</span><span class="fu">map</span>(item <span class="kw">=&gt;</span> <span class="op">&lt;</span>div role<span class="op">=</span><span class="st">&quot;option&quot;</span><span class="op">&gt;</span>{item}<span class="op">&lt;/</span>div<span class="op">&gt;</span>)}</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>div<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        Component architecture</li>
+        <li><strong><a href="./page-components.html">Page
+        Components</a></strong> - Page-level components</li>
+        <li><strong><a href="./styling.html">Styling</a></strong> - CSS
+        and Tailwind patterns</li>
+        <li><strong><a href="./testing.html">Testing</a></strong> -
+        Testing patterns</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

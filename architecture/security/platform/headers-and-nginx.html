@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>headers-and-nginx - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-headers--nginx-configuration">Security Headers
+        &amp; nginx Configuration</h1>
+        <h2 id="overview">Overview</h2>
+        <p>HTTP security headers instruct browsers how to handle content
+        and prevent common attacks. This document covers StockEase
+        Frontend's nginx configuration for clickjacking prevention,
+        HSTS, MIME type sniffing, and other security headers.</p>
+        <hr />
+        <h2 id="security-headers-in-stockease">Security Headers in
+        StockEase</h2>
+        <h3 id="current-implementation">Current Implementation</h3>
+        <p>StockEase Frontend has security headers configured in
+        <code>ops/nginx/nginx.conf</code>:</p>
+        <pre class="nginx"><code># =========================================================================
+# Security Headers
+# =========================================================================
+add_header X-Content-Type-Options &quot;nosniff&quot; always;
+add_header X-XSS-Protection &quot;1; mode=block&quot; always;
+add_header X-Frame-Options &quot;DENY&quot; always;
+add_header Referrer-Policy &quot;strict-origin-when-cross-origin&quot; always;</code></pre>
+        <h3 id="header-overview">Header Overview</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Header</th>
+        <th>Purpose</th>
+        <th>Current Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>X-Content-Type-Options</td>
+        <td>MIME type sniffing prevention</td>
+        <td>nosniff</td>
+        </tr>
+        <tr class="even">
+        <td>X-XSS-Protection</td>
+        <td>XSS protection in old browsers</td>
+        <td>1; mode=block</td>
+        </tr>
+        <tr class="odd">
+        <td>X-Frame-Options</td>
+        <td>Clickjacking prevention</td>
+        <td>DENY</td>
+        </tr>
+        <tr class="even">
+        <td>Referrer-Policy</td>
+        <td>Referrer leakage prevention</td>
+        <td>strict-origin-when-cross-origin</td>
+        </tr>
+        <tr class="odd">
+        <td>HSTS</td>
+        <td>HTTPS enforcement</td>
+        <td>❌ Not configured (recommended)</td>
+        </tr>
+        <tr class="even">
+        <td>CSP</td>
+        <td>Content Security Policy</td>
+        <td>❌ Not configured (recommended)</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2
+        id="x-content-type-options-mime-sniffing-prevention">X-Content-Type-Options:
+        MIME Sniffing Prevention</h2>
+        <h3 id="what-is-mime-sniffing">What is MIME Sniffing?</h3>
+        <p>MIME (Multipurpose Internet Mail Extensions) describes file
+        types:</p>
+        <pre><code>image/png       → Image file
+text/javascript → JavaScript file
+application/json → JSON data</code></pre>
+        <p><strong>Sniffing attack:</strong></p>
+        <pre><code>Server sends: Content-Type: text/plain
+              &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;
+
+Browser (without protection):
+  ├─ Reads content
+  ├─ Ignores Content-Type header (sniffs)
+  ├─ Sees &lt;script&gt; tag
+  ├─ Interprets as JavaScript
+  └─ Executes script ❌</code></pre>
+        <h3 id="x-content-type-options-header">X-Content-Type-Options
+        Header</h3>
+        <pre class="http"><code>X-Content-Type-Options: nosniff</code></pre>
+        <p><strong>What it does:</strong></p>
+        <ul>
+        <li>Tells browser: "Trust the Content-Type header"</li>
+        <li>Browser will NOT sniff the actual content</li>
+        <li>If header says <code>text/plain</code>, treat as plain text
+        (even if it's script)</li>
+        </ul>
+        <p><strong>Example:</strong></p>
+        <pre><code>Server sends:
+  Content-Type: text/plain
+  X-Content-Type-Options: nosniff
+  &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;
+
+Browser:
+  ├─ Reads Content-Type: text/plain
+  ├─ Sees X-Content-Type-Options: nosniff
+  ├─ Does NOT sniff content
+  ├─ Treats as plain text
+  └─ Displays as text (script not executed) ✅</code></pre>
+        <h3 id="current-configuration">Current Configuration</h3>
+        <pre class="nginx"><code>add_header X-Content-Type-Options &quot;nosniff&quot; always;</code></pre>
+        <p><strong>Status:</strong> ✅ Correctly configured</p>
+        <hr />
+        <h2
+        id="x-frame-options-clickjacking-prevention">X-Frame-Options:
+        Clickjacking Prevention</h2>
+        <h3 id="what-is-clickjacking">What is Clickjacking?</h3>
+        <p>Clickjacking (UI redressing) tricks users into clicking
+        hidden elements:</p>
+        <p><strong>Attack scenario:</strong></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Attacker&#39;s site --&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span> <span class="er">style</span><span class="ot">=</span><span class="st">&quot;position: absolute; opacity: 0; top: 0; left: 0; width: 100%; height: 100%;&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">iframe</span> <span class="er">src</span><span class="ot">=</span><span class="st">&quot;https://stockease.com/api/delete-product?id=123&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">iframe</span><span class="dt">&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- Invisible iframe on top --&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Visible content below --&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span> <span class="er">style</span><span class="ot">=</span><span class="st">&quot;position: relative; z-index: -1; padding: 100px;&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Free Prize! Click Here to Claim<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">button</span><span class="dt">&gt;</span>Click Me!<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- User clicks visible button --&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- Actually clicks hidden iframe button --&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">&lt;!-- Accidental API call executed ❌ --&gt;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div>
+        <h3 id="x-frame-options-header">X-Frame-Options Header</h3>
+        <pre class="http"><code>X-Frame-Options: DENY</code></pre>
+        <p><strong>Possible values:</strong></p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Value</th>
+        <th>Effect</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>DENY</code></td>
+        <td>Cannot be embedded in ANY iframe</td>
+        </tr>
+        <tr class="even">
+        <td><code>SAMEORIGIN</code></td>
+        <td>Can embed in iframe from same origin</td>
+        </tr>
+        <tr class="odd">
+        <td><code>ALLOW-FROM origin</code></td>
+        <td>Can embed in iframe from specific origin (deprecated)</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>How it works:</strong></p>
+        <pre><code>Browser loads: &lt;iframe src=&quot;https://stockease.com&quot;&gt;
+
+Check: X-Frame-Options header
+  ├─ DENY → Refuse to load in iframe ❌
+  ├─ SAMEORIGIN → Check if same origin
+  │   ├─ iframe is from same origin → Load ✅
+  │   └─ iframe is from different origin → Refuse ❌
+  └─ ALLOW-FROM → Check if from allowed origin</code></pre>
+        <h3 id="current-configuration-1">Current Configuration</h3>
+        <pre class="nginx"><code>add_header X-Frame-Options &quot;DENY&quot; always;</code></pre>
+        <p><strong>Status:</strong> ✅ Correctly configured (most
+        restrictive)</p>
+        <p><strong>Implications:</strong></p>
+        <ul>
+        <li>StockEase cannot be embedded in iframes (anywhere)</li>
+        <li>Prevents clickjacking completely</li>
+        <li>May affect some legitimate use cases (e.g., dashboard
+        widgets)</li>
+        </ul>
+        <h3 id="adjust-if-needed">Adjust if Needed</h3>
+        <p><strong>Allow same-origin iframes:</strong></p>
+        <pre class="nginx"><code>add_header X-Frame-Options &quot;SAMEORIGIN&quot; always;</code></pre>
+        <p><strong>Use case:</strong> Admin dashboard in iframe on same
+        domain</p>
+        <hr />
+        <h2
+        id="x-xss-protection-legacy-xss-protection">X-XSS-Protection:
+        Legacy XSS Protection</h2>
+        <h3 id="what-is-x-xss-protection">What is X-XSS-Protection?</h3>
+        <p>Legacy header for XSS protection in older browsers (IE, older
+        Chrome):</p>
+        <pre class="http"><code>X-XSS-Protection: 1; mode=block</code></pre>
+        <p><strong>Modes:</strong></p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Value</th>
+        <th>Effect</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>0</code></td>
+        <td>Disable XSS protection</td>
+        </tr>
+        <tr class="even">
+        <td><code>1</code></td>
+        <td>Enable XSS protection</td>
+        </tr>
+        <tr class="odd">
+        <td><code>1; mode=block</code></td>
+        <td>Block page if XSS detected</td>
+        </tr>
+        <tr class="even">
+        <td><code>1; report=uri</code></td>
+        <td>Report to URI if XSS detected</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>How it works:</strong></p>
+        <pre><code>Browser detects XSS (reflected):
+  ├─ With &quot;1; mode=block&quot; → Don&#39;t render page ✅
+  └─ With &quot;1&quot; → Sanitize and render ⚠️</code></pre>
+        <h3 id="current-configuration-2">Current Configuration</h3>
+        <pre class="nginx"><code>add_header X-XSS-Protection &quot;1; mode=block&quot; always;</code></pre>
+        <p><strong>Status:</strong> ✅ Correctly configured</p>
+        <p><strong>Modern browsers:</strong> Ignore this header (use CSP
+        instead)<br />
+        <strong>Legacy browsers:</strong> Benefit from protection</p>
+        <hr />
+        <h2
+        id="referrer-policy-prevent-referrer-leakage">Referrer-Policy:
+        Prevent Referrer Leakage</h2>
+        <h3 id="what-is-referrer-leakage">What is Referrer Leakage?</h3>
+        <p>When user navigates from one site to another, browser sends
+        <code>Referer</code> header:</p>
+        <pre><code>User on https://stockease.com/admin/secret-page
+Clicks link to https://example.com
+
+Browser sends:
+  Referer: https://stockease.com/admin/secret-page
+  
+Attacker now knows:
+  ├─ User visited StockEase
+  └─ They viewed /admin/secret-page</code></pre>
+        <p><strong>Sensitive data in URLs:</strong></p>
+        <pre><code>https://stockease.com/user/settings?email=john@example.com&amp;password=temp123
+^                                      ^ Leaks email and password to next site!</code></pre>
+        <h3 id="referrer-policy-header">Referrer-Policy Header</h3>
+        <pre class="http"><code>Referrer-Policy: strict-origin-when-cross-origin</code></pre>
+        <p><strong>Possible values:</strong></p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Policy</th>
+        <th>HTTPS→HTTPS</th>
+        <th>HTTPS→HTTP</th>
+        <th>HTTP→HTTPS</th>
+        <th>HTTP→HTTP</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>no-referrer</td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+        </tr>
+        <tr class="even">
+        <td>strict-origin</td>
+        <td>Origin</td>
+        <td>None</td>
+        <td>Origin</td>
+        <td>Origin</td>
+        </tr>
+        <tr class="odd">
+        <td>no-referrer-when-downgrade</td>
+        <td>Full</td>
+        <td>None</td>
+        <td>Full</td>
+        <td>Full</td>
+        </tr>
+        <tr class="even">
+        <td>same-origin</td>
+        <td>Full</td>
+        <td>None</td>
+        <td>None</td>
+        <td>Full</td>
+        </tr>
+        <tr class="odd">
+        <td>origin</td>
+        <td>Origin</td>
+        <td>Origin</td>
+        <td>Origin</td>
+        <td>Origin</td>
+        </tr>
+        <tr class="even">
+        <td>strict-origin-when-cross-origin</td>
+        <td>Full</td>
+        <td>None</td>
+        <td>Origin</td>
+        <td>Full</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="current-configuration-3">Current Configuration</h3>
+        <pre class="nginx"><code>add_header Referrer-Policy &quot;strict-origin-when-cross-origin&quot; always;</code></pre>
+        <p><strong>What it does:</strong></p>
+        <ul>
+        <li>HTTPS to HTTPS: Send full URL</li>
+        <li>HTTPS to HTTP: Send nothing (prevent downgrade)</li>
+        <li>HTTP to HTTPS: Send origin only</li>
+        <li>HTTP to HTTP: Send full URL</li>
+        </ul>
+        <p><strong>Status:</strong> ✅ Good balance of privacy and
+        functionality</p>
+        <hr />
+        <h2 id="hsts-http-strict-transport-security">HSTS (HTTP Strict
+        Transport Security)</h2>
+        <h3 id="what-is-hsts">What is HSTS?</h3>
+        <p>HSTS forces browsers to use HTTPS only:</p>
+        <pre class="http"><code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code></pre>
+        <h3 id="how-hsts-works">How HSTS Works</h3>
+        <pre><code>Browser visits: http://stockease.com (plain HTTP)
+
+Server responds:
+  HTTP/1.1 200 OK
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  
+Browser remembers:
+  ├─ For 31536000 seconds (1 year)
+  ├─ Always use HTTPS for this domain
+  └─ Apply to all subdomains too
+
+Next request to: http://stockease.com
+  ├─ Before HSTS: Browser sends HTTP ❌
+  └─ With HSTS: Browser upgrades to HTTPS ✅</code></pre>
+        <h3 id="hsts-directives">HSTS Directives</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Directive</th>
+        <th>Purpose</th>
+        <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>max-age</code></td>
+        <td>How long to enforce (seconds)</td>
+        <td>31536000 (1 year)</td>
+        </tr>
+        <tr class="even">
+        <td><code>includeSubDomains</code></td>
+        <td>Apply to all subdomains</td>
+        <td>Recommended</td>
+        </tr>
+        <tr class="odd">
+        <td><code>preload</code></td>
+        <td>Add to HSTS preload list</td>
+        <td>Optional (stricter)</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="current-configuration-4">Current Configuration</h3>
+        <p><strong>❌ NOT CONFIGURED</strong></p>
+        <p>StockEase should add:</p>
+        <pre class="nginx"><code>add_header Strict-Transport-Security &quot;max-age=31536000; includeSubDomains&quot; always;</code></pre>
+        <h3 id="hsts-benefits">HSTS Benefits</h3>
+        <p>✅ <strong>Prevents downgrade attacks</strong></p>
+        <ul>
+        <li>Attacker cannot force HTTP</li>
+        <li>Forces HTTPS upgrade automatically</li>
+        </ul>
+        <p>✅ <strong>Improves performance</strong></p>
+        <ul>
+        <li>Skips HTTP request (goes straight to HTTPS)</li>
+        <li>Reduces one round-trip</li>
+        </ul>
+        <p>✅ <strong>Enhances security</strong></p>
+        <ul>
+        <li>Protects against MITM (Man-in-the-Middle)</li>
+        <li>Works even if first visit is HTTP</li>
+        </ul>
+        <h3 id="hsts-risks">HSTS Risks</h3>
+        <p>⚠️ <strong>max-age too long</strong></p>
+        <ul>
+        <li>If you stop using HTTPS, users stuck</li>
+        <li>Can't access site until max-age expires</li>
+        </ul>
+        <p>⚠️ <strong>includeSubDomains</strong></p>
+        <ul>
+        <li>All subdomains must support HTTPS</li>
+        <li>Enforce consistently</li>
+        </ul>
+        <h3 id="recommended-implementation">Recommended
+        Implementation</h3>
+        <p><strong>Start conservative:</strong></p>
+        <pre class="nginx"><code># 2 weeks (test period)
+add_header Strict-Transport-Security &quot;max-age=1209600&quot; always;</code></pre>
+        <p><strong>After testing:</strong></p>
+        <pre class="nginx"><code># 1 month (adjust when comfortable)
+add_header Strict-Transport-Security &quot;max-age=2592000&quot; always;</code></pre>
+        <p><strong>Production (final):</strong></p>
+        <pre class="nginx"><code># 1 year (after confirming HTTPS is permanent)
+add_header Strict-Transport-Security &quot;max-age=31536000; includeSubDomains&quot; always;</code></pre>
+        <hr />
+        <h2 id="recommended-headers-for-production">Recommended Headers
+        for Production</h2>
+        <h3 id="enhanced-configuration">Enhanced Configuration</h3>
+        <pre class="nginx"><code># =========================================================================
+# Enhanced Security Headers (Recommended)
+# =========================================================================
+
+# Prevent MIME sniffing
+add_header X-Content-Type-Options &quot;nosniff&quot; always;
+
+# Prevent clickjacking
+add_header X-Frame-Options &quot;DENY&quot; always;
+
+# Legacy XSS protection (old browsers)
+add_header X-XSS-Protection &quot;1; mode=block&quot; always;
+
+# Control referrer information
+add_header Referrer-Policy &quot;strict-origin-when-cross-origin&quot; always;
+
+# Force HTTPS (only after full HTTPS migration)
+add_header Strict-Transport-Security &quot;max-age=31536000; includeSubDomains&quot; always;
+
+# Content Security Policy (see CSP documentation)
+add_header Content-Security-Policy &quot;
+  default-src &#39;self&#39;;
+  script-src &#39;self&#39; &#39;unsafe-inline&#39;;
+  style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com;
+  font-src &#39;self&#39; https://fonts.gstatic.com data:;
+  img-src &#39;self&#39; data: https:;
+  connect-src &#39;self&#39; https://api.stockease.com;
+  frame-src &#39;none&#39;;
+  object-src &#39;none&#39;;
+  base-uri &#39;self&#39;;
+  form-action &#39;self&#39;;
+&quot; always;
+
+# Additional security headers
+add_header Permissions-Policy &quot;geolocation=(), microphone=(), camera=()&quot; always;
+add_header X-Permitted-Cross-Domain-Policies &quot;none&quot; always;</code></pre>
+        <hr />
+        <h2 id="nginx-configuration-locations">nginx Configuration
+        Locations</h2>
+        <h3 id="file-location">File Location</h3>
+        <pre><code>ops/nginx/nginx.conf
+├─ Server block
+│   ├─ Security headers
+│   ├─ Caching rules
+│   ├─ Compression
+│   └─ Routing</code></pre>
+        <h3 id="current-security-section">Current Security Section</h3>
+        <pre class="nginx"><code>server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+
+  # ... SPA routing, caching, compression ...
+
+  # =========================================================================
+  # Security Headers
+  # =========================================================================
+  add_header X-Content-Type-Options &quot;nosniff&quot; always;
+  add_header X-XSS-Protection &quot;1; mode=block&quot; always;
+  add_header X-Frame-Options &quot;DENY&quot; always;
+  add_header Referrer-Policy &quot;strict-origin-when-cross-origin&quot; always;
+
+  # =========================================================================
+  # Error Pages
+  # =========================================================================
+  error_page 404 /index.html;
+}</code></pre>
+        <hr />
+        <h2 id="testing-security-headers">Testing Security Headers</h2>
+        <h3 id="using-curl">Using curl</h3>
+        <div class="sourceCode" id="cb28"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all response headers</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> https://frontend.stockease.com</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get specific header</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> https://frontend.stockease.com <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> <span class="st">&quot;X-Frame-Options&quot;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Output:</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co"># X-Frame-Options: DENY</span></span></code></pre></div>
+        <h3 id="using-online-tools">Using Online Tools</h3>
+        <ul>
+        <li><a href="https://securityheaders.com/">Security Headers
+        Scanner</a></li>
+        <li><a href="https://observatory.mozilla.org/">Mozilla
+        Observatory</a></li>
+        <li><a href="https://tools.digitalocean.com/">DigitalOcean DNS
+        Checker</a></li>
+        </ul>
+        <h3 id="expected-output">Expected Output</h3>
+        <pre><code>Checking https://frontend.stockease.com
+
+Headers found:
+✓ X-Content-Type-Options: nosniff
+✓ X-XSS-Protection: 1; mode=block
+✓ X-Frame-Options: DENY
+✓ Referrer-Policy: strict-origin-when-cross-origin
+⚠ Strict-Transport-Security: MISSING (recommended)
+⚠ Content-Security-Policy: MISSING (recommended)
+
+Score: A (good)
+Grade: B+ (add HSTS and CSP for A+)</code></pre>
+        <hr />
+        <h2 id="common-issues--solutions">Common Issues &amp;
+        Solutions</h2>
+        <h3 id="issue-1-hsts-causes-redirect-loop">Issue 1: HSTS Causes
+        Redirect Loop</h3>
+        <p><strong>Problem:</strong></p>
+        <pre><code>Browser tries: http://stockease.com
+HSTS forces: https://stockease.com
+nginx redirects: http://stockease.com
+Loop ❌</code></pre>
+        <p><strong>Cause:</strong> HSTS set but no HTTP→HTTPS redirect
+        in nginx</p>
+        <p><strong>Solution:</strong></p>
+        <pre class="nginx"><code># Ensure HTTP listener redirects
+server {
+  listen 80;
+  server_name _;
+  return 301 https://$server_name$request_uri;
+}
+
+# HTTPS server with headers
+server {
+  listen 443 ssl http2;
+  server_name _;
+  
+  add_header Strict-Transport-Security &quot;max-age=31536000&quot; always;
+}</code></pre>
+        <h3 id="issue-2-deny-too-restrictive">Issue 2: DENY Too
+        Restrictive</h3>
+        <p><strong>Problem:</strong> Legitimate admin dashboard cannot
+        embed in iframe</p>
+        <p><strong>Solution:</strong></p>
+        <pre class="nginx"><code># Allow same-origin embedding
+add_header X-Frame-Options &quot;SAMEORIGIN&quot; always;</code></pre>
+        <h3 id="issue-3-headers-not-appearing">Issue 3: Headers Not
+        Appearing</h3>
+        <p><strong>Problem:</strong></p>
+        <div class="sourceCode" id="cb33"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> https://stockease.com <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;X-Frame-Options&quot;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># No output</span></span></code></pre></div>
+        <p><strong>Cause:</strong></p>
+        <ul>
+        <li>nginx not reloaded after config change</li>
+        <li>Headers only added for specific routes</li>
+        </ul>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb34"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload nginx</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec nginx nginx <span class="at">-s</span> reload</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or restart container</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> restart nginx-container</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> https://stockease.com <span class="kw">|</span> <span class="fu">head</span> <span class="at">-20</span></span></code></pre></div>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <ul>
+        <li>✅ Include all recommended security headers</li>
+        <li>✅ Set <code>always</code> flag (even for error
+        responses)</li>
+        <li>✅ Test headers before production</li>
+        <li>✅ Document why each header is needed</li>
+        <li>✅ Keep headers consistent across all pages</li>
+        <li>✅ Monitor header compliance</li>
+        </ul>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <ul>
+        <li>❌ Disable security headers for convenience</li>
+        <li>❌ Set max-age too high initially</li>
+        <li>❌ Forget to reload nginx after config changes</li>
+        <li>❌ Ignore header warnings</li>
+        <li>❌ Set conflicting headers</li>
+        </ul>
+        <hr />
+        <h2 id="related-files">Related Files</h2>
+        <ul>
+        <li><strong>nginx Config:</strong>
+        <code>ops/nginx/nginx.conf</code></li>
+        <li><strong>Docker Setup:</strong> <code>Dockerfile</code></li>
+        <li><strong>CI/CD:</strong>
+        <code>.github/workflows/deploy-frontend.yml</code></li>
+        <li><strong>CSP Documentation:</strong> See <a
+        href="../frontend/csp.html">Frontend Security - CSP</a></li>
+        </ul>
+        <hr />
+        <h2 id="references">References</h2>
+        <ul>
+        <li><a
+        href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_for_Your_Website_Cheat_Sheet.html">OWASP
+        Security Headers Cheat Sheet</a></li>
+        <li><a
+        href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">MDN
+        HTTP Headers</a></li>
+        <li><a href="https://nginx.org/en/docs/">nginx
+        Documentation</a></li>
+        <li><a href="https://securityheaders.com/">Security Headers
+        Scanner</a></li>
+        <li><a href="https://hstspreload.org/">HSTS Preload
+        List</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Partially Configured (HSTS &amp; CSP
+        Recommended)<br />
+        <strong>Priority:</strong> High (Defense against common
+        attacks)</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

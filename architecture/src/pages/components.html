@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>components - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="page-components-reference">Page Components
+        Reference</h1>
+        <h2 id="complete-page-inventory">Complete Page Inventory</h2>
+        <p>This document describes each page component in detail,
+        including its purpose, features, and usage.</p>
+        <hr />
+        <h2 id="1-homepage">1. HomePage</h2>
+        <p><strong>Route</strong>: <code>/</code></p>
+        <p><strong>Access</strong>: Public (no authentication
+        required)</p>
+        <p><strong>Purpose</strong>: Landing page and application
+        introduction</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Welcome message with app description</li>
+        <li>Navigation to main features</li>
+        <li>Quick stats or featured products (optional)</li>
+        <li>Link to login for unauthenticated users</li>
+        <li>Feature highlights</li>
+        </ul>
+        <p><strong>Layout</strong>:</p>
+        <pre><code>┌─────────────────────────────────┐
+│           Header                │
+├─────────┬───────────────────────┤
+│         │                       │
+│ Sidebar │  Hero Section         │
+│         │  - Welcome            │
+│         │  - Feature highlights │
+│         │  - Call to action     │
+│         │                       │
+├─────────┴───────────────────────┤
+│           Footer                │
+└─────────────────────────────────┘</code></pre>
+        <p><strong>Key Elements</strong>:</p>
+        <ul>
+        <li>Hero section with app overview</li>
+        <li>Feature cards</li>
+        <li>Login/Sign-up buttons</li>
+        <li>Navigation links</li>
+        </ul>
+        <hr />
+        <h2 id="2-loginpage">2. LoginPage</h2>
+        <p><strong>Route</strong>: <code>/login</code></p>
+        <p><strong>Access</strong>: Public (redirects if already
+        authenticated)</p>
+        <p><strong>Purpose</strong>: User authentication and session
+        initiation</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Login form (email/username, password)</li>
+        <li>Form validation with error messages</li>
+        <li>Loading state during submission</li>
+        <li>Remember me option (optional)</li>
+        <li>Redirect to dashboard on successful login</li>
+        </ul>
+        <p><strong>Form Fields</strong>:</p>
+        <pre><code>Email/Username    [__________________]
+Password          [__________________]
+                  [☐ Remember me]
+
+         [Cancel] [Login]</code></pre>
+        <p><strong>Submission Flow</strong>:</p>
+        <div class="mermaid">
+        sequenceDiagram
+            participant User as User
+            participant Form as LoginForm
+            participant Service as auth.login()
+            participant API as API Server
+            participant Redux as Redux Store
+            participant Router as React Router
+
+            User->>Form: Enter credentials
+            User->>Form: Click login
+            Form->>Form: Validate input
+            Form->>Service: login(email, password)
+            Service->>API: POST /api/auth/login
+            API-->>Service: {token, role, userId}
+            Service->>Redux: dispatch(setUser)
+            Redux->>Form: Update auth state
+            Form->>Router: Navigate to /user or /admin
+            Router->>Router: Load appropriate dashboard
+        </div>
+        <p><strong>Error Handling</strong>:</p>
+        <ul>
+        <li><strong>Invalid credentials</strong>: Display error message,
+        allow retry</li>
+        <li><strong>Network error</strong>: Show retry prompt or
+        connection error</li>
+        <li><strong>Server error</strong>: Display generic error
+        message</li>
+        <li><strong>Session expired</strong>: Clear cache, redirect to
+        login</li>
+        </ul>
+        <p><strong>Success Handling</strong>:</p>
+        <ul>
+        <li>Save auth token to localStorage</li>
+        <li>Store user role (admin/user)</li>
+        <li>Redirect based on role:
+        <ul>
+        <li>Admin → <code>/admin</code> (AdminDashboard)</li>
+        <li>User → <code>/user</code> (UserDashboard)</li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="3-userdashboard">3. UserDashboard</h2>
+        <p><strong>Route</strong>: <code>/user</code></p>
+        <p><strong>Access</strong>: Authenticated users only</p>
+        <p><strong>Purpose</strong>: User-specific inventory management
+        and statistics</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Display products owned by user</li>
+        <li>Inventory statistics (total, value, low stock)</li>
+        <li>Search and filter functionality</li>
+        <li>Quick product actions (view, edit, delete)</li>
+        <li>Responsive grid/table layout</li>
+        <li>Real-time updates</li>
+        </ul>
+        <p><strong>Data Flow</strong>:</p>
+        <pre><code>Page Load
+  ↓
+Check authentication
+  ├─ Not authenticated → Redirect to /login
+  └─ Authenticated → Continue
+  ↓
+Fetch user&#39;s products (via Redux/API)
+  ↓
+Calculate statistics
+  ├─ Total products count
+  ├─ Total inventory value
+  ├─ Low stock items count
+  └─ Average price
+  ↓
+Render dashboard with data</code></pre>
+        <p><strong>Key Sections</strong>:</p>
+        <ul>
+        <li><p><strong>Statistics Cards</strong></p>
+        <ul>
+        <li>Total Products</li>
+        <li>Total Value</li>
+        <li>Low Stock Count</li>
+        <li>Average Price</li>
+        </ul></li>
+        <li><p><strong>Product Table/Grid</strong></p>
+        <ul>
+        <li>Product name, price, quantity</li>
+        <li>Stock status indicator</li>
+        <li>Last updated date</li>
+        <li>Action buttons</li>
+        </ul></li>
+        <li><p><strong>Filter/Search Bar</strong></p>
+        <ul>
+        <li>Search by product name</li>
+        <li>Filter by stock status</li>
+        <li>Sort options</li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="4-admindashboard">4. AdminDashboard</h2>
+        <p><strong>Route</strong>: <code>/admin</code></p>
+        <p><strong>Access</strong>: Admin users only</p>
+        <p><strong>Purpose</strong>: Administrative control panel</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>View entire product inventory (not just owned products)</li>
+        <li>System-wide statistics</li>
+        <li>Quick links to admin operations</li>
+        <li>User management (optional)</li>
+        <li>Bulk operations (optional)</li>
+        </ul>
+        <p><strong>Admin-Specific Features</strong>:</p>
+        <ul>
+        <li>View all products in system</li>
+        <li>Add/edit/delete product links</li>
+        <li>Audit logs (optional)</li>
+        <li>System health overview</li>
+        <li>User activity summary</li>
+        </ul>
+        <p><strong>Quick Links</strong>:</p>
+        <ul>
+        <li><a href="./components.html#5-addproductpage">Add
+        Product</a></li>
+        <li><a href="./components.html#6-changeproductdetailspage">Edit
+        Product</a></li>
+        <li><a href="./components.html#7-deleteproductpage">Delete
+        Product</a></li>
+        <li>View All Products</li>
+        </ul>
+        <hr />
+        <h2 id="5-addproductpage">5. AddProductPage</h2>
+        <p><strong>Route</strong>: <code>/add-product</code></p>
+        <p><strong>Access</strong>: Admin users only</p>
+        <p><strong>Purpose</strong>: Create and add new products to
+        inventory</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Product information form</li>
+        <li>Input validation</li>
+        <li>Error messages</li>
+        <li>Success confirmation</li>
+        <li>Redirect to admin dashboard after save</li>
+        </ul>
+        <p><strong>Form Fields</strong>:</p>
+        <pre><code>Product Name      [__________________]
+Price             [__________________]
+Quantity          [__________________]
+Description       [__________________]
+Category (opt.)   [__________________]
+
+         [Cancel] [Save Product]</code></pre>
+        <p><strong>Form Validation</strong>:</p>
+        <ul>
+        <li>Product name: Required, max 100 chars</li>
+        <li>Price: Required, positive number</li>
+        <li>Quantity: Required, non-negative integer</li>
+        <li>Description: Optional, max 500 chars</li>
+        </ul>
+        <p><strong>Submission Flow</strong>:</p>
+        <div class="mermaid">
+        graph TD
+            A["Admin fills form"]
+            B["Validate inputs"]
+            C{"All valid?"}
+            D["Display errors"]
+            E["Submit to API"]
+            F["Create product"]
+            G["Show success message"]
+            H["Redirect to /admin"]
+            
+            A --> B
+            B --> C
+            C -->|No| D
+            D --> A
+            C -->|Yes| E
+            E --> F
+            F --> G
+            G --> H
+        </div>
+        <p><strong>Error Handling</strong>:</p>
+        <ul>
+        <li>Show field-level validation errors</li>
+        <li>Display API error messages</li>
+        <li>Allow retry on failure</li>
+        </ul>
+        <hr />
+        <h2 id="6-changeproductdetailspage">6.
+        ChangeProductDetailsPage</h2>
+        <p><strong>Route</strong>:
+        <code>/product/:productId/edit</code></p>
+        <p><strong>Access</strong>: Admin users only</p>
+        <p><strong>Purpose</strong>: Edit and update existing product
+        information</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Pre-populated form with current product data</li>
+        <li>Update validation</li>
+        <li>Optimistic UI updates</li>
+        <li>Conflict resolution</li>
+        <li>Change history (optional)</li>
+        </ul>
+        <p><strong>Route Parameters</strong>:</p>
+        <ul>
+        <li><code>productId</code> (number or string): ID of product to
+        edit</li>
+        </ul>
+        <p><strong>Data Flow</strong>:</p>
+        <pre><code>1. Extract productId from URL: /product/123/edit
+2. Load product details from API
+3. Pre-fill form with current values
+4. Admin edits fields
+5. Submit changes
+6. Update in backend
+7. Update Redux store
+8. Show success message
+9. Redirect to /admin</code></pre>
+        <p><strong>Form Pre-filling</strong>:</p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">useEffect</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> product <span class="op">=</span> ProductService<span class="op">.</span><span class="fu">getProduct</span>(productId)<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setForm</span>({</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    name<span class="op">:</span> product<span class="op">.</span><span class="at">name</span><span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    price<span class="op">:</span> product<span class="op">.</span><span class="at">price</span><span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    quantity<span class="op">:</span> product<span class="op">.</span><span class="at">quantity</span><span class="op">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    description<span class="op">:</span> product<span class="op">.</span><span class="at">description</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [productId])<span class="op">;</span></span></code></pre></div>
+        <p><strong>Change Tracking</strong> (optional):</p>
+        <ul>
+        <li>Show which fields changed</li>
+        <li>Display original values</li>
+        <li>Confirm before save</li>
+        </ul>
+        <hr />
+        <h2 id="7-deleteproductpage">7. DeleteProductPage</h2>
+        <p><strong>Route</strong>: <code>/delete-product</code></p>
+        <p><strong>Access</strong>: Admin users only</p>
+        <p><strong>Purpose</strong>: Safely delete products with
+        confirmation</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Product search/selection dropdown</li>
+        <li>Confirmation dialog with warning</li>
+        <li>Safety checks (e.g., can't delete if in orders)</li>
+        <li>Success/error feedback</li>
+        <li>Optional undo functionality</li>
+        </ul>
+        <p><strong>Deletion Flow</strong>:</p>
+        <div class="mermaid">
+        graph TD
+            A["Admin selects product"]
+            B["Display confirmation dialog"]
+            C{"Admin confirms?"}
+            D["Cancel deletion"]
+            E["Check if deletable"]
+            F{"Can delete?"}
+            G["Show error/warning"]
+            H["Delete from database"]
+            I["Remove from UI"]
+            J["Show success message"]
+            
+            A --> B
+            B --> C
+            C -->|No| D
+            C -->|Yes| E
+            E --> F
+            F -->|No| G
+            F -->|Yes| H
+            H --> I
+            I --> J
+        </div>
+        <p><strong>Safety Checks</strong>:</p>
+        <ul>
+        <li>Verify product exists</li>
+        <li>Check for related orders</li>
+        <li>Require admin confirmation</li>
+        <li>Log deletion action</li>
+        </ul>
+        <p><strong>Confirmation Dialog</strong>:</p>
+        <pre><code>Are you sure you want to delete this product?
+
+Product: Hammer (ID: 123)
+This action cannot be undone.
+
+[Cancel] [Delete Permanently]</code></pre>
+        <hr />
+        <h2 id="8-searchproductpage">8. SearchProductPage</h2>
+        <p><strong>Route</strong>: <code>/search-product</code></p>
+        <p><strong>Access</strong>: Authenticated users</p>
+        <p><strong>Purpose</strong>: Search and filter products across
+        inventory</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Text search by product name (with debouncing)</li>
+        <li>Filter options (category, price range, stock status)</li>
+        <li>Result pagination</li>
+        <li>Result count display</li>
+        <li>Loading states</li>
+        <li>No results handling</li>
+        </ul>
+        <p><strong>Search Parameters</strong>:</p>
+        <ul>
+        <li>Query: Product name (substring match)</li>
+        <li>Category (optional): Product type</li>
+        <li>Price range (optional): Min-Max price filter</li>
+        <li>Stock status (optional): Low stock / In stock</li>
+        </ul>
+        <p><strong>Search Flow</strong>:</p>
+        <pre><code>User types in search box
+  ↓
+Debounce (300ms wait)
+  ↓
+Call ProductService.searchProducts(query, filters)
+  ↓
+Show loading spinner
+  ↓
+Receive results from API
+  ↓
+Display results with pagination
+  ↓
+User can refine filters
+  ↓
+Results update automatically</code></pre>
+        <p><strong>Results Display</strong>:</p>
+        <ul>
+        <li>Product cards or table rows</li>
+        <li>Relevant information (name, price, quantity)</li>
+        <li>Action buttons (view, edit)</li>
+        <li>Pagination controls</li>
+        </ul>
+        <hr />
+        <h2 id="9-liststockpage">9. ListStockPage</h2>
+        <p><strong>Route</strong>: <code>/list-stock</code></p>
+        <p><strong>Access</strong>: Authenticated users</p>
+        <p><strong>Purpose</strong>: View complete inventory with
+        sorting and filtering</p>
+        <p><strong>Features</strong>:</p>
+        <ul>
+        <li>Complete product inventory list</li>
+        <li>Sorting by multiple columns</li>
+        <li>Filtering by stock status</li>
+        <li>Pagination</li>
+        <li>Multiple view options (table, grid, card)</li>
+        <li>Export functionality (optional)</li>
+        </ul>
+        <p><strong>Display Options</strong>:</p>
+        <ul>
+        <li><strong>Table View</strong> (default): Compact, sortable
+        columns</li>
+        <li><strong>Grid View</strong>: Card-based layout</li>
+        <li><strong>Card View</strong>: Mobile-friendly,
+        touch-optimized</li>
+        </ul>
+        <p><strong>Table Columns</strong>:</p>
+        <ul>
+        <li>Product ID</li>
+        <li>Product Name</li>
+        <li>Price</li>
+        <li>Quantity in Stock</li>
+        <li>Status (Low stock / In stock)</li>
+        <li>Last Updated</li>
+        <li>Actions (View, Edit, Delete)</li>
+        </ul>
+        <p><strong>Sorting Options</strong>:</p>
+        <ul>
+        <li>By name (A→Z, Z→A)</li>
+        <li>By price (Low→High, High→Low)</li>
+        <li>By quantity (Low→High, High→Low)</li>
+        <li>By last updated (Newest first)</li>
+        </ul>
+        <p><strong>Filtering</strong>:</p>
+        <ul>
+        <li>Stock status: Low stock / In stock / All</li>
+        <li>Price range: Min-Max filter</li>
+        <li>Category: Optional category filter</li>
+        </ul>
+        <p><strong>Pagination</strong>:</p>
+        <ul>
+        <li>Items per page: 10, 25, 50</li>
+        <li>Page numbers</li>
+        <li>Previous/Next buttons</li>
+        <li>Jump to page input</li>
+        </ul>
+        <hr />
+        <h2 id="navigation-between-pages">Navigation Between Pages</h2>
+        <h3 id="from-homepage">From HomePage</h3>
+        <ul>
+        <li>→ LoginPage (if not authenticated)</li>
+        <li>→ UserDashboard (if logged in)</li>
+        <li>→ AdminDashboard (if admin)</li>
+        </ul>
+        <h3 id="from-loginpage">From LoginPage</h3>
+        <ul>
+        <li>→ UserDashboard (user role)</li>
+        <li>→ AdminDashboard (admin role)</li>
+        </ul>
+        <h3 id="from-userdashboard">From UserDashboard</h3>
+        <ul>
+        <li>→ SearchProductPage</li>
+        <li>→ ListStockPage</li>
+        <li>→ AdminDashboard (if admin)</li>
+        </ul>
+        <h3 id="from-admindashboard">From AdminDashboard</h3>
+        <ul>
+        <li>→ AddProductPage</li>
+        <li>→ ChangeProductDetailsPage (via product list)</li>
+        <li>→ DeleteProductPage</li>
+        <li>→ UserDashboard</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Overview</a> - Routing
+        architecture and summary</li>
+        <li><a href="./lifecycle.html">Page Lifecycle</a> - Component
+        structure and patterns</li>
+        <li><a href="./authentication.html">Authentication</a> - Route
+        protection and access control</li>
+        <li><a href="./performance.html">Performance</a> - Lazy loading
+        and optimization</li>
+        <li><a href="./testing.html">Testing</a> - Testing
+        strategies</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

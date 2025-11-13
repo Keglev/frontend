@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="docker-containerization--deployment">Docker
+        Containerization &amp; Deployment</h1>
+        <h2 id="overview">Overview</h2>
+        <p>StockEase Frontend uses <strong>multi-stage Docker
+        builds</strong> to create optimized production containers. The
+        build process compiles the React application and serves it via
+        nginx, minimizing image size and improving startup time.</p>
+        <h3 id="key-features">Key Features</h3>
+        <ul>
+        <li><strong>Multi-Stage Build</strong>: Reduces final image size
+        by excluding build artifacts</li>
+        <li><strong>Alpine Linux</strong>: Small base images for both
+        Node.js and nginx</li>
+        <li><strong>Build Argument</strong>: Runtime API
+        configuration</li>
+        <li><strong>SPA Routing</strong>: nginx configured for
+        client-side routing</li>
+        <li><strong>Security</strong>: Non-root execution and minimal
+        dependencies</li>
+        </ul>
+        <hr />
+        <h2 id="dockerfile-architecture">Dockerfile Architecture</h2>
+        <h3 id="multi-stage-build-diagram">Multi-Stage Build
+        Diagram</h3>
+        <div class="mermaid">
+        graph TB
+            subgraph "Stage 1: Builder"
+                Base1["node:18-alpine"]
+                Deps["Install Dependencies<br/>npm ci"]
+                Copy1["Copy Source Files<br/>src/, config files"]
+                Build["Build App<br/>npm run build"]
+                Dist["Output: dist/"]
+            end
+            
+            subgraph "Stage 2: Production"
+                Base2["nginx:stable-alpine"]
+                Copy2["Copy dist/<br/>to nginx"]
+                Config["Copy nginx.conf<br/>SPA routing"]
+                Runtime["Runtime: nginx"]
+            end
+            
+            Base1 -->|build| Deps
+            Deps -->|install| Copy1
+            Copy1 -->|source| Build
+            Build -->|output| Dist
+            
+            Base2 -->|setup| Copy2
+            Copy2 -->|config| Config
+            Config -->|start| Runtime
+            
+            Dist -.->|copy| Copy2
+            
+            style Base1 fill:#e3f2fd
+            style Base2 fill:#c8e6c9
+            style Runtime fill:#fff9c4
+        </div>
+        <hr />
+        <h2 id="build-stages">Build Stages</h2>
+        <p>The Docker build uses two stages to optimize final image
+        size:</p>
+        <h3 id="stage-1-builder">Stage 1: Builder</h3>
+        <p><strong>Base Image</strong>: <code>node:18-alpine</code>
+        (~180MB)</p>
+        <p><strong>Purpose</strong>: Compile TypeScript, bundle
+        JavaScript, optimize assets</p>
+        <ul>
+        <li>Install dependencies</li>
+        <li>Copy source files</li>
+        <li>Run build process</li>
+        <li>Output: optimized <code>dist/</code> directory</li>
+        </ul>
+        <p>See <a href="./build-stage.html">Build Stage Details</a> for
+        complete information.</p>
+        <h3 id="stage-2-production-nginx">Stage 2: Production
+        (nginx)</h3>
+        <p><strong>Base Image</strong>: <code>nginx:stable-alpine</code>
+        (~41MB)</p>
+        <p><strong>Purpose</strong>: Serve built application via web
+        server</p>
+        <ul>
+        <li>Copy optimized dist/ files</li>
+        <li>Configure nginx for SPA routing</li>
+        <li>Run production server</li>
+        <li><strong>Final size</strong>: ~45MB (no Node.js, no build
+        tools)</li>
+        </ul>
+        <p>See <a href="./production-stage.html">Production Stage
+        Details</a> for complete information.</p>
+        <hr />
+        <h2 id="key-components">Key Components</h2>
+        <h3 id="build-arguments--configuration">Build Arguments &amp;
+        Configuration</h3>
+        <p>Environment variables can be passed at build time for
+        different deployments:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Variable</th>
+        <th>Purpose</th>
+        <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>VITE_API_BASE_URL</td>
+        <td>Production API endpoint</td>
+        <td><code>https://api.stockease.com</code></td>
+        </tr>
+        <tr class="even">
+        <td>NODE_ENV</td>
+        <td>Build environment</td>
+        <td>production</td>
+        </tr>
+        </tbody>
+        </table>
+        <p>See <a href="./configuration.html">Build Configuration</a>
+        for detailed setup.</p>
+        <h3 id="nginx-configuration-for-spa-routing">nginx Configuration
+        for SPA Routing</h3>
+        <p>The nginx configuration enables client-side routing without
+        404 errors on non-root paths:</p>
+        <pre><code>/assets/... (static files)  → Serve with cache headers
+/admin, /user, etc.        → Serve index.html → React Router handles</code></pre>
+        <p>See <a href="./configuration.html#spa-routing">SPA Routing
+        Details</a> for complete configuration.</p>
+        <h3 id="dockerignore">.dockerignore</h3>
+        <p>Excludes unnecessary files from the Docker build context,
+        improving build speed:</p>
+        <ul>
+        <li>Tests and coverage files</li>
+        <li>Documentation</li>
+        <li>Git files and IDE config</li>
+        <li>Node modules (reinstalled)</li>
+        </ul>
+        <p>See <a href="./configuration.html#dockerignore">Build
+        Configuration</a> for complete list.</p>
+        <hr />
+        <h2 id="deployment-workflow">Deployment Workflow</h2>
+        <div class="mermaid">
+        graph TD
+            SourceCode["Source Code<br/>GitHub Repository"]
+            CI["GitHub Actions<br/>CI/CD Pipeline"]
+            Test["Run Tests"]
+            BuildApp["Build App"]
+            BuildDocker["Docker Build<br/>(Multi-stage)"]
+            Registry["Docker Registry"]
+            Deploy["Deploy to<br/>Production"]
+            Running["Running App<br/>Port 80"]
+            
+            SourceCode -->|Push| CI
+            CI --> Test
+            Test -->|Pass| BuildApp
+            BuildApp --> BuildDocker
+            BuildDocker -->|Push| Registry
+            Registry -->|Pull| Deploy
+            Deploy --> Running
+        </div>
+        <hr />
+        <h2 id="quick-links">Quick Links</h2>
+        <ul>
+        <li>📦 <a href="./build-stage.html">Build Stage Details</a> -
+        Node.js builder configuration</li>
+        <li>🚀 <a href="./production-stage.html">Production Stage
+        Details</a> - nginx runtime configuration</li>
+        <li>⚙️ <a href="./configuration.html">Build Configuration</a> -
+        Build args, dockerignore, SPA routing</li>
+        <li>🔧 <a href="./local-usage.html">Running Locally</a> - Docker
+        commands and docker-compose</li>
+        <li>🛡️ <a href="./security-performance.html">Security &amp;
+        Performance</a> - Optimization and best practices</li>
+        <li>� <a href="./ci-cd.html">CI/CD Pipeline</a> - GitHub Actions
+        workflow and automation</li>
+        <li>�🐛 <a href="./troubleshooting.html">Troubleshooting</a> -
+        Common issues and solutions</li>
+        </ul>
+        <hr />
+        <h2 id="performance-summary">Performance Summary</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Metric</th>
+        <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Final Image Size</td>
+        <td>~45MB</td>
+        </tr>
+        <tr class="even">
+        <td>Build Time</td>
+        <td>1-2 minutes (fresh) / 30-40s (cached)</td>
+        </tr>
+        <tr class="odd">
+        <td>Container Startup</td>
+        <td>&lt;2 seconds</td>
+        </tr>
+        <tr class="even">
+        <td>Memory Usage</td>
+        <td>50-100MB</td>
+        </tr>
+        <tr class="odd">
+        <td>Response Time</td>
+        <td>&lt;100ms</td>
+        </tr>
+        <tr class="even">
+        <td>Concurrent Connections</td>
+        <td>1000+</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="architecture-comparison">Architecture Comparison</h2>
+        <h3 id="development">Development</h3>
+        <ul>
+        <li>Vite dev server with hot reload</li>
+        <li>Full source maps</li>
+        <li>Slower build, faster iteration</li>
+        </ul>
+        <h3 id="production-docker">Production (Docker)</h3>
+        <ul>
+        <li>Optimized bundle</li>
+        <li>Minimal dependencies</li>
+        <li>Fast startup, efficient serving</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="../pipeline/overview.html">CI/CD Pipeline</a></li>
+        <li><a href="../overview.html">Main Overview</a></li>
+        <li><a href="../pipeline/overview.html">GitHub Actions
+        CI/CD</a></li>
+        <li><a href="https://docs.docker.com/">Official Docker
+        Docs</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Node Version</strong>: 18 Alpine<br />
+        <strong>nginx Version</strong>: Stable Alpine<br />
+        <strong>Final Image Size</strong>: ~45MB</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

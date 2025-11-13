@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-testing-overview">Security Testing
+        Overview</h1>
+        <p><strong>Version:</strong> 1.0.0<br />
+        <strong>Last Updated:</strong> 2024<br />
+        <strong>Status:</strong> Active</p>
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <p>The StockEase Frontend employs a comprehensive security
+        testing program with three pillars:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Testing Type</th>
+        <th>Focus</th>
+        <th>Timing</th>
+        <th>Tools</th>
+        <th>Coverage</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong><a href="sast.html">SAST</a></strong></td>
+        <td>Code-level vulnerabilities</td>
+        <td>During development</td>
+        <td>ESLint, TypeScript</td>
+        <td>Syntax errors, patterns</td>
+        </tr>
+        <tr class="even">
+        <td><strong><a
+        href="strategy.html">Unit/Integration</a></strong></td>
+        <td>Application logic security</td>
+        <td>Before merge</td>
+        <td>Vitest, jsdom</td>
+        <td>85%+ code coverage</td>
+        </tr>
+        <tr class="odd">
+        <td><strong><a href="dast.html">DAST</a></strong></td>
+        <td>Runtime vulnerabilities</td>
+        <td>Post-deploy</td>
+        <td>OWASP ZAP</td>
+        <td>API, UI, config</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="table-of-contents">Table of Contents</h2>
+        <ol type="1">
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#security-testing-pyramid">Security Testing
+        Pyramid</a></li>
+        <li><a href="#when-to-use-each-testing-type">When to Use Each
+        Testing Type</a></li>
+        <li><a href="#testing-standards--goals">Testing Standards &amp;
+        Goals</a></li>
+        <li><a href="#test-domains">Test Domains</a></li>
+        <li><a href="#running-tests">Running Tests</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#related-resources">Related Resources</a></li>
+        </ol>
+        <hr />
+        <h2 id="quick-start">Quick Start</h2>
+        <h3 id="for-developers">For Developers</h3>
+        <p><strong>Before pushing code:</strong></p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Run SAST (takes ~10 seconds)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Run unit/integration tests (takes ~30 seconds)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Check coverage</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span></span></code></pre></div>
+        <p><strong>During code review:</strong></p>
+        <ul>
+        <li>Verify SAST violations are addressed</li>
+        <li>Ensure test coverage ≥85% for security code</li>
+        <li>Check for dangerous code patterns</li>
+        </ul>
+        <h3 id="for-security-teams">For Security Teams</h3>
+        <p><strong>Weekly:</strong></p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run baseline DAST scan on staging</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dast:baseline <span class="at">--</span> <span class="at">--url</span> https://staging.stockease.local</span></code></pre></div>
+        <p><strong>Post-release:</strong></p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run full DAST scan on production</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dast:full <span class="at">--</span> <span class="at">--url</span> https://stockease.app</span></code></pre></div>
+        <p><strong>Continuous:</strong></p>
+        <ul>
+        <li>Monitor security test results</li>
+        <li>Track vulnerability trends</li>
+        <li>Review remediation progress</li>
+        </ul>
+        <hr />
+        <h2 id="security-testing-pyramid">Security Testing Pyramid</h2>
+        <pre><code>                    ▲
+                   / \
+                  /   \
+                 / DAST \ (1-2 tests)
+                /  Tests  \
+               /           \
+              /─────────────\
+              │   Full UI   │
+              │  Scenario   │
+              │   Testing   │
+              │             │
+              ├─────────────┤
+              │  Integration│  (10-20 tests per feature)
+              │   Tests     │
+              │             │
+              ├─────────────┤
+              │Unit &amp; Focus │  (50-100+ unit tests)
+              │  Security   │
+              │   Tests     │
+              │             │
+              ├─────────────┤
+              │   SAST      │  (Continuous - every keystroke)
+              │   Analysis  │
+              │(ESLint, TS) │
+              └─────────────┘
+
+Effort →     Low                        High
+Speed →      Fast (continuous)          Slow (30-45 min)
+Coverage →   Broad patterns             Deep vulnerabilities
+Timing →     Dev time                   After deployment</code></pre>
+        <h3 id="test-count-by-category">Test Count by Category</h3>
+        <p>Based on analysis of <code>src/__tests__/</code>
+        directory:</p>
+        <pre><code>Total Test Files: 40+
+Total Tests: 200+
+
+Distribution:
+├── SAST Rules:              ~500 linting rules active
+├── Unit Security Tests:     ~120 tests
+│   ├── Secrets (4 files):   ~30 tests
+│   ├── XSS:                 ~15 tests
+│   ├── CSRF:                ~12 tests
+│   ├── CSP:                 ~10 tests
+│   ├── Headers:             ~15 tests
+│   └── Components:          ~18 tests
+├── API Integration Tests:   ~30 tests
+├── Service Tests:           ~20 tests
+├── Component Tests:         ~15 tests
+└── Scenario/Playbook:       ~15 tests</code></pre>
+        <hr />
+        <h2 id="when-to-use-each-testing-type">When to Use Each Testing
+        Type</h2>
+        <h3 id="sast-static-analysis---use-when">SAST (Static Analysis)
+        - Use When...</h3>
+        <p>✅ <strong>Use SAST to:</strong></p>
+        <ul>
+        <li>Find syntax errors before runtime</li>
+        <li>Detect dangerous code patterns early</li>
+        <li>Enforce coding standards</li>
+        <li>Prevent common vulnerabilities</li>
+        <li>Get instant feedback during development</li>
+        </ul>
+        <p><strong>Frequency:</strong> Continuous (every save)
+        <strong>Time:</strong> &lt;1 second per file
+        <strong>Cost:</strong> Free (built-in tooling)</p>
+        <p><strong>Example Issues Caught:</strong></p>
+        <ul>
+        <li><code>eval()</code> usage</li>
+        <li>Direct <code>innerHTML</code> assignment</li>
+        <li>Missing null checks</li>
+        <li>Type mismatches</li>
+        </ul>
+        <p><strong>See:</strong> <a href="sast.html">Static Analysis
+        (SAST)</a></p>
+        <hr />
+        <h3 id="unit--integration-tests---use-when">Unit &amp;
+        Integration Tests - Use When...</h3>
+        <p>✅ <strong>Use Unit/Integration Tests to:</strong></p>
+        <ul>
+        <li>Validate security logic correctness</li>
+        <li>Test edge cases and error handling</li>
+        <li>Verify API integrations work safely</li>
+        <li>Ensure proper token management</li>
+        <li>Check authorization rules</li>
+        <li>Test component security features</li>
+        </ul>
+        <p><strong>Frequency:</strong> Before code review (every commit)
+        <strong>Time:</strong> 20-30 seconds for full suite
+        <strong>Cost:</strong> Part of development</p>
+        <p><strong>Example Tests:</strong></p>
+        <ul>
+        <li>Token storage in localStorage</li>
+        <li>XSS prevention in React components</li>
+        <li>CSRF token validation</li>
+        <li>CORS header checking</li>
+        <li>Error message sanitization</li>
+        </ul>
+        <p><strong>See:</strong> <a href="strategy.html">Testing
+        Strategy</a></p>
+        <hr />
+        <h3 id="dast-dynamic-testing---use-when">DAST (Dynamic Testing)
+        - Use When...</h3>
+        <p>✅ <strong>Use DAST to:</strong></p>
+        <ul>
+        <li>Test running application behavior</li>
+        <li>Find runtime configuration issues</li>
+        <li>Detect authentication/authorization flaws</li>
+        <li>Test API endpoints against payloads</li>
+        <li>Validate security headers</li>
+        <li>Identify race conditions</li>
+        <li>Test with real browser environment</li>
+        </ul>
+        <p><strong>Frequency:</strong> On PR (baseline), after merge
+        (full) <strong>Time:</strong> 5-10 min (baseline) / 30-45 min
+        (full) <strong>Cost:</strong> Free (OWASP ZAP is
+        open-source)</p>
+        <p><strong>Example Issues Caught:</strong></p>
+        <ul>
+        <li>CORS misconfiguration</li>
+        <li>Missing security headers</li>
+        <li>XSS in parameter handling</li>
+        <li>CSRF protection gaps</li>
+        <li>Authentication bypass</li>
+        </ul>
+        <p><strong>See:</strong> <a href="dast.html">Dynamic Testing
+        (DAST)</a></p>
+        <hr />
+        <h2 id="testing-standards--goals">Testing Standards &amp;
+        Goals</h2>
+        <h3 id="coverage-targets">Coverage Targets</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Code Type</th>
+        <th>Target Coverage</th>
+        <th>Minimum</th>
+        <th>Check</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Security-critical</td>
+        <td><strong>≥95%</strong></td>
+        <td>90%</td>
+        <td><code>npm test -- --coverage</code></td>
+        </tr>
+        <tr class="even">
+        <td>Auth/Authz</td>
+        <td><strong>≥90%</strong></td>
+        <td>85%</td>
+        <td>CI/CD failure threshold</td>
+        </tr>
+        <tr class="odd">
+        <td>General</td>
+        <td><strong>≥80%</strong></td>
+        <td>70%</td>
+        <td>Tracked in git</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="security-test-goals">Security Test Goals</h3>
+        <ul>
+        <li><strong>Unit Tests:</strong> Every security function has ≥2
+        test cases</li>
+        <li><strong>Integration Tests:</strong> Every API endpoint has
+        auth + validation tests</li>
+        <li><strong>DAST Scans:</strong> Zero critical issues before
+        release</li>
+        <li><strong>SAST:</strong> 100% of security rules pass</li>
+        </ul>
+        <h3 id="quality-metrics">Quality Metrics</h3>
+        <p><strong>Green Status Requires:</strong></p>
+        <pre><code>✅ SAST: npm run lint                    (0 security errors)
+✅ Unit: npm test -- security/          (all passing, ≥85% coverage)
+✅ Integration: npm test -- api/         (all passing)
+✅ Type Check: npx tsc --noEmit          (0 type errors)
+✅ DAST: OWASP ZAP baseline              (0 critical findings)</code></pre>
+        <hr />
+        <h2 id="test-domains">Test Domains</h2>
+        <h3 id="organized-by-security-concern">Organized by Security
+        Concern</h3>
+        <h4 id="1-secrets--sensitive-data-">1. <strong>Secrets &amp;
+        Sensitive Data</strong> 🔐</h4>
+        <p><strong>What's Tested:</strong> Token storage, error
+        messages, logging, environment variables<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/secrets/</code><br />
+        <strong>Importance:</strong> Critical - prevents credential
+        exposure<br />
+        <strong>Effort:</strong> 30 minutes to add new test</p>
+        <h4 id="2-cross-site-scripting-xss-">2. <strong>Cross-Site
+        Scripting (XSS)</strong> 🔗</h4>
+        <p><strong>What's Tested:</strong> Input escaping, DOM safety,
+        React component safety<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/xss/</code><br />
+        <strong>Importance:</strong> Critical - prevents account
+        takeover<br />
+        <strong>Effort:</strong> 20 minutes to add new test</p>
+        <h4 id="3-cross-site-request-forgery-csrf-">3.
+        <strong>Cross-Site Request Forgery (CSRF)</strong> 📝</h4>
+        <p><strong>What's Tested:</strong> Token validation,
+        state-changing request protection<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/csrf/</code><br />
+        <strong>Importance:</strong> High - prevents unauthorized
+        actions<br />
+        <strong>Effort:</strong> 25 minutes to add new test</p>
+        <h4 id="4-content-security-policy-csp-️">4. <strong>Content
+        Security Policy (CSP)</strong> 🛡️</h4>
+        <p><strong>What's Tested:</strong> CSP directive compliance,
+        nonce validation<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/csp/</code><br />
+        <strong>Importance:</strong> High - defense-in-depth against
+        XSS<br />
+        <strong>Effort:</strong> 30 minutes to add new test</p>
+        <h4 id="5-http-headers-">5. <strong>HTTP Headers</strong>
+        📊</h4>
+        <p><strong>What's Tested:</strong> CORS headers, security
+        headers, cache control<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/headers/</code><br />
+        <strong>Importance:</strong> High - prevents several
+        vulnerability classes<br />
+        <strong>Effort:</strong> 25 minutes to add new test</p>
+        <h4 id="6-authentication-">6. <strong>Authentication</strong>
+        🔑</h4>
+        <p><strong>What's Tested:</strong> Login/logout, token refresh,
+        session handling, RBAC<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/auth/authorization/</code><br />
+        <strong>Importance:</strong> Critical - gates access to
+        protected resources<br />
+        <strong>Effort:</strong> 35 minutes to add new test</p>
+        <h4 id="7-api-security-">7. <strong>API Security</strong>
+        🔗</h4>
+        <p><strong>What's Tested:</strong> Endpoint auth, parameter
+        validation, error handling<br />
+        <strong>Location:</strong> <code>src/__tests__/api/</code> and
+        <code>src/__tests__/services/</code><br />
+        <strong>Importance:</strong> Critical - backend integration
+        security<br />
+        <strong>Effort:</strong> 30 minutes to add new test</p>
+        <h4 id="8-component-security-️">8. <strong>Component
+        Security</strong> ⚛️</h4>
+        <p><strong>What's Tested:</strong> Component-level XSS,
+        authorization, error boundaries<br />
+        <strong>Location:</strong>
+        <code>src/__tests__/security/components/</code><br />
+        <strong>Importance:</strong> Medium - UI-specific security<br />
+        <strong>Effort:</strong> 20 minutes to add new test</p>
+        <hr />
+        <h2 id="running-tests">Running Tests</h2>
+        <h3 id="development-workflow">Development Workflow</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Before commit: Run SAST</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint                           <span class="co"># ESLint security checks</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Before push: Run all tests</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test                               <span class="co"># All unit/integration tests</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span>                 <span class="co"># With coverage report</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Watch mode for development</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--watch</span>                    <span class="co"># Re-run on file change</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Run specific test category</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/                  <span class="co"># All security tests</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/xss/              <span class="co"># Only XSS tests</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> auth/authorization         <span class="co"># Only auth tests</span></span></code></pre></div>
+        <h3 id="continuous-integration">Continuous Integration</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CI/CD runs these (see GitHub Actions)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. SAST</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Unit &amp; Integration Tests</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span> <span class="at">--reporter</span><span class="op">=</span>verbose</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Type checking</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="ex">npx</span> tsc <span class="at">--noEmit</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. DAST (if PR/merge)</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="ex">./scripts/run-dast-scan.sh</span></span></code></pre></div>
+        <h3 id="baseline-dast-scan-pr">Baseline DAST Scan (PR)</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Manual baseline run</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dast:baseline</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View report</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> ./zap-reports/baseline-report.html</span></code></pre></div>
+        <h3 id="full-dast-scan-staging">Full DAST Scan (Staging)</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Requires staging deployment</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dast:full <span class="at">--</span> <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--url</span> https://staging.stockease.local <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--report</span> ./dast-reports/full-report.html</span></code></pre></div>
+        <h3 id="coverage-report">Coverage Report</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate HTML coverage report</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Open in browser</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> ./coverage/index.html</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check specific file</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span> src/api/auth.ts</span></code></pre></div>
+        <hr />
+        <h2 id="troubleshooting">Troubleshooting</h2>
+        <h3 id="common-issues">Common Issues</h3>
+        <h4 id="tests-are-failing-but-code-looks-correct">"Tests are
+        failing, but code looks correct"</h4>
+        <p><strong>Solution:</strong></p>
+        <ol type="1">
+        <li>Check test setup: <code>src/__tests__/setup.ts</code></li>
+        <li>Verify mocks are configured:
+        <code>src/__tests__/mocks/</code></li>
+        <li>Run with debug info:
+        <code>npm test -- --reporter=verbose</code></li>
+        </ol>
+        <p><strong>Example:</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/secrets/ <span class="at">--reporter</span><span class="op">=</span>verbose</span></code></pre></div>
+        <hr />
+        <h4 id="coverage-report-shows-0-for-my-file">"Coverage report
+        shows 0% for my file"</h4>
+        <p><strong>Possible causes:</strong></p>
+        <ul>
+        <li>File isn't imported by any test</li>
+        <li>Tests aren't actually running the code</li>
+        <li>Import statement has an error</li>
+        </ul>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what&#39;s being covered</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span> src/api/auth.ts</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if file can be imported</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-e</span> <span class="st">&quot;import(&#39;./src/api/auth.ts&#39;)&quot;</span></span></code></pre></div>
+        <hr />
+        <h4 id="dast-scan-timeout-or-hanging">"DAST scan timeout or
+        hanging"</h4>
+        <p><strong>Solutions:</strong></p>
+        <ol type="1">
+        <li>Reduce scan depth:
+        <code>--config spider.maxDepth=2</code></li>
+        <li>Increase timeout: <code>--timeout 3600</code></li>
+        <li>Limit threads:
+        <code>--config ascan.threadPerHost=2</code></li>
+        <li>Check app is running:
+        <code>curl http://localhost:3000</code></li>
+        </ol>
+        <hr />
+        <h4 id="sast-error-plugin-not-found">"SAST error: Plugin not
+        found"</h4>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reinstall dependencies</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> node_modules package-lock.json</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify ESLint config</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="ex">npx</span> eslint <span class="at">--print-config</span> src/index.ts <span class="kw">|</span> <span class="fu">head</span> <span class="at">-20</span></span></code></pre></div>
+        <hr />
+        <h2 id="making-changes-to-tests">Making Changes to Tests</h2>
+        <h3 id="adding-a-new-security-test">Adding a New Security
+        Test</h3>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Create test file in appropriate domain</li>
+        <li>Use provided template</li>
+        <li>Run test to verify</li>
+        <li>Ensure ≥85% coverage</li>
+        <li>Update test count in this document</li>
+        </ol>
+        <p><strong>Example - Add XSS test:</strong></p>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Create file</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> src/__tests__/security/xss/event-handler.test.ts <span class="op">&lt;&lt; &#39;EOF&#39;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">import { describe, it, expect } from &#39;vitest&#39;;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">describe(&#39;XSS: Event Handler Injection&#39;, () =&gt; {</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">  it(&#39;should not allow onclick attributes&#39;, () =&gt; {</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">    // Your test here</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="st">  });</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">});</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Run test</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/xss/event-handler.test.ts</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Check coverage</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span> src/__tests__/security/xss/event-handler.test.ts</span></code></pre></div>
+        <h3 id="updating-eslint-rules">Updating ESLint Rules</h3>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Edit <code>eslint.config.js</code></li>
+        <li>Test with: <code>npm run lint</code></li>
+        <li>Verify it catches the issue</li>
+        <li>Update documentation in <code>sast.md</code></li>
+        </ol>
+        <p><strong>Example - Add new rule:</strong></p>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Update config</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;&gt;</span> eslint.config.js <span class="op">&lt;&lt; &#39;EOF&#39;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">// New rule</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="st">rules: {</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;no-eval&#39;: &#39;error&#39;,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">  &#39;no-implied-eval&#39;: &#39;error&#39;,</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Test</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint <span class="at">--</span> <span class="at">--rule</span> <span class="st">&#39;no-implied-eval: error&#39;</span></span></code></pre></div>
+        <h3 id="modifying-dast-scan">Modifying DAST Scan</h3>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Update ZAP config in <code>scripts/dast/</code></li>
+        <li>Run baseline scan: <code>npm run dast:baseline</code></li>
+        <li>Review findings: <code>open ./zap-reports/</code></li>
+        <li>Update <code>dast.md</code> with new rules</li>
+        </ol>
+        <hr />
+        <h2 id="related-resources">Related Resources</h2>
+        <h3 id="documentation">Documentation</h3>
+        <ul>
+        <li><a href="strategy.html">Security Testing Strategy</a> -
+        Detailed testing approach</li>
+        <li><a href="sast.html">Static Analysis (SAST)</a> - ESLint
+        rules and code patterns</li>
+        <li><a href="dast.html">Dynamic Testing (DAST)</a> - OWASP ZAP
+        and API testing</li>
+        <li><a href="../checklists/">Security Checklists</a> - Manual
+        review guides</li>
+        <li><a href="../compliance/">Compliance &amp; Standards</a> -
+        Standards mapping</li>
+        </ul>
+        <h3 id="external-resources">External Resources</h3>
+        <ul>
+        <li><a
+        href="https://owasp.org/www-project-web-security-testing-guide/">OWASP
+        Testing Guide</a></li>
+        <li><a href="https://owasp.org/Top10/">OWASP Top 10
+        2021</a></li>
+        <li><a href="https://cwe.mitre.org/top25/">CWE Top 25</a></li>
+        <li><a href="https://vitest.dev/">Vitest Documentation</a></li>
+        <li><a href="https://www.zaproxy.org/docs/">OWASP ZAP
+        Documentation</a></li>
+        </ul>
+        <h3 id="tools">Tools</h3>
+        <ul>
+        <li>ESLint - <code>npm run lint</code></li>
+        <li>Vitest - <code>npm test</code></li>
+        <li>OWASP ZAP - <code>npm run dast:*</code></li>
+        <li>TypeScript - <code>npx tsc --noEmit</code></li>
+        </ul>
+        <hr />
+        <h2 id="test-execution-matrix">Test Execution Matrix</h2>
+        <p><strong>Quick reference for different scenarios:</strong></p>
+        <pre><code>┌─────────────┬──────────────┬────────────┬──────────────┬──────────┐
+│ Scenario    │ SAST         │ Unit Tests │ DAST         │ Time     │
+├─────────────┼──────────────┼────────────┼──────────────┼──────────┤
+│ Pre-commit  │ npm run lint │ npm test   │ (skip)       │ ~30 sec  │
+│ Pre-push    │ npm run lint │ npm test   │ (baseline)   │ ~5 min   │
+│ Code review │ ✓ Required   │ ✓ Required │ (PR status)  │ ~30 min  │
+│ Post-merge  │ ✓ CI/CD      │ ✓ CI/CD    │ ✓ Full scan  │ ~45 min  │
+│ Production  │ ✓ Enforce    │ ✓ Enforce  │ ✓ Scheduled  │ daily    │
+└─────────────┴──────────────┴────────────┴──────────────┴──────────┘</code></pre>
+        <hr />
+        <h2 id="metrics--reporting">Metrics &amp; Reporting</h2>
+        <h3 id="monthly-security-report">Monthly Security Report</h3>
+        <pre><code>Month: [Month/Year]
+
+SAST Status:
+- Lint violations: [Count]
+- Security errors: [Count]
+- Trend: ↓ [Down is good]
+
+Unit Test Status:
+- Tests passing: [Count]
+- Coverage: [%]
+- New tests: [Count]
+
+DAST Status:
+- Critical findings: [Count]
+- High findings: [Count]
+- Remediation rate: [%]
+
+Vulnerability Trends:
+- Top issue type: [Type]
+- Most common domain: [Domain]
+- Resolution time avg: [Days]</code></pre>
+        <hr />
+        <h2 id="version-history">Version History</h2>
+        <ul>
+        <li><strong>v1.0.0</strong> - Initial testing documentation
+        <ul>
+        <li>Created strategy.md (unit, integration, scenario-based
+        testing)</li>
+        <li>Created sast.md (ESLint security patterns)</li>
+        <li>Created dast.md (OWASP ZAP scanning)</li>
+        <li>Created overview.md (this document)</li>
+        </ul></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

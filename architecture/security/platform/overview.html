@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="platform--deployment-security">Platform &amp; Deployment
+        Security</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Platform security covers the deployment infrastructure,
+        dependency management, and operational security for StockEase
+        Frontend. This includes protecting CI/CD pipelines, managing
+        build-time configuration, securing dependencies, and hardening
+        the production environment through nginx headers and deployment
+        practices.</p>
+        <hr />
+        <h2 id="security-domains">Security Domains</h2>
+        <h3 id="1-dependency-management--supply-chain-security">1.
+        <strong>Dependency Management &amp; Supply Chain
+        Security</strong></h3>
+        <p>📄 <a href="./dependencies.html">dependencies.md</a></p>
+        <p><strong>Topics Covered:</strong></p>
+        <ul>
+        <li>npm audit for vulnerability scanning</li>
+        <li>Renovate bot for automated dependency updates</li>
+        <li>Software Composition Analysis (SCA) configuration</li>
+        <li>Dependency resolution and conflict detection</li>
+        <li>Vulnerability triage and severity assessment</li>
+        <li>Version pinning strategies</li>
+        <li>Security.md disclosure file setup</li>
+        </ul>
+        <p><strong>Key Practices:</strong></p>
+        <ul>
+        <li>Regular security audits with <code>npm audit</code></li>
+        <li>Automated patch updates via Renovate</li>
+        <li>Compliance tracking with SCA tools</li>
+        <li>Vulnerability severity classification</li>
+        </ul>
+        <p><strong>Status:</strong> ✅ Configured</p>
+        <hr />
+        <h3 id="2-cicd-pipeline--secrets-management">2. <strong>CI/CD
+        Pipeline &amp; Secrets Management</strong></h3>
+        <p>📄 <a href="./ci-secrets.html">ci-secrets.md</a></p>
+        <p><strong>Topics Covered:</strong></p>
+        <ul>
+        <li>GitHub Secrets for sensitive configuration</li>
+        <li>OIDC (OpenID Connect) token-based authentication</li>
+        <li>Secret masking in workflow logs</li>
+        <li>Secret rotation and expiration practices</li>
+        <li>Workflow permission scoping</li>
+        <li>Environment-specific secrets</li>
+        <li>Testing secrets access in CI/CD</li>
+        </ul>
+        <p><strong>Key Practices:</strong></p>
+        <ul>
+        <li>Store all secrets in GitHub Secrets (never in code)</li>
+        <li>Use OIDC tokens instead of long-lived credentials</li>
+        <li>Mask sensitive values in logs</li>
+        <li>Rotate secrets on a schedule</li>
+        <li>Limit workflow permissions to minimum required</li>
+        <li>Test secret access without exposing values</li>
+        </ul>
+        <p><strong>Secrets Currently Used:</strong> | Secret | Purpose |
+        Used In | |--------|---------|---------| |
+        <code>FRONTEND_API_BASE_URL</code> | API endpoint for production
+        | Build args | | <code>DOCKER_USERNAME</code> | Docker Hub
+        authentication | Registry push | | <code>DOCKER_PASSWORD</code>
+        | Docker Hub token | Registry push | |
+        <code>DEPLOY_SSH_KEY</code> | SSH key for deployment | SSH
+        connections | | <code>DEPLOY_HOST</code> | Production server
+        hostname | Deployment target | | <code>DEPLOY_PORT</code> | SSH
+        port for deployment | Deployment target |</p>
+        <p><strong>Status:</strong> ✅ Configured</p>
+        <hr />
+        <h3 id="3-security-headers--nginx-configuration">3.
+        <strong>Security Headers &amp; nginx Configuration</strong></h3>
+        <p>📄 <a
+        href="./headers-and-nginx.html">headers-and-nginx.md</a></p>
+        <p><strong>Topics Covered:</strong></p>
+        <ul>
+        <li>HTTP security headers (clickjacking, MIME sniffing,
+        XSS)</li>
+        <li>X-Content-Type-Options (MIME type sniffing prevention)</li>
+        <li>X-Frame-Options (clickjacking prevention)</li>
+        <li>X-XSS-Protection (legacy XSS protection)</li>
+        <li>Referrer-Policy (prevent referrer leakage)</li>
+        <li>HSTS (force HTTPS)</li>
+        <li>CSP (Content Security Policy)</li>
+        <li>nginx configuration and best practices</li>
+        </ul>
+        <p><strong>Security Headers Implemented:</strong> | Header |
+        Value | Purpose | Status | |--------|-------|---------|--------|
+        | X-Content-Type-Options | nosniff | Prevent MIME sniffing | ✅
+        | | X-Frame-Options | DENY | Prevent clickjacking | ✅ | |
+        X-XSS-Protection | 1; mode=block | Legacy XSS protection | ✅ |
+        | Referrer-Policy | strict-origin-when-cross-origin | Prevent
+        referrer leakage | ✅ | | Strict-Transport-Security | Not
+        configured | Force HTTPS | ⚠️ Recommended | |
+        Content-Security-Policy | Not configured | Control content
+        sources | ⚠️ Recommended |</p>
+        <p><strong>Key Practices:</strong></p>
+        <ul>
+        <li>Always set <code>always</code> flag for headers (even on
+        errors)</li>
+        <li>Test headers with curl or online tools</li>
+        <li>Start conservative with max-age values</li>
+        <li>Apply headers at server level (not per-route)</li>
+        <li>Monitor header compliance</li>
+        </ul>
+        <p><strong>Status:</strong> ✅ Partially Configured (HSTS &amp;
+        CSP Recommended)</p>
+        <hr />
+        <h2 id="deployment-architecture">Deployment Architecture</h2>
+        <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                     GitHub Repository                        │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ Source Code + package.json + ops/nginx/nginx.conf   │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                   ┌──────────▼──────────┐
+                   │   GitHub Actions   │ (CI/CD)
+                   │  - Dependency Audit│
+                   │  - Build Image     │
+                   │  - Push Registry   │
+                   │  - Deploy Server   │
+                   └──────────┬──────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+   ┌────▼─────┐         ┌────▼──────┐      ┌──────▼─────┐
+   │   Docker │         │  Docker   │      │  Production│
+   │  Registry│         │ Container │      │   Server   │
+   │(secrets) │         │           │      │  (nginx)   │
+   └──────────┘         └─────┬─────┘      └──────▲─────┘
+                              │                   │
+                              │   SSH Deploy      │
+                              └───────────────────┘
+                        DEPLOY_SSH_KEY
+                        (GitHub Secret)</code></pre>
+        <hr />
+        <h2 id="security-checklist">Security Checklist</h2>
+        <h3 id="-dependency-management">✅ Dependency Management</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Run <code>npm audit</code>
+        regularly</label></li>
+        <li><label><input type="checkbox" />Review Renovate updates
+        weekly</label></li>
+        <li><label><input type="checkbox" />Check SCA tool for
+        vulnerabilities</label></li>
+        <li><label><input type="checkbox" />Update critical
+        vulnerabilities immediately</label></li>
+        <li><label><input type="checkbox" />Test updates before
+        production</label></li>
+        </ul>
+        <h3 id="-cicd-pipeline">✅ CI/CD Pipeline</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All secrets in GitHub
+        Secrets (not code)</label></li>
+        <li><label><input type="checkbox" />Use OIDC tokens for
+        authentication</label></li>
+        <li><label><input type="checkbox" />Mask secrets in
+        logs</label></li>
+        <li><label><input type="checkbox" />Rotate long-lived secrets
+        monthly</label></li>
+        <li><label><input type="checkbox" />Review workflow permissions
+        quarterly</label></li>
+        <li><label><input type="checkbox" />Limit deployment access to
+        specific branches</label></li>
+        </ul>
+        <h3 id="-nginx-security">✅ nginx Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Verify all security headers
+        present</label></li>
+        <li><label><input type="checkbox" />Test with curl or online
+        tools</label></li>
+        <li><label><input type="checkbox" />Monitor header
+        compliance</label></li>
+        <li><label><input type="checkbox" />Keep nginx
+        updated</label></li>
+        <li><label><input type="checkbox" />Review header policies
+        quarterly</label></li>
+        <li><label><input type="checkbox" />Test HTTPS redirect
+        functionality</label></li>
+        <li><label><input type="checkbox" />Consider HSTS
+        implementation</label></li>
+        <li><label><input type="checkbox" />Implement CSP
+        headers</label></li>
+        </ul>
+        <h3 id="-docker-security">✅ Docker Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Use specific image versions
+        (not <code>latest</code>)</label></li>
+        <li><label><input type="checkbox" />Run as non-root
+        user</label></li>
+        <li><label><input type="checkbox" />Keep base image
+        updated</label></li>
+        <li><label><input type="checkbox" />Scan images for
+        vulnerabilities</label></li>
+        <li><label><input type="checkbox" />Use multi-stage builds
+        (minimize size)</label></li>
+        <li><label><input type="checkbox" />Don't include secrets in
+        image</label></li>
+        </ul>
+        <hr />
+        <h2 id="vulnerability-response-process">Vulnerability Response
+        Process</h2>
+        <h3 id="1-detection">1. Detection</h3>
+        <pre><code>npm audit → Vulnerability found
+            ↓
+GitHub Renovate → Creates PR
+                 ↓
+            Automated tests run</code></pre>
+        <h3 id="2-assessment">2. Assessment</h3>
+        <pre><code>Evaluate severity:
+├─ Critical → Fix immediately
+├─ High → Fix within 1 week
+├─ Medium → Fix within 1 month
+└─ Low → Fix in next release</code></pre>
+        <h3 id="3-remediation">3. Remediation</h3>
+        <pre><code>Update dependency:
+├─ npm install updated-package@x.y.z
+├─ Run tests
+├─ Review changes
+├─ Merge to main
+└─ Deploy</code></pre>
+        <h3 id="4-monitoring">4. Monitoring</h3>
+        <pre><code>Ongoing:
+├─ Weekly audit runs
+├─ Renovate updates
+├─ SCA tool checks
+└─ GitHub Dependabot alerts</code></pre>
+        <hr />
+        <h2 id="configuration-files">Configuration Files</h2>
+        <h3 id="relevant-files">Relevant Files</h3>
+        <pre><code>frontend/
+├── ops/nginx/nginx.conf          (Security headers, caching)
+├── Dockerfile                     (Build environment, base image)
+├── package.json                   (Dependencies)
+├── package-lock.json              (Locked versions)
+└── .github/
+    └── workflows/
+        └── deploy-frontend.yml    (CI/CD with secrets)</code></pre>
+        <h3 id="nginx-configuration-location">nginx Configuration
+        Location</h3>
+        <pre class="nginx"><code># File: ops/nginx/nginx.conf
+server {
+  listen 80;
+  
+  # =========================================================================
+  # Security Headers
+  # =========================================================================
+  add_header X-Content-Type-Options &quot;nosniff&quot; always;
+  add_header X-XSS-Protection &quot;1; mode=block&quot; always;
+  add_header X-Frame-Options &quot;DENY&quot; always;
+  add_header Referrer-Policy &quot;strict-origin-when-cross-origin&quot; always;
+}</code></pre>
+        <hr />
+        <h2 id="related-security-domains">Related Security Domains</h2>
+        <h3 id="frontend-security">Frontend Security</h3>
+        <ul>
+        <li><a href="../frontend/overview.html">Frontend Security
+        Overview</a>
+        <ul>
+        <li>XSS prevention and input sanitization</li>
+        <li>Content Security Policy setup</li>
+        <li>CORS and CSRF protection</li>
+        <li>Secrets management in frontend code</li>
+        </ul></li>
+        </ul>
+        <h3 id="api-communication">API Communication</h3>
+        <ul>
+        <li><a href="../api-communication/overview.html">API
+        Communication Overview</a>
+        <ul>
+        <li>JWT token authentication</li>
+        <li>Request/response interceptors</li>
+        <li>Error handling and logging</li>
+        <li>API error handling</li>
+        </ul></li>
+        </ul>
+        <h3 id="authentication--authorization">Authentication &amp;
+        Authorization</h3>
+        <ul>
+        <li><a href="../auth/overview.html">Authentication Overview</a>
+        <ul>
+        <li>JWT token management</li>
+        <li>Authentication flow</li>
+        <li>Authorization rules</li>
+        <li>Token refresh strategy</li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="next-steps--recommendations">Next Steps &amp;
+        Recommendations</h2>
+        <h3 id="immediate-high-priority">Immediate (High Priority)</h3>
+        <ol type="1">
+        <li>✅ Implement security headers (DONE)</li>
+        <li>✅ Configure CI/CD secrets (DONE)</li>
+        <li>✅ Setup dependency scanning (DONE)</li>
+        <li>⏳ <strong>Enable HSTS headers</strong> (See
+        headers-and-nginx.md for implementation)</li>
+        </ol>
+        <h3 id="short-term-1-2-months">Short Term (1-2 months)</h3>
+        <ol type="1">
+        <li>Implement full CSP headers (See CSP documentation in
+        frontend security)</li>
+        <li>Add subresource integrity (SRI) for CDN resources</li>
+        <li>Setup continuous compliance monitoring</li>
+        <li>Quarterly security header audit</li>
+        </ol>
+        <h3 id="long-term-ongoing">Long Term (Ongoing)</h3>
+        <ol type="1">
+        <li>Incident response plan for supply chain attacks</li>
+        <li>Security training for developers</li>
+        <li>Regular penetration testing</li>
+        <li>Annual security audit</li>
+        </ol>
+        <hr />
+        <h2 id="monitoring--compliance">Monitoring &amp; Compliance</h2>
+        <h3 id="weekly-tasks">Weekly Tasks</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for dependency vulnerabilities</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> audit</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Monitor Renovate PR status</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (GitHub notifications)</span></span></code></pre></div>
+        <h3 id="monthly-tasks">Monthly Tasks</h3>
+        <ul>
+        <li>Review GitHub Secrets usage</li>
+        <li>Update security policies</li>
+        <li>Check npm audit summary</li>
+        <li>Verify HTTPS compliance</li>
+        </ul>
+        <h3 id="quarterly-tasks">Quarterly Tasks</h3>
+        <ul>
+        <li>Full security header audit</li>
+        <li>Penetration testing</li>
+        <li>Access control review</li>
+        <li>Dependency update analysis</li>
+        </ul>
+        <hr />
+        <h2 id="references">References</h2>
+        <ul>
+        <li><a href="https://docs.npmjs.com/security">npm Security Best
+        Practices</a></li>
+        <li><a
+        href="https://docs.github.com/en/actions/security-guides">GitHub
+        Actions Security</a></li>
+        <li><a href="https://docs.renovatebot.com/">Renovate
+        Documentation</a></li>
+        <li><a
+        href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_for_Your_Website_Cheat_Sheet.html">OWASP
+        Security Headers</a></li>
+        <li><a
+        href="https://nginx.org/en/docs/http/ngx_http_headers_module.html">nginx
+        Security</a></li>
+        <li><a
+        href="https://docs.docker.com/develop/security-best-practices/">Docker
+        Security Best Practices</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Implemented (Partial - HSTS &amp; CSP
+        Recommended)<br />
+        <strong>Maintainer:</strong> Frontend Security Team</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

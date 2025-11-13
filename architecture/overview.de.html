@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview.de - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="stockease-frontend---architektur-übersicht">StockEase
+        Frontend - Architektur-Übersicht</h1>
+        <h2 id="projektübersicht">Projektübersicht</h2>
+        <p><strong>StockEase Frontend</strong> ist eine moderne,
+        responsive Webanwendung, die mit <strong>React 18</strong> und
+        <strong>TypeScript</strong> gebaut wurde und
+        Bestandsverwaltungsfunktionalität bereitstellt. Die Anwendung
+        unterstützt mehrere Sprachen (Englisch und Deutsch), responsive
+        Designs und umfassende Testabdeckung.</p>
+        <h3 id="hauptziele">Hauptziele</h3>
+        <ul>
+        <li><strong>Mehrsprachige Unterstützung</strong>: Unterstützen
+        Sie Englisch und Deutsch durch Internationalisierung (i18n)</li>
+        <li><strong>Responsives Design</strong>: Bieten Sie nahtlose
+        Erfahrung auf Desktop- und Mobilgeräten</li>
+        <li><strong>Typsicherheit</strong>: Vollständige
+        TypeScript-Implementierung für Wartbarkeit und
+        Entwicklererfahrung</li>
+        <li><strong>Umfassende Tests</strong>: 478+ Unit- und
+        Integrationstests zur Sicherung der Codequalität</li>
+        <li><strong>Enterprise-Standards</strong>: Enterprise-grade
+        Dokumentation, Fehlerbehandlung und Architekturmuster</li>
+        </ul>
+        <hr />
+        <h2 id="anwendungsarchitektur">Anwendungsarchitektur</h2>
+        <h3
+        id="architektur-diagramm-auf-hoher-ebene">Architektur-Diagramm
+        auf hoher Ebene</h3>
+        <div class="mermaid">
+        graph TB
+            subgraph "Frontend-Anwendung"
+                A["React SPA<br/>React Router v7"]
+                B["Zustandsverwaltung<br/>Redux Toolkit"]
+                C["API-Kommunikation<br/>Axios + React Query"]
+                D["UI-Komponenten<br/>React Components + Tailwind"]
+                E["Internationalisierung<br/>i18next"]
+            end
+
+            subgraph "Backend-Dienste"
+                API["REST API<br/>Authentifizierung & Produkte"]
+            end
+
+            subgraph "Externe Dienste"
+                BROWSER["Browser APIs<br/>localStorage, sessionStorage"]
+            end
+
+            A -->|Routes| D
+            A -->|State| B
+            A -->|API Calls| C
+            A -->|i18n Context| E
+            C -->|HTTP Requests| API
+            C -->|Token Storage| BROWSER
+            D -->|Styling| TAILWIND["Tailwind CSS<br/>Responsives Design"]
+        </div>
+        <hr />
+        <h2 id="kerntechnologien">Kerntechnologien</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Technologie</th>
+        <th>Version</th>
+        <th>Zweck</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>React</strong></td>
+        <td>18.3.1</td>
+        <td>UI-Bibliothek und Component-Framework</td>
+        </tr>
+        <tr class="even">
+        <td><strong>TypeScript</strong></td>
+        <td>~5.6.2</td>
+        <td>Typsichere Entwicklung</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Vite</strong></td>
+        <td>6.0.5</td>
+        <td>Build-Tool und Development Server</td>
+        </tr>
+        <tr class="even">
+        <td><strong>React Router</strong></td>
+        <td>7.1.1</td>
+        <td>Client-seitiges Routing</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Redux Toolkit</strong></td>
+        <td>2.5.0</td>
+        <td>Zustandsverwaltung</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Axios</strong></td>
+        <td>1.7.9</td>
+        <td>HTTP-Client</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>React Query</strong></td>
+        <td>5.62.16</td>
+        <td>Server-Zustandsverwaltung</td>
+        </tr>
+        <tr class="even">
+        <td><strong>i18next</strong></td>
+        <td>24.2.2</td>
+        <td>Internationalisierungs-Framework</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Tailwind CSS</strong></td>
+        <td>3.4.17</td>
+        <td>Utility-First CSS Framework</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Vitest</strong></td>
+        <td>4.0.8</td>
+        <td>Unit-Test-Framework</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="projektstruktur">Projektstruktur</h2>
+        <pre><code>frontend/
+├── src/
+│   ├── App.tsx                          # Root-Komponente mit Routing
+│   ├── main.tsx                         # Anwendungseinstiegspunkt
+│   ├── i18n.ts                          # i18next-Konfiguration
+│   ├── api/                             # API-Service-Layer
+│   │   ├── auth.ts                      # Authentifizierungs-Endpoints
+│   │   └── ProductService.ts            # Produkt CRUD-Operationen
+│   ├── components/                      # Wiederverwendbare UI-Komponenten
+│   │   ├── Header.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Buttons.tsx
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── HelpModal.tsx
+│   │   └── SkeletonLoader.tsx
+│   ├── pages/                           # Seiten-Level-Komponenten (geroutet)
+│   │   ├── HomePage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── AdminDashboard.tsx
+│   │   ├── UserDashboard.tsx
+│   │   ├── AddProductPage.tsx
+│   │   ├── DeleteProductPage.tsx
+│   │   ├── SearchProductPage.tsx
+│   │   ├── ListStockPage.tsx
+│   │   └── ChangeProductDetailsPage.tsx
+│   ├── services/                        # Geschäftslogik &amp; Integrationen
+│   │   └── apiClient.ts                 # Konfigurierte Axios-Instanz
+│   ├── types/                           # TypeScript Schnittstellen &amp; Typen
+│   │   └── Product.ts
+│   ├── logic/                           # Geschäftslogik-Hooks
+│   │   └── DashboardLogic.ts
+│   ├── styles/                          # Globale und Komponenten-Stile
+│   ├── assets/                          # Bilder und statische Assets
+│   ├── locales/                         # i18n-Übersetzungsdateien
+│   │   ├── en.json
+│   │   ├── de.json
+│   │   ├── help_en.json
+│   │   └── help_de.json
+│   └── __tests__/                       # Test-Dateien (spiegelt src-Struktur)
+│       ├── component/
+│       ├── api/
+│       ├── auth/
+│       ├── a11y/
+│       ├── workflows/
+│       ├── product-operations/
+│       ├── validation-rules/
+│       ├── i18n-configuration/
+│       ├── api-client-operations/
+│       ├── setup.ts
+│       └── ... (49+ Test-Dateien)
+├── docs/
+│   └── architecture/                    # Architektur-Dokumentation
+│       ├── overview.md
+│       ├── src/
+│       ├── pipeline.md
+│       └── ...
+├── Dockerfile                           # Multi-Stage Docker Build
+├── vite.config.ts                       # Vite-Konfiguration
+├── vitest.config.ts                     # Vitest-Konfiguration
+├── tsconfig.json                        # TypeScript Root-Konfiguration
+├── tailwind.config.js                   # Tailwind CSS-Konfiguration
+├── package.json                         # Projekt-Abhängigkeiten
+└── .github/
+    └── workflows/
+        ├── deploy-frontend.yml          # Test &amp; Deploy Pipeline
+        └── deploy-docs.yml              # Dokumentation Deployment (TBD)</code></pre>
+        <hr />
+        <h2 id="architektur-schichten">Architektur-Schichten</h2>
+        <h3 id="1-präsentationsschicht-components-pages-styles">1.
+        <strong>Präsentationsschicht</strong> (<code>/components</code>,
+        <code>/pages</code>, <code>/styles</code>)</h3>
+        <ul>
+        <li><strong>Verantwortung</strong>: UI rendern und
+        Benutzerinteraktionen verarbeiten</li>
+        <li><strong>Technologien</strong>: React-Komponenten, Tailwind
+        CSS</li>
+        <li><strong>Muster</strong>: Komponenten-basierte Architektur
+        mit Separation of Concerns</li>
+        <li><strong>Schlüsselkomponenten</strong>: Header, Sidebar,
+        Footer, Modal, Formulare</li>
+        </ul>
+        <h3 id="2-routing-schicht-apptsx-pages">2.
+        <strong>Routing-Schicht</strong> (<code>App.tsx</code>,
+        <code>pages/</code>)</h3>
+        <ul>
+        <li><strong>Framework</strong>: React Router v7</li>
+        <li><strong>Muster</strong>: Deklarative Route-Definitionen</li>
+        <li><strong>Routes</strong>:
+        <ul>
+        <li><code>/</code> → HomePage</li>
+        <li><code>/login</code> → LoginPage</li>
+        <li><code>/admin</code> → AdminDashboard (nur Admin)</li>
+        <li><code>/user</code> → UserDashboard (nur Benutzer)</li>
+        <li><code>/product/*</code> → Produktverwaltungsseiten</li>
+        </ul></li>
+        </ul>
+        <h3 id="3-zustandsverwaltung-redux-toolkit">3.
+        <strong>Zustandsverwaltung</strong> (Redux Toolkit)</h3>
+        <ul>
+        <li><strong>Zweck</strong>: Zentralisierter State für
+        Authentifizierung, Benutzerdaten und Anwendungsstatus</li>
+        <li><strong>Muster</strong>: Slice-basierte Reducer (Redux
+        Toolkit)</li>
+        <li><strong>Umfang</strong>: Globaler State für
+        komponentenübergreifende Kommunikation</li>
+        </ul>
+        <h3 id="4-api-kommunikationsschicht-api-services">4.
+        <strong>API-Kommunikationsschicht</strong> (<code>/api</code>,
+        <code>/services</code>)</h3>
+        <ul>
+        <li><strong>HTTP-Client</strong>: Axios mit benutzerdefinierter
+        Konfiguration</li>
+        <li><strong>Features</strong>:
+        <ul>
+        <li>JWT Token-Injektion in Request-Header</li>
+        <li>Automatische 401-Fehlerbehandlung</li>
+        <li>Request/Response-Logging</li>
+        <li>Zentralisierte Fehlerbehandlung</li>
+        </ul></li>
+        <li><strong>Services</strong>:
+        <ul>
+        <li><code>auth.ts</code> → Authentifizierungs-Endpoints</li>
+        <li><code>ProductService.ts</code> → Produkt
+        CRUD-Operationen</li>
+        </ul></li>
+        </ul>
+        <h3 id="5-geschäftslogik-schicht-logic-services">5.
+        <strong>Geschäftslogik-Schicht</strong> (<code>/logic</code>,
+        <code>/services</code>)</h3>
+        <ul>
+        <li><strong>Zweck</strong>: Geschäftslogik,
+        Datentransformationen und Utility-Funktionen</li>
+        <li><strong>Beispiele</strong>: Dashboard-Berechnungen,
+        Produktfilterung, Validierungsregeln</li>
+        <li><strong>Muster</strong>: Custom Hooks und
+        Utility-Funktionen</li>
+        </ul>
+        <h3 id="6-datenschicht-types">6. <strong>Datenschicht</strong>
+        (<code>/types</code>)</h3>
+        <ul>
+        <li><strong>Zweck</strong>: TypeScript-Schnittstellen und
+        Datenverträge</li>
+        <li><strong>Gewährleistet</strong>: Typsicherheit über die
+        gesamte Anwendung</li>
+        </ul>
+        <h3 id="7-internationalisierungsschicht-locales-i18nts">7.
+        <strong>Internationalisierungsschicht</strong>
+        (<code>/locales</code>, <code>i18n.ts</code>)</h3>
+        <ul>
+        <li><strong>Framework</strong>: i18next mit
+        React-Integration</li>
+        <li><strong>Sprachen</strong>: Englisch (en), Deutsch (de)</li>
+        <li><strong>Features</strong>: Browser-Spracherkennung,
+        localStorage-Persistenz</li>
+        <li><strong>Namespaces</strong>: <code>translation</code>
+        (allgemein), <code>help</code> (Hilfe-Modal)</li>
+        </ul>
+        <hr />
+        <h2 id="datenfluss">Datenfluss</h2>
+        <h3 id="authentifizierungsfluss">Authentifizierungsfluss</h3>
+        <div class="mermaid">
+        sequenceDiagram
+            participant User as Benutzer
+            participant LoginPage as LoginPage.tsx
+            participant Auth as auth.ts
+            participant API as Backend API
+            participant Redux as Redux Store
+
+            User->>LoginPage: Anmeldedaten eingeben
+            LoginPage->>Auth: login(username, password)
+            Auth->>API: POST /api/auth/login
+            API-->>Auth: {token, user_role}
+            Auth->>Redux: dispatch(setUser)
+            Redux-->>LoginPage: Update auth state
+            LoginPage->>User: Zu Dashboard umleiten
+        </div>
+        <h3 id="produktdatenfluss">Produktdatenfluss</h3>
+        <div class="mermaid">
+        sequenceDiagram
+            participant Page as Produktseite
+            participant ProductService as ProductService.ts
+            participant apiClient as apiClient.ts
+            participant API as Backend API
+            participant Redux as Redux Store
+
+            Page->>ProductService: fetchProducts()
+            ProductService->>apiClient: GET /api/products
+            apiClient->>apiClient: JWT Token injizieren
+            apiClient->>API: HTTP GET Request
+            API-->>apiClient: Produktliste
+            apiClient-->>ProductService: Antwortdaten
+            ProductService-->>Redux: dispatch(setProducts)
+            Redux-->>Page: UI mit Produkten aktualisieren
+        </div>
+        <hr />
+        <h2 id="wichtige-architektur-entscheidungen">Wichtige
+        Architektur-Entscheidungen</h2>
+        <h3 id="1-react-router-v7-für-routing">1. <strong>React Router
+        v7 für Routing</strong></h3>
+        <ul>
+        <li>Bietet deklaratives Route-Management</li>
+        <li>Unterstützt verschachtelte Routes und dynamische
+        Segmente</li>
+        <li>Eingebautes Datenladen und Fehlerbehandlung</li>
+        </ul>
+        <h3 id="2-redux-toolkit-für-zustandsverwaltung">2. <strong>Redux
+        Toolkit für Zustandsverwaltung</strong></h3>
+        <ul>
+        <li>Zentralisierter State für Authentifizierung und App-weite
+        Daten</li>
+        <li>Vereinfachte Reducer-Syntax mit Immer-Integration</li>
+        <li>DevTools-Unterstützung zum Debuggen</li>
+        </ul>
+        <h3 id="3-axios--react-query">3. <strong>Axios + React
+        Query</strong></h3>
+        <ul>
+        <li>Axios bietet Low-Level HTTP-Kontrolle</li>
+        <li>React Query verwaltet Caching und Synchronisation</li>
+        <li>Separation of Concerns (HTTP vs Datensynchronisation)</li>
+        </ul>
+        <h3 id="4-i18next-für-internationalisierung">4. <strong>i18next
+        für Internationalisierung</strong></h3>
+        <ul>
+        <li>Flexible Sprachladeung und -wechsel</li>
+        <li>Namespace-Unterstützung für organisierte Übersetzungen</li>
+        <li>Automatische Browser-Spracherkennung</li>
+        </ul>
+        <h3 id="5-tailwind-css-für-styling">5. <strong>Tailwind CSS für
+        Styling</strong></h3>
+        <ul>
+        <li>Utility-First-Ansatz reduziert benutzerdefiniertes CSS</li>
+        <li>Responsives Design mit Mobile-First-Breakpoints</li>
+        <li>Dark Mode und Theme-Anpassungsunterstützung</li>
+        </ul>
+        <h3 id="6-typescript-für-typsicherheit">6. <strong>TypeScript
+        für Typsicherheit</strong></h3>
+        <ul>
+        <li>Fehler zur Compile-Zeit erkennen</li>
+        <li>Bessere IDE-Unterstützung und Refactoring-Tools</li>
+        <li>Selbstdokumentierender Code</li>
+        </ul>
+        <h3 id="7-vitest-für-tests">7. <strong>Vitest für
+        Tests</strong></h3>
+        <ul>
+        <li>Schnelle Unit-Tests mit Jest-kompatibler API</li>
+        <li>Eingebaute Coverage-Berichterstattung</li>
+        <li>478+ Tests sichern Codequalität</li>
+        </ul>
+        <hr />
+        <h2 id="sicherheitserwägungen">Sicherheitserwägungen</h2>
+        <h3 id="authentifizierung--autorisierung">Authentifizierung
+        &amp; Autorisierung</h3>
+        <pre><code>1. JWT Token-Verwaltung
+   ├── Gespeichert in localStorage (HttpOnly Cookies bevorzugt)
+   ├── Automatisch in Authorization Header injiziert
+   ├── Bei Login erneuert
+   └── Gelöscht bei Logout oder 401-Antwort
+
+2. Geschützte Routes
+   ├── Admin Routes (/admin, /add-product)
+   ├── Benutzer Routes (/user)
+   └── Öffentliche Routes (/, /login)
+
+3. Token-Validierung
+   ├── Serverseitige Signatur-Verifikation
+   ├── Clientseitige Rolle-Extraktion
+   └── Automatische Bereinigung bei Ablauf</code></pre>
+        <h3 id="api-sicherheit">API-Sicherheit</h3>
+        <ul>
+        <li><strong>CORS</strong>: Von Backend verwaltet</li>
+        <li><strong>HTTPS</strong>: In Produktion erzwungen</li>
+        <li><strong>Timeout</strong>: 2-Minuten-Request-Timeout</li>
+        <li><strong>Fehlerbehandlung</strong>: Sensible Daten nicht
+        geloggt</li>
+        </ul>
+        <hr />
+        <h2 id="entwicklungs-workflow">Entwicklungs-Workflow</h2>
+        <h3 id="lokale-entwicklung">Lokale Entwicklung</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Development Server starten (Vite HMR)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests im Watch-Modus ausführen</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:watch</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Spezifische Test-Suite ausführen</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--run</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Coverage-Bericht generieren</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:coverage</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Für Produktion bauen</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Produktions-Build anzeigen</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run preview</span></code></pre></div>
+        <h3 id="test-strategie">Test-Strategie</h3>
+        <ul>
+        <li><strong>Unit Tests</strong>: Komponenten-Logik, Utilities,
+        Hooks</li>
+        <li><strong>Integrations-Tests</strong>: API-Interaktionen,
+        Zustandsverwaltung</li>
+        <li><strong>E2E Tests</strong>: Benutzer-Workflows
+        (optional)</li>
+        <li><strong>Accessibility Tests</strong>: WCAG-Compliance</li>
+        </ul>
+        <hr />
+        <h2 id="deployment-pipeline">Deployment Pipeline</h2>
+        <h3 id="umgebungskonfiguration">Umgebungskonfiguration</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Umgebung</th>
+        <th>API Base URL</th>
+        <th>Build-Typ</th>
+        <th>Deployment</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Lokal</strong></td>
+        <td>http://localhost:8081/api</td>
+        <td>Development (HMR)</td>
+        <td>N/A</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Entwicklung</strong></td>
+        <td>API Server</td>
+        <td>Produktion</td>
+        <td>Interner Server</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Produktion</strong></td>
+        <td>Produktions-API</td>
+        <td>Optimiert</td>
+        <td>Docker + nginx</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="docker-build-prozess">Docker Build-Prozess</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Stage 1: Builder</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  ├── Node 18 Alpine Base</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  ├── Abhängigkeiten installieren</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  ├── Source-Dateien kopieren (src/, public/, config)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  └── Produktions-Bundle bauen (npm run build)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>Stage 2: Produktion</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ├── nginx Alpine Base</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  ├── dist/ vom Builder kopieren</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  ├── nginx für SPA Routing konfigurieren</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  └── Port 80 exposieren</span></code></pre></div>
+        <hr />
+        <h2 id="zukünftige-verbesserungen">Zukünftige
+        Verbesserungen</h2>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Server-Side Rendering (SSR)
+        mit Next.js</label></li>
+        <li><label><input type="checkbox" />Progressive Web App (PWA)
+        Features</label></li>
+        <li><label><input type="checkbox" />Echtzeit-Updates mit
+        WebSocket</label></li>
+        <li><label><input type="checkbox" />Fortgeschrittene
+        Caching-Strategien</label></li>
+        <li><label><input type="checkbox" />Performance Monitoring
+        (Sentry, DataDog)</label></li>
+        <li><label><input type="checkbox" />E2E Tests mit
+        Playwright/Cypress</label></li>
+        </ul>
+        <hr />
+        <h2 id="-sicherheitsdokumentation">🔒
+        Sicherheitsdokumentation</h2>
+        <p>Umfassende Sicherheitsdokumentation mit Schwerpunkt auf
+        Authentifizierung, Autorisierung, API-Sicherheit,
+        Deployment-Sicherheit, Teststrategien und Compliance.</p>
+        <p><strong>📚 <a
+        href="./security/overview.html">Sicherheitsdokumentation</a></strong>
+        — Vollständiger Sicherheitsleitfaden mit:</p>
+        <ul>
+        <li><strong>API-Kommunikationssicherheit</strong> —
+        JWT-Authentifizierung, Fehlerbehandlung, CORS</li>
+        <li><strong>Authentifizierung &amp; Autorisierung</strong> —
+        RBAC, Token-Lebenszyklus, Sitzungsverwaltung</li>
+        <li><strong>Frontend-Sicherheit</strong> — XSS-Prävention,
+        Eingabe-Sanitisierung, CSP</li>
+        <li><strong>Plattform- &amp; Deployment-Sicherheit</strong> —
+        CI/CD-Pipeline-Sicherheit, Secrets-Verwaltung</li>
+        <li><strong>Sicherheitstests</strong> — Unit-Tests (200+),
+        SAST/DAST-Analyse, Teststrategien</li>
+        <li><strong>Compliance &amp; Standards</strong> — OWASP ASVS
+        v4.0, GDPR, PCI DSS, SOC 2-Ausrichtung</li>
+        <li><strong>Sicherheits-Checklisten</strong> — PR-Review- und
+        Pre-Release-Verifikations-Checklisten</li>
+        <li><strong>Sicherheits-Playbooks</strong> — Token-Widerruf,
+        Schlüsselrotation, Incident-Response-Verfahren</li>
+        </ul>
+        <hr />
+        <h2 id="verwandte-dokumentation">Verwandte Dokumentation</h2>
+        <ul>
+        <li><a
+        href="./src/components.html">Komponenten-Architektur</a></li>
+        <li><a href="./src/api.html">API-Struktur</a></li>
+        <li><a href="./src/data-flow.html">Datenfluss-Muster</a></li>
+        <li><a href="./src/tests.html">Test-Strategie</a></li>
+        <li><a href="./pipeline.html">CI/CD Pipeline</a></li>
+        <li><a href="./src/dockerfile.html">Deployment &amp;
+        Infrastructure</a></li>
+        <li><strong>Sicherheitsdokumentation</strong> → <a
+        href="./security/overview.html">Umfassender
+        Sicherheitsleitfaden</a></li>
+        <li><strong>Dokumentations-Pipeline</strong> → <a
+        href="./docs-pipeline/overview.html">Wie Dokumentation generiert
+        und veröffentlicht wird</a></li>
+        <li><strong>Backend Architektur &amp; API Docs</strong> → <a
+        href="https://keglev.github.io/stockease/">StockEase Backend
+        Dokumentation</a></li>
+        </ul>
+        <hr />
+        <p><strong>Zuletzt aktualisiert</strong>: November 2025<br />
+        <strong>Verwaltet von</strong>: Entwicklungsteam<br />
+        <strong>Version</strong>: 1.0</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>security-performance - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="docker-troubleshooting--security">Docker Troubleshooting
+        &amp; Security</h1>
+        <h2 id="common-issues">Common Issues</h2>
+        <h3 id="app-not-loading-on-spa-routes">App Not Loading on SPA
+        Routes</h3>
+        <p><strong>Symptom</strong>: <code>/admin</code> or
+        <code>/user</code> returns 404</p>
+        <p><strong>Cause</strong>: nginx not configured for SPA
+        routing</p>
+        <p><strong>Solution</strong>:</p>
+        <ol type="1">
+        <li>Check nginx config has
+        <code>try_files $uri /index.html</code></li>
+        <li>Verify <code>ops/nginx/nginx.conf</code> is being
+        copied</li>
+        <li>Restart container</li>
+        </ol>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> logs stockease-frontend <span class="kw">|</span> <span class="fu">grep</span> nginx</span></code></pre></div>
+        <h3 id="api-calls-failing">API Calls Failing</h3>
+        <p><strong>Symptom</strong>: Frontend loads but API calls return
+        404/CORS errors</p>
+        <p><strong>Cause</strong>: <code>VITE_API_BASE_URL</code> build
+        argument not set correctly</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what URL was baked into the app</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> stockease-frontend:latest <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  cat /usr/share/nginx/html/assets/<span class="pp">*</span>.js <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> <span class="st">&quot;api&quot;</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-5</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild with correct URL</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.correct.com <span class="dt">\</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-t</span> stockease-frontend:latest .</span></code></pre></div>
+        <h3 id="404-on-static-assets">404 on Static Assets</h3>
+        <p><strong>Symptom</strong>: CSS/JS files return 404</p>
+        <p><strong>Cause</strong>: Files not in dist/ directory, or
+        nginx path issue</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what files are in container</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> stockease-frontend:latest <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  ls <span class="at">-la</span> /usr/share/nginx/html/assets/</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check nginx config</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> stockease-frontend:latest <span class="dt">\</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  cat /etc/nginx/conf.d/default.conf <span class="kw">|</span> <span class="fu">grep</span> location</span></code></pre></div>
+        <h3 id="large-image-size">Large Image Size</h3>
+        <p><strong>Symptom</strong>: Image is 100MB+ instead of
+        ~45MB</p>
+        <p><strong>Cause</strong>: Node.js still included, or large
+        build artifacts</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check image layers</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> history stockease-frontend:latest</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify .dockerignore excludes build artifacts</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .dockerignore <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-E</span> <span class="st">&quot;node_modules|dist|coverage&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--no-cache</span> <span class="at">-t</span> stockease:test .</span></code></pre></div>
+        <h3 id="slow-docker-builds">Slow Docker Builds</h3>
+        <p><strong>Symptom</strong>: Building takes 2-3 minutes</p>
+        <p><strong>Cause</strong>: npm dependencies or no caching</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use BuildKit for faster builds</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">DOCKER_BUILDKIT</span><span class="op">=</span>1 <span class="ex">docker</span> build <span class="at">-t</span> stockease:latest .</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check .dockerignore is optimized</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> .dockerignore  <span class="co"># Should have ~30 lines</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify layer caching working</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--no-cache</span> <span class="at">-t</span> stockease:test .  <span class="co"># Slow - no cache</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> stockease:test .              <span class="co"># Fast - uses cache</span></span></code></pre></div>
+        <h3 id="port-already-in-use">Port Already in Use</h3>
+        <p><strong>Symptom</strong>: <code>docker run</code> fails with
+        "port 80 already in use"</p>
+        <p><strong>Cause</strong>: Another container or service using
+        port 80</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what&#39;s using port 80</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;:80&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> <span class="at">-i</span> :80  <span class="co"># Show process using port</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use different port</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8080:80 stockease-frontend:latest</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Or stop conflicting container</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> stop <span class="op">&lt;</span>container-id<span class="op">&gt;</span></span></code></pre></div>
+        <h3 id="container-exits-immediately">Container Exits
+        Immediately</h3>
+        <p><strong>Symptom</strong>: Container starts then stops</p>
+        <p><strong>Cause</strong>: nginx crashed or failed to start</p>
+        <p><strong>Solution</strong>:</p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check logs</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> logs stockease-frontend</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Test nginx config</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> stockease-frontend:latest <span class="dt">\</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  nginx <span class="at">-t</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Run interactively to see error</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-it</span> stockease-frontend:latest /bin/sh</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Then type: nginx -t</span></span></code></pre></div>
+        <hr />
+        <h2 id="performance-optimization">Performance Optimization</h2>
+        <h3 id="build-time-optimization">Build Time Optimization</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimal layer order (fastest builds)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">1. FROM node:18-alpine</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">2. COPY package*.json</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">3. RUN npm ci</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">4. COPY tsconfig*.json vite.config.ts</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">5. COPY src ./src</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">6. RUN npm run build</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">7. FROM nginx:alpine</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">8. COPY --from=builder dist</span></span></code></pre></div>
+        <p><strong>Why this order?</strong></p>
+        <ul>
+        <li>Dependencies layer (COPY package.json + RUN npm ci) changes
+        rarely</li>
+        <li>Source code layer (COPY src) changes frequently</li>
+        <li>When only code changes, Docker reuses dependencies
+        layer</li>
+        </ul>
+        <h3 id="runtime-performance">Runtime Performance</h3>
+        <pre><code>Metrics:
+├─ Startup: &lt;2 seconds
+├─ Memory: 50-100MB
+├─ Response time: &lt;100ms
+└─ Concurrent users: 1000+</code></pre>
+        <p>Nginx is already highly optimized. Most performance comes
+        from:</p>
+        <ul>
+        <li>CDN (for static assets)</li>
+        <li>Browser caching (via Cache-Control headers)</li>
+        <li>Asset optimization (minification, gzip)</li>
+        </ul>
+        <hr />
+        <h2 id="security-best-practices">Security Best Practices</h2>
+        <h3 id="-implement-these">✅ Implement These</h3>
+        <p><strong>1. Security Headers</strong></p>
+        <pre class="nginx"><code>add_header X-Frame-Options &quot;SAMEORIGIN&quot;;
+add_header X-Content-Type-Options &quot;nosniff&quot;;
+add_header X-XSS-Protection &quot;1; mode=block&quot;;
+add_header Strict-Transport-Security &quot;max-age=31536000&quot; always;</code></pre>
+        <p><strong>2. Non-Root User</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alpine nginx runs as non-root by default</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify: docker run --user 0 --rm app id</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Should show: uid=101(nginx) gid=101(nginx)</span></span></code></pre></div>
+        <p><strong>3. HTTPS Only</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Behind a reverse proxy or load balancer</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Force HTTPS redirect</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">if ($scheme != &quot;https&quot;) {</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">  return 301 https://$server_name$request_uri;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">}</span></span></code></pre></div>
+        <p><strong>4. Minimal Base Image</strong></p>
+        <ul>
+        <li>Alpine Linux (minimal attack surface)</li>
+        <li>No unnecessary packages</li>
+        <li>Regular security updates</li>
+        </ul>
+        <p><strong>5. No Hardcoded Secrets</strong></p>
+        <ul>
+        <li>Use environment variables/secrets</li>
+        <li>Don't include credentials in Dockerfile</li>
+        <li>Use <code>--build-arg</code> for sensitive values</li>
+        </ul>
+        <h3 id="vulnerability-scanning">Vulnerability Scanning</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scan image with Snyk</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> scan stockease-frontend:latest</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Scan with Trivy</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">trivy</span> image stockease-frontend:latest</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix vulnerabilities</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull nginx:latest  <span class="co"># Update base image</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--no-cache</span> <span class="at">-t</span> stockease:latest .</span></code></pre></div>
+        <hr />
+        <h2 id="health-checks">Health Checks</h2>
+        <h3 id="docker-health-check">Docker Health Check</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">HEALTHCHECK</span> <span class="op">--interval=30s</span> <span class="op">--timeout=5s</span> <span class="op">--start-period=5s</span> <span class="op">--retries=3</span> \</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">CMD</span> <span class="ex">curl</span> <span class="at">-f</span> http://localhost/index.html <span class="kw">||</span> <span class="bu">exit</span> 1</span></code></pre></div>
+        <h3 id="monitor-health">Monitor Health</h3>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with health check</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--health-interval</span><span class="op">=</span>10s stockease-frontend:latest</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check status</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps <span class="kw">|</span> <span class="fu">grep</span> stockease</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> inspect <span class="at">--format</span><span class="op">=</span><span class="st">&#39;{{json .State.Health}}&#39;</span> stockease-frontend</span></code></pre></div>
+        <hr />
+        <h2 id="debugging-techniques">Debugging Techniques</h2>
+        <h3 id="inspect-image-layers">Inspect Image Layers</h3>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> history stockease-frontend:latest</span></code></pre></div>
+        <p>Shows:</p>
+        <ul>
+        <li>What each layer contains</li>
+        <li>Layer size</li>
+        <li>Commands that created each layer</li>
+        </ul>
+        <h3 id="run-shell-inside-container">Run Shell Inside
+        Container</h3>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-it</span> stockease-frontend:latest /bin/sh</span></code></pre></div>
+        <p><strong>Common debugging commands</strong>:</p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test nginx config</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">nginx</span> <span class="at">-t</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># List served files</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> /usr/share/nginx/html/</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if nginx is running</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">grep</span> nginx</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Test local request</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost/</span></code></pre></div>
+        <h3 id="view-real-time-logs">View Real-Time Logs</h3>
+        <div class="sourceCode" id="cb19"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> logs <span class="at">-f</span> <span class="at">--timestamps</span> stockease-frontend</span></code></pre></div>
+        <hr />
+        <h2 id="production-considerations">Production
+        Considerations</h2>
+        <h3 id="use-specific-base-image-versions">Use Specific Base
+        Image Versions</h3>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ❌ Don&#39;t</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> nginx:latest</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ✅ Do</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18.17.1-alpine3.18</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> nginx:1.25.3-alpine3.18</span></code></pre></div>
+        <p>Pinning versions ensures reproducible builds.</p>
+        <h3 id="image-registry">Image Registry</h3>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tag for registry</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> tag stockease-frontend:latest myregistry.azurecr.io/stockease:v1.0.0</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Push to registry</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> push myregistry.azurecr.io/stockease:v1.0.0</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull from registry</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull myregistry.azurecr.io/stockease:v1.0.0</span></code></pre></div>
+        <h3 id="automated-scanning-in-ci">Automated Scanning in CI</h3>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GitHub Actions</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Scan image</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> docker scan stockease-frontend:latest</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Docker Overview</a></li>
+        <li><a href="./configuration.html">Configuration</a></li>
+        <li><a href="./local-usage.html">Local Usage</a></li>
+        <li><a href="./build-stage.html">Build Stage</a></li>
+        <li><a href="./production-stage.html">Production Stage</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Status</strong>: Production Ready<br />
+        <strong>Maintenance</strong>: Security patches monthly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

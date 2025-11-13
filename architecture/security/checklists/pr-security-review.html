@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>pr-security-review - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="pr-security-review-checklist">PR Security Review
+        Checklist</h1>
+        <h2 id="overview">Overview</h2>
+        <p>This checklist is designed for <strong>code reviewers and
+        security teams</strong> to evaluate pull requests for security
+        vulnerabilities, best practices, and compliance with StockEase
+        security standards before merging to master.</p>
+        <p><strong>Purpose:</strong> Prevent security regressions and
+        ensure all code meets enterprise security requirements</p>
+        <p><strong>Timing:</strong> Review BEFORE approving and merging
+        pull requests<br />
+        <strong>Responsibility:</strong> Code reviewers, security team,
+        and maintainers<br />
+        <strong>Tools Required:</strong> Code editor, git, npm audit,
+        ESLint, TypeScript compiler</p>
+        <hr />
+        <h2 id="-authentication--authorization">🔐 Authentication &amp;
+        Authorization</h2>
+        <h3 id="a1-token--session-security">A1: Token &amp; Session
+        Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>JWT Token
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Token is only stored in
+        localStorage (not in URL, cookies, or session
+        storage)</label></li>
+        <li><label><input type="checkbox" />Token is never logged to
+        console or error messages</label></li>
+        <li><label><input type="checkbox" />Token extraction logic
+        properly decodes JWT payload</label></li>
+        <li><label><input type="checkbox" />Token format validation
+        prevents malformed tokens</label></li>
+        <li><label><input type="checkbox" />Token is cleared on 401
+        responses</label></li>
+        <li><label><input type="checkbox" />Logout properly removes
+        token from localStorage</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Session
+        management</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Session cleanup logic
+        executes on authentication failure</label></li>
+        <li><label><input type="checkbox" />User state cleared when
+        token expires</label></li>
+        <li><label><input type="checkbox" />No stale tokens remain after
+        logout</label></li>
+        <li><label><input type="checkbox" />Concurrent requests don't
+        cause race conditions with token</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Password
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Passwords are never logged
+        or stored client-side</label></li>
+        <li><label><input type="checkbox" />Password validation rules
+        are enforced (minimum length, complexity)</label></li>
+        <li><label><input type="checkbox" />Login errors don't reveal
+        whether username or password is incorrect (prevents
+        enumeration)</label></li>
+        <li><label><input type="checkbox" />No plaintext passwords in
+        error messages</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="a2-authorization--access-control">A2: Authorization
+        &amp; Access Control</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Route
+        protection</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Protected routes verify
+        authentication before rendering</label></li>
+        <li><label><input type="checkbox" />Unauthorized users cannot
+        access admin/protected pages</label></li>
+        <li><label><input type="checkbox" />Role-based access control
+        (RBAC) is consistently applied</label></li>
+        <li><label><input type="checkbox" />Component-level
+        authorization checks user role/permissions</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>API call
+        authorization</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All API calls include Bearer
+        token in Authorization header</label></li>
+        <li><label><input type="checkbox" />Token is refreshed if
+        expired (or new login required)</label></li>
+        <li><label><input type="checkbox" />Unauthorized API responses
+        (401/403) are handled gracefully</label></li>
+        <li><label><input type="checkbox" />User cannot modify API
+        requests to access other user's data</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="️-input-validation--xss-prevention">🛡️ Input Validation
+        &amp; XSS Prevention</h2>
+        <h3 id="b1-input-validation">B1: Input Validation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Form input
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All form inputs have
+        validation rules (required, type, length, pattern)</label></li>
+        <li><label><input type="checkbox" />Validation rules match
+        backend validation</label></li>
+        <li><label><input type="checkbox" />Error messages are
+        user-friendly but don't expose system details</label></li>
+        <li><label><input type="checkbox" />Special characters are
+        properly handled</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Dynamic data
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />User input is never used
+        directly in code execution</label></li>
+        <li><label><input type="checkbox" />eval(), Function(),
+        innerHTML with user data are NOT used</label></li>
+        <li><label><input type="checkbox" />Template literals with user
+        data are safe</label></li>
+        <li><label><input type="checkbox" />Data from API responses are
+        treated as untrusted</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Search/filter
+        inputs</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Search queries are validated
+        and sanitized</label></li>
+        <li><label><input type="checkbox" />Filters prevent SQL
+        injection patterns (handled by backend)</label></li>
+        <li><label><input type="checkbox" />Large input payloads are
+        rejected (prevents DoS)</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="b2-xss-prevention">B2: XSS Prevention</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>React best
+        practices</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />dangerouslySetInnerHTML is
+        not used (or only with sanitized data)</label></li>
+        <li><label><input type="checkbox" />innerHTML is not
+        used</label></li>
+        <li><label><input type="checkbox" />User data is rendered as
+        text, not HTML</label></li>
+        <li><label><input type="checkbox" />JSX automatically escapes
+        content</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>DOM
+        operations</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No direct DOM manipulation
+        with user data</label></li>
+        <li><label><input type="checkbox" />React refs are used
+        safely</label></li>
+        <li><label><input type="checkbox" />Event handlers don't accept
+        HTML strings</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Component
+        output</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />API responses displaying
+        user data are escaped</label></li>
+        <li><label><input type="checkbox" />Error messages don't contain
+        unescaped user input</label></li>
+        <li><label><input type="checkbox" />No rendering of error stack
+        traces in production</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-api-security">🔗 API Security</h2>
+        <h3 id="c1-api-requestresponse-security">C1: API
+        Request/Response Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Request
+        security</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All API requests use HTTPS
+        (verified in base URL)</label></li>
+        <li><label><input type="checkbox" />Bearer token is attached to
+        Authorization header</label></li>
+        <li><label><input type="checkbox" />Request body doesn't include
+        sensitive data unnecessarily</label></li>
+        <li><label><input type="checkbox" />Request logging doesn't
+        expose credentials</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Response
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />API responses are validated
+        before use</label></li>
+        <li><label><input type="checkbox" />Response structure matches
+        expected schema</label></li>
+        <li><label><input type="checkbox" />Unexpected response formats
+        are handled safely</label></li>
+        <li><label><input type="checkbox" />API responses don't expose
+        internal error details</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error
+        responses</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />401 errors trigger token
+        cleanup and re-authentication</label></li>
+        <li><label><input type="checkbox" />403 errors are handled
+        without revealing why access was denied</label></li>
+        <li><label><input type="checkbox" />400 errors display
+        user-friendly messages (not internal validation
+        schema)</label></li>
+        <li><label><input type="checkbox" />5xx errors are generic ("An
+        error occurred") without stack traces</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="c2-cors--cross-origin-security">C2: CORS &amp;
+        Cross-Origin Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>CORS
+        configuration</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />API base URL matches
+        approved origin in CORS headers</label></li>
+        <li><label><input type="checkbox" />Wildcard origin (*) is not
+        used with credentials</label></li>
+        <li><label><input type="checkbox" />Credentials are included in
+        requests to trusted origins only</label></li>
+        <li><label><input type="checkbox" />CORS preflight requests are
+        properly handled</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Request
+        headers</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Authorization header is set
+        correctly (Bearer token format)</label></li>
+        <li><label><input type="checkbox" />Content-Type is set
+        appropriately (application/json)</label></li>
+        <li><label><input type="checkbox" />Custom headers don't expose
+        sensitive information</label></li>
+        <li><label><input type="checkbox" />Headers don't include
+        credentials in query parameters</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-data-protection--logging">📊 Data Protection &amp;
+        Logging</h2>
+        <h3 id="d1-sensitive-data-protection">D1: Sensitive Data
+        Protection</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Data in
+        transit</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All API calls use HTTPS (not
+        HTTP)</label></li>
+        <li><label><input type="checkbox" />Credentials are never sent
+        via URL parameters</label></li>
+        <li><label><input type="checkbox" />Sensitive data (tokens,
+        passwords, API keys) is not logged</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Data in
+        storage</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Tokens in localStorage are
+        accessible only to the same domain</label></li>
+        <li><label><input type="checkbox" />No PII (personally
+        identifiable information) stored in localStorage</label></li>
+        <li><label><input type="checkbox" />No passwords or API keys
+        stored in localStorage</label></li>
+        <li><label><input type="checkbox" />sessionStorage is cleared
+        when browser closes</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error messages &amp;
+        logs</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Console logs don't contain
+        tokens, passwords, or API keys</label></li>
+        <li><label><input type="checkbox" />Error messages don't leak
+        database connection strings</label></li>
+        <li><label><input type="checkbox" />Error tracking services
+        receive sanitized errors only</label></li>
+        <li><label><input type="checkbox" />Stack traces don't include
+        user-sensitive context</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="d2-logging--monitoring">D2: Logging &amp;
+        Monitoring</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Application
+        logging</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Authorization header is
+        redacted from request logs</label></li>
+        <li><label><input type="checkbox" />Response body logging is
+        limited to non-sensitive fields</label></li>
+        <li><label><input type="checkbox" />Error logging includes
+        request ID (not full request/response)</label></li>
+        <li><label><input type="checkbox" />No PII or credentials in
+        error context objects</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Audit
+        trail</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Authentication failures are
+        logged (server-side)</label></li>
+        <li><label><input type="checkbox" />Access to admin features is
+        logged</label></li>
+        <li><label><input type="checkbox" />Data modifications are
+        traceable to user</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-dependencies--third-party-code">📦 Dependencies &amp;
+        Third-party Code</h2>
+        <h3 id="e1-dependency-security">E1: Dependency Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Installed
+        packages</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />npm audit reports no
+        critical or high vulnerabilities</label></li>
+        <li><label><input type="checkbox" />package.json uses reasonable
+        version constraints</label></li>
+        <li><label><input type="checkbox" />No abandoned or inactive
+        packages</label></li>
+        <li><label><input type="checkbox" />License compatibility is
+        verified</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>New
+        dependencies</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />New packages have been
+        audited for vulnerabilities</label></li>
+        <li><label><input type="checkbox" />Package functionality is
+        needed (no unnecessary bloat)</label></li>
+        <li><label><input type="checkbox" />Package maintainer is active
+        and trusted</label></li>
+        <li><label><input type="checkbox" />Install script doesn't
+        execute dangerous code</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Dependency
+        imports</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Only necessary exports are
+        imported from dependencies</label></li>
+        <li><label><input type="checkbox" />Dependencies are not
+        monkey-patched or extended dangerously</label></li>
+        <li><label><input type="checkbox" />No loading of arbitrary code
+        from user input</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="e2-supply-chain-security">E2: Supply Chain Security</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Build and
+        bundling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Build process is
+        reproducible</label></li>
+        <li><label><input type="checkbox" />Bundled code includes no
+        test files or private data</label></li>
+        <li><label><input type="checkbox" />Source maps are not deployed
+        to production (or restricted)</label></li>
+        <li><label><input type="checkbox" />No secrets or environment
+        variables hardcoded in build output</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-cryptography--secrets">🔒 Cryptography &amp;
+        Secrets</h2>
+        <h3 id="f1-secrets-management">F1: Secrets Management</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Environment
+        variables</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No hardcoded API keys,
+        tokens, or passwords</label></li>
+        <li><label><input type="checkbox" />Sensitive config is in .env
+        files (git-ignored)</label></li>
+        <li><label><input type="checkbox" />VITE_* variables don't
+        expose secrets (they're visible in frontend)</label></li>
+        <li><label><input type="checkbox" />API base URL is configurable
+        via environment</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Build-time
+        secrets</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />GitHub Secrets are used for
+        CI/CD (not in code)</label></li>
+        <li><label><input type="checkbox" />Secrets are not logged in
+        CI/CD output</label></li>
+        <li><label><input type="checkbox" />Build artifacts don't
+        contain secrets</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-code-quality--best-practices">✅ Code Quality &amp;
+        Best Practices</h2>
+        <h3 id="g1-typescript--type-safety">G1: TypeScript &amp; Type
+        Safety</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Type
+        definitions</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All API responses have
+        TypeScript interfaces</label></li>
+        <li><label><input type="checkbox" />Function parameters and
+        return types are defined</label></li>
+        <li><label><input type="checkbox" />Any type is avoided (use
+        unknown or specific types)</label></li>
+        <li><label><input type="checkbox" />Null checks are performed
+        where needed</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Type
+        checking</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><code>tsc --noEmit</code>
+        passes without errors</label></li>
+        <li><label><input type="checkbox" />No TypeScript compilation
+        warnings</label></li>
+        <li><label><input type="checkbox" />Type errors related to
+        security are fixed (e.g., string vs Token type)</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="g2-code-style--security-patterns">G2: Code Style &amp;
+        Security Patterns</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>ESLint
+        compliance</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />ESLint passes without
+        errors: <code>npm run lint</code></label></li>
+        <li><label><input type="checkbox" />Security-related rules are
+        not disabled</label></li>
+        <li><label><input type="checkbox" />No console.log of sensitive
+        data</label></li>
+        <li><label><input type="checkbox" />Promise/async error handling
+        is correct</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Naming &amp;
+        documentation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Functions/variables clearly
+        indicate their purpose</label></li>
+        <li><label><input type="checkbox" />Security-critical logic has
+        explanatory comments</label></li>
+        <li><label><input type="checkbox" />No misleading or incorrect
+        comments</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Component
+        structure</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Components follow single
+        responsibility principle</label></li>
+        <li><label><input type="checkbox" />Error handling is explicit
+        and comprehensive</label></li>
+        <li><label><input type="checkbox" />No side effects in render
+        methods</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="g3-error-handling">G3: Error Handling</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Try-catch
+        blocks</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Async functions properly
+        handle promise rejections</label></li>
+        <li><label><input type="checkbox" />Error objects are not
+        directly exposed to users</label></li>
+        <li><label><input type="checkbox" />Error messages are logged
+        but sanitized</label></li>
+        </ul></li>
+        <li><label><input
+        type="checkbox" /><strong>ErrorBoundary</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />ErrorBoundary catches and
+        handles component errors</label></li>
+        <li><label><input type="checkbox" />Error UI is user-friendly
+        (no stack traces)</label></li>
+        <li><label><input type="checkbox" />Errors are logged to
+        monitoring service (if used)</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-testing">🧪 Testing</h2>
+        <h3 id="h1-security-test-coverage">H1: Security Test
+        Coverage</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Authentication
+        tests</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Token storage and retrieval
+        is tested</label></li>
+        <li><label><input type="checkbox" />Token cleanup on 401 is
+        tested</label></li>
+        <li><label><input type="checkbox" />Login and logout workflows
+        are tested</label></li>
+        <li><label><input type="checkbox" />Unauthorized access is
+        prevented</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Authorization
+        tests</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Protected routes reject
+        unauthenticated users</label></li>
+        <li><label><input type="checkbox" />Role-based restrictions are
+        enforced</label></li>
+        <li><label><input type="checkbox" />Admin features are not
+        accessible to regular users</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Input validation
+        tests</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Invalid inputs are
+        rejected</label></li>
+        <li><label><input type="checkbox" />XSS payloads are handled
+        safely</label></li>
+        <li><label><input type="checkbox" />Boundary values are
+        tested</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error handling
+        tests</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />API errors are handled
+        gracefully</label></li>
+        <li><label><input type="checkbox" />Error messages are
+        appropriate</label></li>
+        <li><label><input type="checkbox" />No sensitive data in error
+        output</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="h2-test-execution">H2: Test Execution</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>All tests
+        pass</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><code>npm run test</code>
+        passes</label></li>
+        <li><label><input type="checkbox" />No test warnings or
+        deprecations</label></li>
+        <li><label><input type="checkbox" />Test coverage is reasonable
+        (&gt;70%)</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-documentation--comments">📝 Documentation &amp;
+        Comments</h2>
+        <h3 id="i1-security-documentation">I1: Security
+        Documentation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Code
+        comments</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Security-critical code has
+        explanatory comments</label></li>
+        <li><label><input type="checkbox" />Why not how (explain the
+        security reasoning)</label></li>
+        <li><label><input type="checkbox" />No sensitive data in
+        comments</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>PR
+        description</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />PR describes what
+        changed</label></li>
+        <li><label><input type="checkbox" />Security implications are
+        explained</label></li>
+        <li><label><input type="checkbox" />Any security-related
+        decisions are documented</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-manual-security-testing">🚨 Manual Security
+        Testing</h2>
+        <h3 id="j1-functional-verification">J1: Functional
+        Verification</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>Authentication
+        flow</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Login works with valid
+        credentials</label></li>
+        <li><label><input type="checkbox" />Login fails with invalid
+        credentials</label></li>
+        <li><label><input type="checkbox" />Session persists across page
+        refreshes</label></li>
+        <li><label><input type="checkbox" />Logout clears token and
+        redirects</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Authorization
+        enforcement</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Protected pages redirect to
+        login when not authenticated</label></li>
+        <li><label><input type="checkbox" />Admin pages are inaccessible
+        to non-admin users</label></li>
+        <li><label><input type="checkbox" />User can only access their
+        own data</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>Error
+        handling</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Network errors display
+        friendly messages</label></li>
+        <li><label><input type="checkbox" />API errors don't expose
+        sensitive information</label></li>
+        <li><label><input type="checkbox" />Error recovery workflows are
+        clear</label></li>
+        </ul></li>
+        </ul>
+        <h3 id="j2-security-testing">J2: Security Testing</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" /><strong>XSS
+        prevention</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Search inputs with
+        <code>&lt;script&gt;</code> are rendered safely (no
+        execution)</label></li>
+        <li><label><input type="checkbox" />Form inputs with special
+        characters are handled correctly</label></li>
+        <li><label><input type="checkbox" />API response data is
+        escaped</label></li>
+        </ul></li>
+        <li><label><input type="checkbox" /><strong>CORS
+        validation</strong></label>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Requests to API include
+        Bearer token</label></li>
+        <li><label><input type="checkbox" />Requests from incorrect
+        origins are blocked</label></li>
+        <li><label><input type="checkbox" />Preflight requests are
+        handled correctly</label></li>
+        </ul></li>
+        </ul>
+        <hr />
+        <h2 id="-final-checklist">🎯 Final Checklist</h2>
+        <p>Before approving the PR, verify:</p>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All security items above are
+        verified or N/A</label></li>
+        <li><label><input type="checkbox" />No hardcoded secrets are
+        present</label></li>
+        <li><label><input type="checkbox" />No breaking changes to
+        security controls</label></li>
+        <li><label><input type="checkbox" />Tests are passing and
+        coverage is maintained</label></li>
+        <li><label><input type="checkbox" />Code follows team standards
+        and best practices</label></li>
+        <li><label><input type="checkbox" />PR description documents
+        security changes</label></li>
+        <li><label><input type="checkbox" />Potential security impacts
+        are understood</label></li>
+        </ul>
+        <hr />
+        <h2 id="-review-sign-off">📊 Review Sign-off</h2>
+        <h3 id="reviewer-information">Reviewer Information</h3>
+        <p><strong>Reviewer Name:</strong> _________________<br />
+        <strong>Review Date:</strong> _________________<br />
+        <strong>GitHub Handle:</strong> _________________</p>
+        <h3 id="review-result">Review Result</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />✅ <strong>Approved</strong>
+        — No security concerns found</label></li>
+        <li><label><input type="checkbox" />⚠️ <strong>Approved with
+        Comments</strong> — Minor security notes documented</label></li>
+        <li><label><input type="checkbox" />❌ <strong>Blocked</strong>
+        — Security issues must be resolved before merge</label></li>
+        </ul>
+        <h3 id="comments">Comments</h3>
+        <pre><code>[Document any security findings, concerns, or recommendations]</code></pre>
+        <hr />
+        <h2 id="-reference-links">📚 Reference Links</h2>
+        <ul>
+        <li><a href="../overview.html">StockEase Security
+        Documentation</a></li>
+        <li><a href="../api-communication/api-security.html">API
+        Security Guide</a></li>
+        <li><a href="../auth/overview.html">Authentication &amp;
+        Authorization</a></li>
+        <li><a href="../frontend/xss-and-sanitization.html">XSS
+        Prevention &amp; Input Sanitization</a></li>
+        <li><a href="../api-communication/error-logging.html">Error
+        Logging &amp; Monitoring</a></li>
+        <li><a href="../frontend/secrets-config.html">Secrets &amp;
+        Configuration</a></li>
+        </ul>
+        <hr />
+        <h2 id="-continuous-review">🔄 Continuous Review</h2>
+        <p>This checklist should be:</p>
+        <ul>
+        <li><strong>Used for every PR</strong> with code changes</li>
+        <li><strong>Updated quarterly</strong> as new threats
+        emerge</li>
+        <li><strong>Customized</strong> for specific PR types (docs-only
+        PRs may skip some items)</li>
+        <li><strong>Enforced</strong> in branch protection rules and
+        CODEOWNERS</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Version:</strong> 1.0.0<br />
+        <strong>Maintained By:</strong> StockEase Security Team<br />
+        <strong>Review Frequency:</strong> For every pull request<br />
+        <strong>Classification:</strong> Internal - Security Team &amp;
+        Developers</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

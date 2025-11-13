@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="stockease-frontend-security-documentation">StockEase
+        Frontend Security Documentation</h1>
+        <blockquote>
+        <p><strong>📍 Navigation:</strong> <a href="../overview.html">←
+        Back to Architecture</a> | <a href="../overview.de.html">←
+        Zurück zur Architektur</a></p>
+        </blockquote>
+        <h2 id="overview">Overview</h2>
+        <p>Welcome to the StockEase Frontend Security Documentation.
+        This comprehensive guide covers security practices, threat
+        mitigation, best practices, and operational procedures for the
+        StockEase Frontend application.</p>
+        <p>Security is a shared responsibility across the entire
+        development lifecycle. This documentation is designed for:</p>
+        <ul>
+        <li><strong>Developers</strong> — Implementing secure code</li>
+        <li><strong>Security Teams</strong> — Auditing and
+        compliance</li>
+        <li><strong>DevOps/SRE</strong> — Deployment and monitoring</li>
+        <li><strong>Project Managers</strong> — Understanding security
+        requirements</li>
+        </ul>
+        <hr />
+        <h2 id="-documentation-structure">📚 Documentation
+        Structure</h2>
+        <p>The security documentation is organized into the following
+        directories:</p>
+        <h3 id="-api-communication-security">🔐 <a
+        href="./api-communication/overview.html">API Communication
+        Security</a></h3>
+        <p>Comprehensive guide to secure API communication, JWT
+        authentication, error handling, and monitoring.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./api-communication/api-security.html">API
+        Security &amp; Configuration</a></strong> — Axios setup,
+        request/response interceptors, bearer tokens, environment
+        configuration</li>
+        <li><strong><a
+        href="./api-communication/error-logging.html">Error Logging
+        &amp; Monitoring</a></strong> — Error handling strategies,
+        sensitive data protection, monitoring, and troubleshooting</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>Bearer token authentication</li>
+        <li>Request/response interceptors</li>
+        <li>401 error handling and session cleanup</li>
+        <li>CORS configuration and handling</li>
+        <li>Token management and storage</li>
+        <li>Environment variables and secrets</li>
+        <li>Error logging without exposing sensitive data</li>
+        </ul>
+        <hr />
+        <h3 id="-authentication--authorization">🔑 <a
+        href="./auth/overview.html">Authentication &amp;
+        Authorization</a></h3>
+        <p>Details on JWT-based authentication, token lifecycle,
+        role-based access control (RBAC), and session management.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./auth/authentication.html">Authentication
+        Flow &amp; Implementation</a></strong> — Login process,
+        LoginPage component, Auth service, JWT token handling, password
+        security</li>
+        <li><strong><a href="./auth/jwt-tokens.html">JWT Token Handling
+        &amp; Authorization</a></strong> — JWT structure, token
+        generation, storage options, token expiration, role-based access
+        control</li>
+        <li><strong><a href="./auth/authorization.html">Authorization
+        &amp; Access Control</a></strong> — RBAC system, route
+        protection, component-level authorization, permission matrix,
+        error handling</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>JWT token flow (login, storage, refresh)</li>
+        <li>User roles and RBAC implementation</li>
+        <li>Protected routes and conditional rendering</li>
+        <li>Token expiration and refresh strategies</li>
+        <li>Password security and validation</li>
+        <li>Multi-factor authentication considerations</li>
+        </ul>
+        <hr />
+        <h3 id="️-frontend-security">🛡️ <a
+        href="./frontend/overview.html">Frontend Security</a></h3>
+        <p>Security practices within React components, input validation,
+        XSS prevention, and client-side protection mechanisms.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./frontend/xss-and-sanitization.html">XSS
+        Prevention &amp; Input Sanitization</a></strong> — Input
+        validation rules, sanitization implementation, dangerous sinks,
+        XSS testing</li>
+        <li><strong><a href="./frontend/csp.html">Content Security
+        Policy (CSP)</a></strong> — CSP directives, nginx configuration,
+        report-only rollout, violation handling</li>
+        <li><strong><a href="./frontend/cors-and-csrf.html">CORS &amp;
+        CSRF Protection</a></strong> — CORS contract, preflight
+        requests, CSRF protection (token-based architecture)</li>
+        <li><strong><a href="./frontend/secrets-config.html">Secrets
+        &amp; Configuration</a></strong> — .env files, Vite variable
+        exposure, GitHub Secrets, never logging sensitive data</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>XSS (Cross-Site Scripting) prevention</li>
+        <li>CSRF (Cross-Site Request Forgery) protection</li>
+        <li>Input sanitization and validation</li>
+        <li>Content Security Policy implementation</li>
+        <li>CORS validation and handling</li>
+        <li>Secure secret management</li>
+        <li>Preventing accidental data leaks</li>
+        </ul>
+        <hr />
+        <h3 id="-platform--deployment-security">🚀 <a
+        href="./platform/overview.html">Platform &amp; Deployment
+        Security</a></h3>
+        <p>Deployment security, CI/CD pipeline protection, environment
+        configuration, and production hardening.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./platform/dependencies.html">Dependency
+        Management &amp; Supply Chain Security</a></strong> — npm audit,
+        Renovate automation, SCA rules, vulnerability triage</li>
+        <li><strong><a href="./platform/ci-secrets.html">CI/CD Secrets
+        &amp; Pipeline Security</a></strong> — GitHub Secrets, OIDC
+        authentication, secret masking, rotation practices</li>
+        <li><strong><a href="./platform/headers-and-nginx.html">Security
+        Headers &amp; nginx Configuration</a></strong> — Clickjacking
+        prevention, HSTS, MIME type sniffing, X-Frame-Options,
+        Referrer-Policy</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>npm vulnerability scanning and automated updates</li>
+        <li>GitHub Secrets for sensitive configuration</li>
+        <li>OIDC token-based authentication</li>
+        <li>Secret masking in CI/CD logs</li>
+        <li>HTTP security headers implementation</li>
+        <li>nginx configuration and best practices</li>
+        <li>HSTS (HTTP Strict Transport Security)</li>
+        <li>MIME type sniffing prevention</li>
+        <li>Referrer policy for privacy</li>
+        </ul>
+        <hr />
+        <h3 id="-security-playbooks">🎯 <a
+        href="./playbooks/overview.html">Security Playbooks</a></h3>
+        <p>Operational procedures for security incident response, token
+        management, and key rotation.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./playbooks/revoke-tokens.html">Token
+        Revocation &amp; Forced Logout</a></strong> — When to revoke
+        tokens, implementation methods, batch revocation, emergency
+        response</li>
+        <li><strong><a href="./playbooks/key-rotation.html">Key Rotation
+        &amp; Rollout</a></strong> — Scheduled rotation, immediate
+        rotation, rollout strategies, rollback procedures,
+        monitoring</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>Token revocation triggers and methods</li>
+        <li>Forced logout procedures</li>
+        <li>Server-side token blacklist implementation</li>
+        <li>Batch revocation for incidents</li>
+        <li>JWT signing key rotation strategies</li>
+        <li>Graceful vs. emergency rotation</li>
+        <li>Dual-key deployment and monitoring</li>
+        <li>Key rotation schedule and compliance</li>
+        <li>Incident response procedures</li>
+        <li>Monitoring and verification</li>
+        </ul>
+        <hr />
+        <h3 id="️-security-checklists">✔️ <a
+        href="./checklists/overview.html">Security Checklists</a></h3>
+        <p>Practical, actionable security verification lists for code
+        reviews and pre-release verification.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./checklists/pr-security-review.html">PR
+        Security Review Checklist</a></strong> — Code reviewer checklist
+        for pull requests (10 categories, 40+ items, ~5-15 min per
+        PR)</li>
+        <li><strong><a
+        href="./checklists/pre-release-security.html">Pre-Release
+        Security Checklist</a></strong> — DevOps/SRE checklist for
+        production releases (10 categories, 60+ items, ~30-60 min per
+        release)</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>Authentication &amp; authorization verification</li>
+        <li>Input validation &amp; XSS prevention checks</li>
+        <li>API security and error handling validation</li>
+        <li>Data protection and logging verification</li>
+        <li>Dependency vulnerability assessment</li>
+        <li>Secrets management and configuration review</li>
+        <li>Code quality and best practices verification</li>
+        <li>Security test coverage validation</li>
+        <li>HTTPS/TLS and security headers verification</li>
+        <li>Deployment and infrastructure hardening</li>
+        <li>Post-deployment security validation</li>
+        <li>Rollback procedures and contingency planning</li>
+        </ul>
+        <p><strong>Checklist Status:</strong></p>
+        <ul>
+        <li>✅ PR Security Review — Implemented &amp; ready to use</li>
+        <li>✅ Pre-Release Security — Implemented &amp; ready to
+        use</li>
+        <li>⏳ Incident Response Checklist — Planned for Q1 2026</li>
+        <li>⏳ Dependency Vulnerability Checklist — Planned for Q1
+        2026</li>
+        </ul>
+        <hr />
+        <p><strong>Planned Playbooks:</strong></p>
+        <ul>
+        <li>API security incident response</li>
+        <li>Unauthorized access incident</li>
+        <li>Token compromise procedures</li>
+        <li>Dependency vulnerability patching</li>
+        <li>Security breach notification</li>
+        </ul>
+        <hr />
+        <h3 id="-security-testing">✅ <a
+        href="./testing/overview.html">Security Testing</a></h3>
+        <p>Comprehensive security testing program covering static
+        analysis, unit testing, integration testing, and dynamic
+        security scanning.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./testing/strategy.html">Testing
+        Strategy</a></strong> — Unit security testing, integration
+        testing, scenario-based testing, and abuse case testing. Covers
+        15 test categories with 200+ security tests and comprehensive
+        test organization</li>
+        <li><strong><a href="./testing/sast.html">Static Application
+        Security Testing (SAST)</a></strong> — ESLint security patterns,
+        dangerous code detection, type safety, and custom security
+        rules. Covers eval(), innerHTML, dangerouslySetInnerHTML,
+        dynamic imports, and other critical vulnerabilities</li>
+        <li><strong><a href="./testing/dast.html">Dynamic Application
+        Security Testing (DAST)</a></strong> — OWASP ZAP scanning, API
+        security testing, vulnerability detection, and CI/CD
+        integration. Includes baseline and full scan configurations,
+        reporting, and remediation workflows</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li><p><strong>Unit Security Tests</strong> (200+ tests across
+        15 test categories):</p>
+        <ul>
+        <li>Secrets &amp; sensitive data protection (token storage,
+        logging, env vars, build-time)</li>
+        <li>XSS prevention (input escaping, DOM safety, React
+        security)</li>
+        <li>CSRF protection (token validation, state-changing
+        requests)</li>
+        <li>CSP compliance (directive validation, nonce validation)</li>
+        <li>HTTP header security (CORS, security headers, caching)</li>
+        <li>Component security (error boundaries, authorization
+        checks)</li>
+        <li>Authentication &amp; authorization (RBAC, role
+        validation)</li>
+        <li>API integration (endpoint auth, error handling)</li>
+        </ul></li>
+        <li><p><strong>Static Analysis (SAST)</strong>:</p>
+        <ul>
+        <li>ESLint security rule enforcement (500+ active rules)</li>
+        <li>Critical patterns: eval, innerHTML, dangerouslySetInnerHTML,
+        dynamic code execution</li>
+        <li>Type safety with TypeScript branded types</li>
+        <li>Pre-commit and CI/CD integration</li>
+        <li>Code review security checklist</li>
+        </ul></li>
+        <li><p><strong>Dynamic Analysis (DAST)</strong>:</p>
+        <ul>
+        <li>OWASP ZAP automated scanning (baseline: 5-10 min, full:
+        30-45 min)</li>
+        <li>API endpoint security testing with payload fuzzing</li>
+        <li>Authentication &amp; authorization testing</li>
+        <li>XSS payload testing in all input vectors</li>
+        <li>CSRF protection verification</li>
+        <li>Security header validation</li>
+        <li>Vulnerability categorization (OWASP Top 10, CWE)</li>
+        </ul></li>
+        <li><p><strong>Test Coverage &amp; Metrics</strong>:</p>
+        <ul>
+        <li>Security-critical code: ≥95% statement coverage</li>
+        <li>Auth/authorization: ≥90% coverage</li>
+        <li>General code: ≥80% coverage</li>
+        <li>Automated coverage tracking in CI/CD</li>
+        </ul></li>
+        </ul>
+        <p><strong>Testing Status:</strong></p>
+        <ul>
+        <li>✅ Unit Security Tests — 200+ tests across 6 security
+        domains</li>
+        <li>✅ SAST (ESLint) — Implemented with 500+ security rules</li>
+        <li>✅ Testing Strategy — Documented with 15 test
+        categories</li>
+        <li>✅ CI/CD Integration — Automated in GitHub Actions</li>
+        <li>✅ Coverage Tracking — v8 provider reporting to
+        public-docs/coverage/</li>
+        <li>⏳ DAST (OWASP ZAP) — Ready for preview/staging
+        deployment</li>
+        <li>⏳ Penetration Testing — Planned for Q2 2026</li>
+        </ul>
+        <hr />
+        <hr />
+        <h3 id="-compliance--standards">📋 <a
+        href="./compliance/overview.html">Compliance &amp;
+        Standards</a></h3>
+        <p>Security compliance frameworks, standards adherence, and
+        regulatory requirements mapping.</p>
+        <p><strong>Subdirectories:</strong></p>
+        <ul>
+        <li><strong><a href="./compliance/owasp-asvs-mapping.html">OWASP
+        ASVS Mapping</a></strong> — Comprehensive mapping to OWASP
+        Application Security Verification Standard v4.0 with control
+        implementation status and evidence links</li>
+        </ul>
+        <p><strong>Key Topics:</strong></p>
+        <ul>
+        <li>OWASP ASVS v4.0 (13 verification categories)</li>
+        <li>OWASP Top 10 2021 coverage and mitigation</li>
+        <li>GDPR compliance requirements</li>
+        <li>PCI DSS security standards</li>
+        <li>SOC 2 Trust Service Criteria</li>
+        <li>Compliance review cycle</li>
+        <li>Security control implementation roadmap</li>
+        <li>Testing and verification procedures</li>
+        <li>Responsible disclosure policy</li>
+        </ul>
+        <p><strong>Compliance Status:</strong></p>
+        <ul>
+        <li>✅ OWASP ASVS Level 2 (Standard) — Achieved</li>
+        <li>✅ OWASP Top 10 2021 — All 10 vulnerabilities mitigated</li>
+        <li>✅ GDPR — Frontend compliance implemented</li>
+        <li>✅ SOC 2 — Security controls in place</li>
+        <li>⏳ Level 3 Advanced Controls — Partially implemented</li>
+        </ul>
+        <hr />
+        <h2 id="-quick-security-reference">🚨 Quick Security
+        Reference</h2>
+        <h3 id="critical-security-controls">Critical Security
+        Controls</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Control</th>
+        <th>Status</th>
+        <th>Documentation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>JWT Bearer Tokens</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>401 Session Cleanup</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./api-communication/error-logging.html">Error
+        Logging</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>XSS Prevention</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./frontend/overview.html">Frontend
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>HTTPS Enforcement</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./platform/overview.html">Platform
+        Security</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>CORS Validation</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./api-communication/api-security.html">API
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>Password Validation</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./auth/overview.html">Authentication</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Input Sanitization</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./frontend/overview.html">Frontend
+        Security</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>Secrets Management</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./platform/overview.html">Platform
+        Security</a></td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Dependency Scanning</strong></td>
+        <td>✅ Implemented</td>
+        <td><a href="./testing/overview.html">Testing &amp;
+        Audits</a></td>
+        </tr>
+        <tr class="even">
+        <td><strong>Multi-Factor Auth</strong></td>
+        <td>⏳ Future</td>
+        <td><a href="./auth/overview.html">Authentication</a></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-security-objectives">🎯 Security Objectives</h2>
+        <h3 id="confidentiality">Confidentiality</h3>
+        <ul>
+        <li>Protect user credentials and authentication tokens</li>
+        <li>Encrypt sensitive data in transit (HTTPS only)</li>
+        <li>Prevent unauthorized access to user data</li>
+        </ul>
+        <h3 id="integrity">Integrity</h3>
+        <ul>
+        <li>Validate all input data</li>
+        <li>Verify API responses (JWT signature validation by
+        backend)</li>
+        <li>Prevent data tampering</li>
+        </ul>
+        <h3 id="availability">Availability</h3>
+        <ul>
+        <li>Handle graceful degradation of API failures</li>
+        <li>Implement retry logic for transient failures</li>
+        <li>Monitor for denial-of-service indicators</li>
+        </ul>
+        <h3 id="non-repudiation">Non-Repudiation</h3>
+        <ul>
+        <li>Log security events with user attribution</li>
+        <li>Audit trail for administrative actions</li>
+        <li>Compliance with data protection regulations (GDPR,
+        etc.)</li>
+        </ul>
+        <hr />
+        <h2 id="-security-metrics--kpis">📊 Security Metrics &amp;
+        KPIs</h2>
+        <h3 id="track-these-metrics">Track These Metrics</h3>
+        <pre><code>API Security
+├─ 401 Error Rate (should be &lt; 1%)
+├─ 403 Error Rate (should be &lt; 0.5%)
+├─ Failed Login Attempts (monitor for brute force)
+└─ Average Response Time (should be &lt; 500ms)
+
+Code Quality
+├─ Known Vulnerabilities in Dependencies (should be 0)
+├─ Code Coverage (target: &gt; 80%)
+├─ Linting Issues (should be 0)
+└─ Security Issues Found in Reviews (track trends)
+
+Deployment
+├─ HTTPS Enforcement (should be 100%)
+├─ Security Headers Present (100%)
+├─ No Secrets in Code (automated scanning)
+└─ Image Scan Pass Rate (100%)</code></pre>
+        <hr />
+        <h2 id="-security-review-cycle">🔄 Security Review Cycle</h2>
+        <h3 id="quarterly-reviews-recommended">Quarterly Reviews
+        (Recommended)</h3>
+        <p><strong>Q1 (Jan-Mar):</strong></p>
+        <ul>
+        <li>Dependency vulnerability audit</li>
+        <li>OWASP Top 10 assessment</li>
+        <li>Code review of authentication flow</li>
+        </ul>
+        <p><strong>Q2 (Apr-Jun):</strong></p>
+        <ul>
+        <li>API security testing</li>
+        <li>CORS policy review</li>
+        <li>Deployment security audit</li>
+        </ul>
+        <p><strong>Q3 (Jul-Sep):</strong></p>
+        <ul>
+        <li>Input validation testing</li>
+        <li>XSS prevention verification</li>
+        <li>Incident response drill</li>
+        </ul>
+        <p><strong>Q4 (Oct-Dec):</strong></p>
+        <ul>
+        <li>Full security assessment</li>
+        <li>Penetration testing consideration</li>
+        <li>Documentation updates</li>
+        </ul>
+        <hr />
+        <h2 id="-security-contacts--escalation">📞 Security Contacts
+        &amp; Escalation</h2>
+        <h3 id="report-security-issues">Report Security Issues</h3>
+        <p><strong>Email:</strong> <a
+        href="mailto:security@stockease.com">security@stockease.com</a>
+        (or your security contact)<br />
+        <strong>Response Time:</strong> 24 hours for confirmed
+        vulnerabilities<br />
+        <strong>Disclosure:</strong> Coordinated disclosure after patch
+        release</p>
+        <p><strong>⚠️ Never:</strong> Post security vulnerabilities
+        publicly before patch release</p>
+        <hr />
+        <h2 id="-compliance--standards-1">🌍 Compliance &amp;
+        Standards</h2>
+        <p>StockEase Frontend aligns with:</p>
+        <ul>
+        <li><strong>OWASP Top 10</strong> — Addressing common web
+        vulnerabilities</li>
+        <li><strong>GDPR</strong> — Data protection and privacy (backend
+        responsibility primarily)</li>
+        <li><strong>PCI DSS</strong> — If handling payment data (backend
+        responsibility)</li>
+        <li><strong>SOC 2</strong> — Security, availability, processing
+        integrity</li>
+        <li><strong>ISO/IEC 27001</strong> — Information security
+        management</li>
+        </ul>
+        <hr />
+        <h2 id="-getting-started">🚀 Getting Started</h2>
+        <p><strong>New to StockEase Security?</strong> Start here:</p>
+        <ol type="1">
+        <li><strong>Read the overview:</strong> Start with <a
+        href="./api-communication/overview.html">API Communication
+        Security</a></li>
+        <li><strong>Understand auth flow:</strong> Check <a
+        href="./auth/overview.html">Authentication &amp;
+        Authorization</a></li>
+        <li><strong>Learn deployment security:</strong> Review <a
+        href="./platform/overview.html">Platform Security</a></li>
+        <li><strong>Use checklists:</strong> Reference <a
+        href="./checklists/overview.html">Security Checklists</a></li>
+        </ol>
+        <hr />
+        <h2 id="-complete-documentation-map">📖 Complete Documentation
+        Map</h2>
+        <pre><code>/docs/architecture/security/
+├── api-communication/              ← API Security
+│   ├── overview.md                (🚀 START HERE)
+│   ├── api-security.md            (Axios, interceptors, bearers)
+│   └── error-logging.md           (Error handling, monitoring)
+├── auth/                           ← Authentication
+│   ├── overview.md                (JWT flow, RBAC)
+│   ├── token-management.md        (Token lifecycle)
+│   └── password-security.md       (Password validation)
+├── frontend/                       ← Client-side Security
+│   ├── overview.md                (XSS, CSRF, validation)
+│   ├── input-validation.md        (Sanitization strategies)
+│   └── secure-storage.md          (localStorage, sessionStorage)
+├── platform/                       ← Deployment Security
+│   ├── overview.md                (CI/CD, Docker, nginx)
+│   ├── secrets-management.md      (Environment variables)
+│   └── deployment-hardening.md    (Production security)
+├── checklists/                     ← Pre-Deployment
+│   ├── overview.md                (All checklists)
+│   ├── pre-deployment.md          (Go/no-go criteria)
+│   ├── code-review.md             (Security review points)
+│   └── dependency-scan.md         (Vulnerability checks)
+├── playbooks/                      ← Incident Response
+│   ├── overview.md                (All playbooks)
+│   ├── api-security-incident.md   (Response procedures)
+│   └── token-compromise.md        (Breach response)
+├── compliance/                     ← Compliance &amp; Standards
+│   ├── overview.md                (Compliance overview)
+│   └── owasp-asvs-mapping.md      (ASVS v4.0 mapping &amp; coverage)
+├── testing/                        ← Security Testing
+│   ├── overview.md                (Testing strategies)
+│   ├── api-testing.md             (API security tests)
+│   ├── penetration-testing.md     (Pen test guidance)
+│   └── vulnerability-scanning.md  (SAST/DAST tools)
+└── overview.md                     ← This file</code></pre>
+        <hr />
+        <h2 id="-contributing-to-security-documentation">🤝 Contributing
+        to Security Documentation</h2>
+        <h3 id="found-a-security-issue">Found a security issue?</h3>
+        <ol type="1">
+        <li><strong>Don't post publicly</strong> — Report to security
+        team first</li>
+        <li><strong>Use security contact email</strong> — <a
+        href="mailto:security@stockease.com">security@stockease.com</a></li>
+        <li><strong>Include details</strong> — Affected code,
+        reproduction steps, impact</li>
+        <li><strong>Allow time for patch</strong> — Coordinated
+        disclosure</li>
+        </ol>
+        <h3 id="want-to-improve-documentation">Want to improve
+        documentation?</h3>
+        <ol type="1">
+        <li>Create an issue or pull request</li>
+        <li>Follow enterprise security best practices</li>
+        <li>Include examples and code snippets</li>
+        <li>Request review from security team</li>
+        </ol>
+        <hr />
+        <h2 id="-version-history">📅 Version History</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Version</th>
+        <th>Date</th>
+        <th>Changes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>1.0.0</td>
+        <td>Nov 13, 2025</td>
+        <td>Initial security documentation release</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- API Communication Security (overview, api-security,
+        error-logging)</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Foundation for auth, frontend, platform, checklists,
+        playbooks, testing</td>
+        </tr>
+        <tr class="even">
+        <td>1.1.0</td>
+        <td>Nov 13, 2025</td>
+        <td>Added Compliance &amp; Standards documentation</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Comprehensive OWASP ASVS v4.0 mapping with 13 verification
+        categories</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- OWASP Top 10 2021 coverage and mitigation strategies</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Compliance overview with GDPR, PCI DSS, SOC 2
+        alignment</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- 47/52 security controls implemented (90% coverage)</td>
+        </tr>
+        <tr class="odd">
+        <td>1.2.0</td>
+        <td>Nov 13, 2025</td>
+        <td>Added Security Checklists documentation</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- PR Security Review Checklist (10 categories, 40+ items for
+        code reviews)</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Pre-Release Security Checklist (10 categories, 60+ items
+        for deployments)</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- Comprehensive checklist guide with selection criteria and
+        templates</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Integration examples and usage procedures</td>
+        </tr>
+        <tr class="even">
+        <td>1.3.0</td>
+        <td>Nov 14, 2025</td>
+        <td>Added Comprehensive Security Testing documentation</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Testing Strategy (unit, integration, scenario-based, abuse
+        case testing)</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- 200+ security tests across 15 test categories with 6
+        security domains</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Static Analysis (SAST) with ESLint security patterns (500+
+        rules)</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- Dynamic Analysis (DAST) with OWASP ZAP automated
+        scanning</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- Dangerous code patterns: eval(), innerHTML,
+        dangerouslySetInnerHTML, XSS</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- Type safety with TypeScript and branded types</td>
+        </tr>
+        <tr class="odd">
+        <td></td>
+        <td></td>
+        <td>- CI/CD integration for automated security testing</td>
+        </tr>
+        <tr class="even">
+        <td></td>
+        <td></td>
+        <td>- Coverage tracking with v8 provider (≥85% target for
+        security code)</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="-external-references">📚 External References</h2>
+        <ul>
+        <li><strong>OWASP Top 10:</strong> <a
+        href="https://owasp.org/www-project-top-ten/">https://owasp.org/www-project-top-ten/</a></li>
+        <li><strong>JWT Best Practices:</strong> <a
+        href="https://tools.ietf.org/html/rfc8949">https://tools.ietf.org/html/rfc8949</a></li>
+        <li><strong>CORS Specification:</strong> <a
+        href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS</a></li>
+        <li><strong>Web Security Academy:</strong> <a
+        href="https://portswigger.net/web-security">https://portswigger.net/web-security</a></li>
+        <li><strong>NIST Cybersecurity Framework:</strong> <a
+        href="https://www.nist.gov/cyberframework">https://www.nist.gov/cyberframework</a></li>
+        </ul>
+        <hr />
+        <h2 id="-security-assurance-statement">✅ Security Assurance
+        Statement</h2>
+        <p>StockEase Frontend implements industry-standard security
+        practices including:</p>
+        <ul>
+        <li>✅ Authenticated API communication with JWT tokens</li>
+        <li>✅ Secure token handling and session management</li>
+        <li>✅ Input validation and XSS prevention</li>
+        <li>✅ HTTPS enforcement in production</li>
+        <li>✅ Dependency vulnerability scanning</li>
+        <li>✅ Secure CI/CD pipeline with secrets management</li>
+        <li>✅ Error logging without exposing sensitive data</li>
+        <li>✅ Role-based access control (RBAC)</li>
+        <li>✅ Security incident response procedures</li>
+        <li>✅ Regular security reviews and updates</li>
+        </ul>
+        <hr />
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Enterprise-Grade Security
+        Documentation<br />
+        <strong>Maintained By:</strong> StockEase Security Team<br />
+        <strong>Review Cycle:</strong> Quarterly<br />
+        <strong>Classification:</strong> Internal - Security Team &amp;
+        Developers</p>
+        <hr />
+        <h2 id="-back-to-architecture">🔗 Back to Architecture</h2>
+        <ul>
+        <li><strong><a href="../overview.html">← Back to Architecture
+        Overview</a></strong> — English architecture documentation</li>
+        <li><strong><a href="../overview.de.html">← Zurück zur
+        Architektur-Übersicht</a></strong> — Deutsche
+        Architekturdokumentation</li>
+        <li><strong><a href="../index.html">Architecture
+        Index</a></strong> — Complete architecture documentation
+        map</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

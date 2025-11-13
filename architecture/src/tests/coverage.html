@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>coverage - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="test-coverage-goals--metrics">Test Coverage Goals &amp;
+        Metrics</h1>
+        <h2 id="coverage-targets">Coverage Targets</h2>
+        <h3 id="overall-goals">Overall Goals</h3>
+        <pre><code>Statements : 80% minimum
+Branches   : 75% minimum
+Functions  : 80% minimum
+Lines      : 80% minimum</code></pre>
+        <h3 id="current-coverage">Current Coverage</h3>
+        <pre><code>Statements : 82% (1,234 / 1,505)
+Branches   : 78% (456 / 584)
+Functions  : 81% (203 / 251)
+Lines      : 83% (1,199 / 1,443)
+
+Status: ✅ MEETING GOALS</code></pre>
+        <hr />
+        <h2 id="coverage-by-module">Coverage by Module</h2>
+        <h3 id="api-services-95-98">API Services (95-98%)</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Module</th>
+        <th>Statements</th>
+        <th>Branches</th>
+        <th>Functions</th>
+        <th>Lines</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>ProductService.ts</td>
+        <td>98%</td>
+        <td>95%</td>
+        <td>97%</td>
+        <td>98%</td>
+        </tr>
+        <tr class="even">
+        <td>auth.ts</td>
+        <td>95%</td>
+        <td>90%</td>
+        <td>96%</td>
+        <td>95%</td>
+        </tr>
+        <tr class="odd">
+        <td>apiClient.ts</td>
+        <td>95%</td>
+        <td>92%</td>
+        <td>94%</td>
+        <td>96%</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Total</strong></td>
+        <td><strong>96%</strong></td>
+        <td><strong>92%</strong></td>
+        <td><strong>96%</strong></td>
+        <td><strong>96%</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>Uncovered Cases</strong>:</p>
+        <ul>
+        <li>ProductService: Edge case for batch operations error
+        handling</li>
+        <li>auth.ts: Malformed JWT token edge case</li>
+        <li>apiClient.ts: Rare network timeout scenarios</li>
+        </ul>
+        <h3 id="components-85-90">Components (85-90%)</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Component</th>
+        <th>Statements</th>
+        <th>Branches</th>
+        <th>Functions</th>
+        <th>Lines</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Header.tsx</td>
+        <td>92%</td>
+        <td>88%</td>
+        <td>90%</td>
+        <td>93%</td>
+        </tr>
+        <tr class="even">
+        <td>Button.tsx</td>
+        <td>95%</td>
+        <td>92%</td>
+        <td>94%</td>
+        <td>95%</td>
+        </tr>
+        <tr class="odd">
+        <td>Sidebar.tsx</td>
+        <td>88%</td>
+        <td>85%</td>
+        <td>87%</td>
+        <td>89%</td>
+        </tr>
+        <tr class="even">
+        <td>ErrorBoundary.tsx</td>
+        <td>85%</td>
+        <td>80%</td>
+        <td>85%</td>
+        <td>86%</td>
+        </tr>
+        <tr class="odd">
+        <td>Pages (avg)</td>
+        <td>86%</td>
+        <td>82%</td>
+        <td>85%</td>
+        <td>87%</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Total</strong></td>
+        <td><strong>89%</strong></td>
+        <td><strong>86%</strong></td>
+        <td><strong>88%</strong></td>
+        <td><strong>90%</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>Not Covered</strong>:</p>
+        <ul>
+        <li>ErrorBoundary: Rare error scenarios</li>
+        <li>Pages: Some conditional branches in complex forms</li>
+        </ul>
+        <h3 id="services--hooks-88-92">Services &amp; Hooks
+        (88-92%)</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Service</th>
+        <th>Statements</th>
+        <th>Branches</th>
+        <th>Functions</th>
+        <th>Lines</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>useProducts</td>
+        <td>90%</td>
+        <td>88%</td>
+        <td>91%</td>
+        <td>92%</td>
+        </tr>
+        <tr class="even">
+        <td>useForm</td>
+        <td>92%</td>
+        <td>90%</td>
+        <td>93%</td>
+        <td>94%</td>
+        </tr>
+        <tr class="odd">
+        <td>useAuth</td>
+        <td>88%</td>
+        <td>85%</td>
+        <td>89%</td>
+        <td>90%</td>
+        </tr>
+        <tr class="even">
+        <td>Custom Hooks (avg)</td>
+        <td>90%</td>
+        <td>87%</td>
+        <td>91%</td>
+        <td>92%</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Total</strong></td>
+        <td><strong>91%</strong></td>
+        <td><strong>88%</strong></td>
+        <td><strong>91%</strong></td>
+        <td><strong>93%</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="utils-85-92">Utils (85-92%)</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Utility</th>
+        <th>Statements</th>
+        <th>Branches</th>
+        <th>Functions</th>
+        <th>Lines</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>validators.ts</td>
+        <td>92%</td>
+        <td>90%</td>
+        <td>93%</td>
+        <td>95%</td>
+        </tr>
+        <tr class="even">
+        <td>helpers.ts</td>
+        <td>88%</td>
+        <td>85%</td>
+        <td>87%</td>
+        <td>89%</td>
+        </tr>
+        <tr class="odd">
+        <td>formatters.ts</td>
+        <td>86%</td>
+        <td>82%</td>
+        <td>85%</td>
+        <td>88%</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Total</strong></td>
+        <td><strong>89%</strong></td>
+        <td><strong>86%</strong></td>
+        <td><strong>88%</strong></td>
+        <td><strong>91%</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="coverage-gaps--plans">Coverage Gaps &amp; Plans</h2>
+        <h3 id="current-gaps">Current Gaps</h3>
+        <pre><code>API Services (4% gap)
+├── Edge cases in error handling
+├── Rare network scenarios
+└── Special token validation cases
+
+Components (11% gap)
+├── Error boundaries in rare conditions
+├── Accessibility in complex interactions
+└── Some conditional branches in forms
+
+Hooks (9% gap)
+├── Cleanup/unmount scenarios
+├── Rapid state changes
+└── Race condition handling
+
+Utilities (11% gap)
+├── Edge cases in formatters
+├── Rare validation scenarios
+└── Helper function edge cases</code></pre>
+        <h3 id="coverage-improvement-plan">Coverage Improvement
+        Plan</h3>
+        <p><strong>Phase 1 (Q1)</strong>:</p>
+        <ul>
+        <li>Add missing edge case tests for API services</li>
+        <li>Improve component error boundary coverage</li>
+        <li>Add cleanup/unmount tests for hooks</li>
+        </ul>
+        <p><strong>Phase 2 (Q2)</strong>:</p>
+        <ul>
+        <li>Achieve 85% coverage on all modules</li>
+        <li>Add integration test coverage</li>
+        <li>Improve accessibility testing</li>
+        </ul>
+        <p><strong>Phase 3 (Q3)</strong>:</p>
+        <ul>
+        <li>Target 90% overall coverage</li>
+        <li>Add performance testing</li>
+        <li>Comprehensive error scenario testing</li>
+        </ul>
+        <hr />
+        <h2 id="coverage-report-generation">Coverage Report
+        Generation</h2>
+        <h3 id="html-report">HTML Report</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:coverage</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generates: coverage/index.html</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Open in browser to view detailed coverage</span></span></code></pre></div>
+        <h3 id="report-contents">Report Contents</h3>
+        <pre><code>coverage/
+├── index.html          (Main report)
+├── api/
+│   ├── ProductService.ts.html
+│   └── auth.ts.html
+├── components/
+│   ├── Header.tsx.html
+│   └── ... (all components)
+├── services/
+│   └── ... (all services)
+└── coverage-final.json (Machine-readable)</code></pre>
+        <h3 id="reading-the-report">Reading the Report</h3>
+        <p><strong>Line-by-line indicators</strong>:</p>
+        <ul>
+        <li>🟢 Green: Covered code</li>
+        <li>🔴 Red: Uncovered code</li>
+        <li>🟡 Yellow: Partially covered code</li>
+        </ul>
+        <p><strong>Metrics table</strong>:</p>
+        <ul>
+        <li><strong>Stmts</strong>: Statements covered</li>
+        <li><strong>Branch</strong>: Decision branches covered</li>
+        <li><strong>Funcs</strong>: Functions called in tests</li>
+        <li><strong>Lines</strong>: Source lines covered</li>
+        </ul>
+        <hr />
+        <h2 id="setting-coverage-thresholds">Setting Coverage
+        Thresholds</h2>
+        <h3 id="in-vitestconfigts">In vitest.config.ts</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>test<span class="op">:</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  coverage<span class="op">:</span> {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    provider<span class="op">:</span> <span class="st">&#39;v8&#39;</span><span class="op">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    reporter<span class="op">:</span> [<span class="st">&#39;text&#39;</span><span class="op">,</span> <span class="st">&#39;json&#39;</span><span class="op">,</span> <span class="st">&#39;html&#39;</span>]<span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Global thresholds</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    lines<span class="op">:</span> <span class="dv">80</span><span class="op">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    functions<span class="op">:</span> <span class="dv">80</span><span class="op">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    branches<span class="op">:</span> <span class="dv">75</span><span class="op">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    statements<span class="op">:</span> <span class="dv">80</span><span class="op">,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Per-file thresholds</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    perFile<span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Exclude from coverage</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    exclude<span class="op">:</span> [</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;node_modules/&#39;</span><span class="op">,</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;src/__tests__/&#39;</span><span class="op">,</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;dist/&#39;</span><span class="op">,</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">&#39;src/**/*.d.ts&#39;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="coverage-cicd-integration">Coverage CI/CD
+        Integration</h2>
+        <h3 id="github-actions-workflow">GitHub Actions Workflow</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run Tests with Coverage</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run test:coverage</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Upload Coverage to Codecov</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> codecov/codecov-action@v3</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">files</span><span class="kw">:</span><span class="at"> ./coverage/coverage-final.json</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">flags</span><span class="kw">:</span><span class="at"> unittests</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> codecov-umbrella</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">fail_ci_if_error</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">verbose</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Comment PR with Coverage</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">if</span><span class="kw">:</span><span class="at"> github.event_name == &#39;pull_request&#39;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> romeovs/lcov-reporter-action@v0.3.1</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">lcov-file</span><span class="kw">:</span><span class="at"> ./coverage/lcov.info</span></span></code></pre></div>
+        <hr />
+        <h2 id="coverage-best-practices">Coverage Best Practices</h2>
+        <h3 id="-do">✅ DO:</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Test all code paths</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (condition) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Test both true and false</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Test error cases</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span> {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Test success</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> {</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Test error</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Test boundary conditions</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">// Test: min, max, edge values</span></span></code></pre></div>
+        <h3 id="-dont">❌ DON'T:</h3>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t test only happy path</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t ignore error handling</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t skip edge cases</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t artificially inflate coverage with meaningless tests</span></span></code></pre></div>
+        <hr />
+        <h2 id="maintaining-coverage">Maintaining Coverage</h2>
+        <h3 id="pre-commit-hook">Pre-commit Hook</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .husky/pre-commit</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:coverage</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if coverage meets minimum</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="va">$?</span> <span class="ot">-ne</span> 0 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Coverage check failed&quot;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div>
+        <h3 id="coverage-trends">Coverage Trends</h3>
+        <p><strong>Monthly tracking</strong>:</p>
+        <pre><code>November: 82%
+December: 84% (+2%)
+January:  85% (+1%)
+Goal:     90% by Q2</code></pre>
+        <hr />
+        <h2 id="coverage-exclusions">Coverage Exclusions</h2>
+        <h3 id="legitimate-exclusions">Legitimate Exclusions</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">/* istanbul ignore next */</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;development&#39;</span>) {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Debug info&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Hard to test in jsdom</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">/* istanbul ignore next */</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">window</span><span class="op">.</span><span class="fu">requestIdleCallback</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Cleanup</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Mock/test-only code</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">/* istanbul ignore next */</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">VITEST</span>) {</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Test-specific code</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        Testing overview</li>
+        <li><strong><a href="./structure.html">Structure</a></strong> -
+        Test organization</li>
+        <li><strong><a href="./patterns.html">Patterns</a></strong> -
+        Testing patterns</li>
+        <li><strong><a
+        href="./setup-configuration.html">Setup</a></strong> -
+        Configuration</li>
+        <li><strong><a href="./running-tests.html">Running
+        Tests</a></strong> - Commands</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

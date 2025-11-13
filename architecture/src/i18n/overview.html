@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1
+        id="internationalization-i18n--localization">Internationalization
+        (i18n) &amp; Localization</h1>
+        <h2 id="overview">Overview</h2>
+        <p>StockEase Frontend supports <strong>multiple
+        languages</strong> using <strong>i18next</strong>. The
+        application provides English and German with automatic language
+        detection and user preferences.</p>
+        <h3 id="supported-languages">Supported Languages</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Language</th>
+        <th>Code</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>English</strong></td>
+        <td><code>en</code></td>
+        <td>✓ Primary</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Deutsch</strong></td>
+        <td><code>de</code></td>
+        <td>✓ Supported</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <h2 id="quick-start">Quick Start</h2>
+        <h3 id="using-translations-in-components">Using Translations in
+        Components</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { useTranslation } <span class="im">from</span> <span class="st">&#39;react-i18next&#39;</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> MyComponent <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { t<span class="op">,</span> i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>div<span class="op">&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>h1<span class="op">&gt;</span>{<span class="fu">t</span>(<span class="st">&#39;common.appName&#39;</span>)}<span class="op">&lt;/</span>h1<span class="op">&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>button onClick<span class="op">=</span>{() <span class="kw">=&gt;</span> i18n<span class="op">.</span><span class="fu">changeLanguage</span>(<span class="st">&#39;de&#39;</span>)}<span class="op">&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        Deutsch</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;/</span>button<span class="op">&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>div<span class="op">&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <h3 id="key-translation-patterns">Key Translation Patterns</h3>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Simple: t(&#39;key&#39;)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="st">&#39;common.appName&#39;</span>)  <span class="co">// → &quot;StockEase&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Nested: t(&#39;section.key&#39;)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="st">&#39;login.title&#39;</span>)     <span class="co">// → &quot;Login&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Interpolation: t(&#39;key&#39;, { var })</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="st">&#39;welcome&#39;</span><span class="op">,</span> { name<span class="op">:</span> <span class="st">&#39;John&#39;</span> })  <span class="co">// → &quot;Welcome, John!&quot;</span></span></code></pre></div>
+        <hr />
+        <h2 id="architecture">Architecture</h2>
+        <div class="mermaid">
+        graph TB
+            App["App.tsx<br/>i18nextProvider"]
+            Config["src/i18n.ts<br/>Configuration"]
+            Detector["Language Detector<br/>localStorage → Browser"]
+            Resources["Translation Resources<br/>en.json, de.json,<br/>help_en.json, help_de.json"]
+            Components["Components<br/>useTranslation()"]
+            
+            App -->|Setup| Config
+            Config -->|Load| Detector
+            Detector -->|Priority| Resources
+            Resources -->|use in| Components
+        </div>
+        <hr />
+        <h2 id="key-components">Key Components</h2>
+        <h3 id="configuration-srci18nts">Configuration
+        (<code>src/i18n.ts</code>)</h3>
+        <ul>
+        <li>i18next initialization</li>
+        <li>Language detection setup</li>
+        <li>Resource loading</li>
+        </ul>
+        <p>See <a href="./configuration.html">Configuration
+        Guide</a></p>
+        <h3 id="translation-files">Translation Files</h3>
+        <ul>
+        <li><strong>en.json, de.json</strong> - App UI translations</li>
+        <li><strong>help_en.json, help_de.json</strong> - Help modal
+        content</li>
+        </ul>
+        <p>See <a href="./translation-files.html">Translation
+        Files</a></p>
+        <h3 id="language-detection">Language Detection</h3>
+        <ul>
+        <li>Checks localStorage first (user preference)</li>
+        <li>Falls back to browser language</li>
+        <li>Final fallback: English</li>
+        </ul>
+        <p>See <a href="./language-detection.html">Language
+        Detection</a></p>
+        <h3 id="component-usage">Component Usage</h3>
+        <ul>
+        <li><code>useTranslation()</code> hook</li>
+        <li><code>useTranslation('namespace')</code> for specific
+        namespaces</li>
+        <li>Automatic language switching</li>
+        </ul>
+        <p>See <a href="./component-patterns.html">Component
+        Patterns</a></p>
+        <hr />
+        <h2 id="language-detection-priority">Language Detection
+        Priority</h2>
+        <pre><code>1. localStorage[&#39;i18nextLng&#39;] (user&#39;s choice)
+     ↓
+2. navigator.language (browser language)
+     ↓
+3. Fallback: &#39;en&#39; (English)</code></pre>
+        <p>When user changes language, it persists to localStorage.</p>
+        <hr />
+        <h2 id="file-structure">File Structure</h2>
+        <pre><code>src/
+├── i18n.ts                # i18next configuration
+└── locales/
+    ├── en.json           # English translations
+    ├── de.json           # German translations
+    ├── help_en.json      # English help content
+    └── help_de.json      # German help content
+
+docs/architecture/src/i18n/
+├── overview.md           # This file
+├── configuration.md      # i18n.ts setup guide
+├── translation-files.md  # JSON file structure &amp; sections
+├── language-detection.md # How language is detected
+├── component-patterns.md # Using i18n in components
+└── testing.md           # Testing i18n functionality</code></pre>
+        <hr />
+        <h2 id="quick-links">Quick Links</h2>
+        <ul>
+        <li>⚙️ <a href="./configuration.html">Configuration Guide</a> -
+        i18n setup</li>
+        <li>📄 <a href="./translation-files.html">Translation Files</a>
+        - JSON structure</li>
+        <li>🌍 <a href="./language-detection.html">Language
+        Detection</a> - Automatic language selection</li>
+        <li>💻 <a href="./component-patterns.html">Component
+        Patterns</a> - Using in React</li>
+        <li>🧪 <a href="./testing.html">Testing i18n</a> - Test
+        patterns</li>
+        </ul>
+        <hr />
+        <h2 id="common-tasks">Common Tasks</h2>
+        <h3 id="add-new-translation">Add New Translation</h3>
+        <ol type="1">
+        <li>Add key to en.json</li>
+        <li>Add German translation to de.json</li>
+        <li>Use in component: <code>t('section.key')</code></li>
+        </ol>
+        <p>See <a href="./translation-files.html">Translation Files</a>
+        for detailed sections.</p>
+        <h3 id="switch-language">Switch Language</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>i18n<span class="op">.</span><span class="fu">changeLanguage</span>(<span class="st">&#39;de&#39;</span>)<span class="op">;</span>  <span class="co">// Automatically saves to localStorage</span></span></code></pre></div>
+        <h3 id="get-current-language">Get Current Language</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { i18n } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> current <span class="op">=</span> i18n<span class="op">.</span><span class="at">language</span><span class="op">;</span>  <span class="co">// &#39;en&#39; or &#39;de&#39;</span></span></code></pre></div>
+        <h3 id="test-translation">Test Translation</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { t } <span class="op">=</span> <span class="fu">useTranslation</span>()<span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">expect</span>(<span class="fu">t</span>(<span class="st">&#39;common.appName&#39;</span>))<span class="op">.</span><span class="fu">toBe</span>(<span class="st">&#39;StockEase&#39;</span>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="performance--best-practices">Performance &amp; Best
+        Practices</h2>
+        <h3 id="-dos">✅ Do's</h3>
+        <ul>
+        <li>✓ Use nested keys for organization</li>
+        <li>✓ Keep translation files organized by feature</li>
+        <li>✓ Always provide default values in tests</li>
+        <li>✓ Use TypeScript for type safety</li>
+        <li>✓ Test both languages</li>
+        </ul>
+        <h3 id="-donts">❌ Don'ts</h3>
+        <ul>
+        <li>✗ Hardcode text in components</li>
+        <li>✗ Mix multiple languages in one key</li>
+        <li>✗ Skip translating new features</li>
+        <li>✗ Use auto-translation tools (use human translators)</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="../../overview.html">Main Architecture
+        Overview</a></li>
+        <li><a href="../components.html">Component Architecture</a></li>
+        <li><a href="../tests.html">Testing Strategy</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025<br />
+        <strong>Languages</strong>: English, German<br />
+        <strong>Framework</strong>: i18next<br />
+        <strong>Status</strong>: Production Ready</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

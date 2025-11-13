@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>configuration - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="build-configuration--spa-routing">Build Configuration
+        &amp; SPA Routing</h1>
+        <h2 id="build-arguments">Build Arguments</h2>
+        <h3 id="vite_api_base_url">VITE_API_BASE_URL</h3>
+        <p>Pass the API endpoint at build time:</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.staging.com <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-t</span> stockease-frontend:staging .</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="dt">\</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.production.com <span class="dt">\</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-t</span> stockease-frontend:production .</span></code></pre></div>
+        <p><strong>In Dockerfile</strong>:</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ARG</span> VITE_API_BASE_URL=<span class="st">&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> VITE_API_BASE_URL=${VITE_API_BASE_URL}</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span></code></pre></div>
+        <p><strong>In Code</strong> (Vite replaces at build time):</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> apiUrl <span class="op">=</span> import<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">VITE_API_BASE_URL</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Becomes:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> apiUrl <span class="op">=</span> <span class="st">&quot;https://api.production.com&quot;</span><span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="dockerignore">.dockerignore</h2>
+        <p>Excludes files from Docker build context, improving build
+        speed.</p>
+        <pre><code># Version Control
+.git
+.gitignore
+.github
+
+# Dependencies (reinstalled)
+node_modules
+.pnp
+
+# Build Artifacts
+dist
+coverage
+typedoc-output
+architecture-html
+
+# Tests (not needed)
+__tests__
+*.test.ts
+*.test.tsx
+*.test.js
+vitest.config.ts
+jest.config.js
+
+# Documentation
+docs
+README.md
+CHANGELOG.md
+*.md
+
+# IDE &amp; Tools
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# Development Files
+.env.local
+.env.development
+.env.test</code></pre>
+        <h3 id="performance-impact">Performance Impact</h3>
+        <pre><code>With .dockerignore:
+  Build context: ~50MB
+  Build time: 10-15s
+
+Without .dockerignore:
+  Build context: 200MB+
+  Build time: 30-40s</code></pre>
+        <hr />
+        <h2 id="spa-routing-configuration">SPA Routing
+        Configuration</h2>
+        <h3 id="problem">Problem</h3>
+        <p>Regular web servers return 404 for non-root routes:</p>
+        <pre><code>GET /admin     → 404 (file not found)
+GET /user      → 404 (file not found)</code></pre>
+        <p>But these routes should serve <code>index.html</code> so
+        React Router can handle them client-side.</p>
+        <h3 id="solution-nginx-configuration">Solution: nginx
+        Configuration</h3>
+        <pre class="nginx"><code>location ~ ^/assets/ {
+  # Static assets: serve with long cache headers
+  expires 1y;
+  add_header Cache-Control &quot;public, immutable&quot;;
+  try_files $uri =404;
+}
+
+location / {
+  # Everything else: serve index.html for SPA routing
+  try_files $uri /index.html;
+}</code></pre>
+        <h3 id="request-flow">Request Flow</h3>
+        <pre><code>GET /assets/index.js
+  ↓
+Match: location ~ ^/assets/
+  ↓
+Serve: /usr/share/nginx/html/assets/index.js
+  ↓
+Cache-Control: 1 year
+
+GET /admin
+  ↓
+No match: doesn&#39;t start with /assets/
+  ↓
+Fall through to: location /
+  ↓
+try_files $uri /index.html
+  ↓
+Serve: /usr/share/nginx/html/index.html
+  ↓
+React Router: renders /admin page</code></pre>
+        <h3 id="complete-configuration-example">Complete Configuration
+        Example</h3>
+        <pre class="nginx"><code>server {
+  listen 80;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # Gzip compression
+  gzip on;
+  gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+  # Security headers
+  add_header X-Frame-Options &quot;SAMEORIGIN&quot; always;
+  add_header X-Content-Type-Options &quot;nosniff&quot; always;
+  add_header X-XSS-Protection &quot;1; mode=block&quot; always;
+
+  # Static assets with long caching
+  location ~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    expires 1y;
+    add_header Cache-Control &quot;public, immutable&quot;;
+  }
+
+  # API requests: pass through
+  location /api/ {
+    proxy_pass $VITE_API_BASE_URL;
+  }
+
+  # SPA routing: serve index.html
+  location / {
+    try_files $uri /index.html =404;
+  }
+
+  # Health check
+  location /health {
+    access_log off;
+    return 200 &quot;healthy\n&quot;;
+    add_header Content-Type text/plain;
+  }
+}</code></pre>
+        <hr />
+        <h2 id="development-vs-production">Development vs
+        Production</h2>
+        <h3 id="development-vite">Development (Vite)</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Vite server running on http://localhost:5173</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Hot reload on file changes</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Full source maps</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># No optimizations</span></span></code></pre></div>
+        <h3 id="production-docker">Production (Docker)</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> app:latest .</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 80:80 app:latest</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># nginx serving static files</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimized bundle</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Long-lived cache</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># No source maps</span></span></code></pre></div>
+        <hr />
+        <h2 id="build-optimization-strategies">Build Optimization
+        Strategies</h2>
+        <h3 id="layer-caching">Layer Caching</h3>
+        <p>Order Dockerfile to cache dependencies before source:</p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This layer caches if package*.json unchanged</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> package*.json ./</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This layer rebuilds if src/ changed (common case)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> src ./src</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span></code></pre></div>
+        <p><strong>Benefit</strong>: Only rebuild app code when
+        necessary, reuse npm dependencies.</p>
+        <h3 id="buildkit">BuildKit</h3>
+        <p>Enable Docker BuildKit for faster builds:</p>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="va">DOCKER_BUILDKIT</span><span class="op">=</span>1 <span class="ex">docker</span> build <span class="at">-t</span> app:latest .</span></code></pre></div>
+        <p>Benefits:</p>
+        <ul>
+        <li>Parallel layer building</li>
+        <li>Better caching</li>
+        <li>Smaller context uploads</li>
+        <li>More efficient builds</li>
+        </ul>
+        <hr />
+        <h2 id="verification">Verification</h2>
+        <h3 id="check-build-arguments-were-used">Check Build Arguments
+        Were Used</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build with API URL</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.example.com <span class="at">-t</span> app .</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check nginx config inside container</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run app cat /etc/nginx/conf.d/default.conf</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify SPA routing works</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 8080:80 app <span class="kw">&amp;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 2</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:8080/admin/  <span class="co"># Should return index.html content</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Docker Overview</a></li>
+        <li><a href="./build-stage.html">Build Stage</a></li>
+        <li><a href="./production-stage.html">Production Stage</a></li>
+        <li><a href="./local-usage.html">Local Usage</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

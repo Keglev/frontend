@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>ci-cd - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="cicd-pipeline--github-actions">CI/CD Pipeline &amp;
+        GitHub Actions</h1>
+        <h2 id="overview">Overview</h2>
+        <p>The Docker build and deployment process is fully automated
+        using GitHub Actions. The pipeline runs tests, builds the
+        application, creates a Docker image, and deploys to production
+        automatically on every push to the master/main branch.</p>
+        <hr />
+        <h2 id="github-actions-workflow-improvements">GitHub Actions
+        Workflow Improvements</h2>
+        <h3 id="enhanced-documentation">Enhanced Documentation</h3>
+        <p>The <code>deploy-frontend.yml</code> workflow includes:</p>
+        <ul>
+        <li>Clear purpose statements for each stage</li>
+        <li>When each stage runs (push vs PR, master/main only)</li>
+        <li>What causes pipeline failure</li>
+        <li>Required secrets and environment variables</li>
+        <li>Error messages with troubleshooting tips</li>
+        </ul>
+        <h3 id="better-naming">Better Naming</h3>
+        <ul>
+        <li>Changed "Use Node.js 20" to "Setup Node.js 20"</li>
+        <li>Changed "Check test results" to "Verify test results"</li>
+        <li>More descriptive deploy step comments</li>
+        </ul>
+        <h3 id="improved-error-handling">Improved Error Handling</h3>
+        <ul>
+        <li>Better error messages explaining what went wrong</li>
+        <li>Troubleshooting tips in failure messages</li>
+        <li>Clear indication of required secrets</li>
+        </ul>
+        <hr />
+        <h2 id="workflow-structure">Workflow Structure</h2>
+        <h3 id="two-stage-pipeline">Two-Stage Pipeline</h3>
+        <p>The deployment pipeline has two distinct stages with
+        different triggers and purposes:</p>
+        <div class="mermaid">
+        graph TD
+            Push["Push to master/main"]
+            
+            subgraph stage1["Stage 1: Test & Verify"]
+                direction TB
+                Checkout1["Checkout code"]
+                Setup1["Setup Node.js 20"]
+                Cache1["Use npm cache"]
+                Install["npm ci"]
+                Lint["npm run lint"]
+                Test["npm run test"]
+                Coverage["Generate coverage"]
+                Verify["Verify results"]
+            end
+            
+            subgraph stage2["Stage 2: Build & Deploy"]
+                direction TB
+                Checkout2["Checkout code"]
+                Setup2["Setup Node.js 20"]
+                Cache2["Use npm cache"]
+                Install2["npm ci"]
+                Build["npm run build"]
+                Docker["docker build"]
+                Deploy["Deploy to Vercel"]
+                Summary["Deployment summary"]
+            end
+            
+            subgraph triggers["Triggers"]
+                direction TB
+                AllCommits["Runs on:<br/>- Push to any branch<br/>- Pull requests"]
+                MainOnly["Runs on:<br/>- Push to master/main only"]
+            end
+            
+            Push --> stage1
+            stage1 -->|Success| stage2
+            stage1 -->|Failure| Blocked["❌ Deployment blocked"]
+            
+            stage1 --> AllCommits
+            stage2 --> MainOnly
+            
+            stage2 --> Success["✅ Deployed"]
+            stage2 -->|Failure| Failure["❌ Deployment failed"]
+            
+            style stage1 fill:#e3f2fd
+            style stage2 fill:#c8e6c9
+            style Success fill:#fff9c4
+            style Blocked fill:#ffccbc
+            style Failure fill:#ffccbc
+        </div>
+        <hr />
+        <h2 id="stage-1-test--verify-always-runs">Stage 1: Test &amp;
+        Verify (Always Runs)</h2>
+        <p><strong>Trigger</strong>: Every commit and pull request to
+        any branch</p>
+        <p><strong>Purpose</strong>: Ensure code quality and prevent
+        broken code from being deployed</p>
+        <h3 id="steps">Steps</h3>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">1. Checkout code</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Gets the latest code from repository</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">2. Setup Node.js 20</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Installs Node.js runtime environment</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">3. Use npm cache</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Speeds up dependency installation</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">4. Install dependencies</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ npm ci (clean install for reproducibility)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Installs all project dependencies</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">5. Run linter</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ npm run lint (ESLint)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Checks code style and quality</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">6. Run tests</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ npm run test (Vitest)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Runs 478+ unit and integration tests</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="at">7. Generate coverage report</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Vitest coverage analysis</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Ensures adequate test coverage</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="at">8. Verify test results</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Fails if tests fail</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Fails if linting issues found</span></span></code></pre></div>
+        <h3 id="key-features">Key Features</h3>
+        <p>✅ <strong>Runs on all commits</strong> - Including pull
+        requests<br />
+        ✅ <strong>Fast feedback</strong> - Developers see failures
+        immediately<br />
+        ✅ <strong>Prevents bad code</strong> - Broken code can't reach
+        production<br />
+        ✅ <strong>npm caching</strong> - Speeds up repeated runs<br />
+        ✅ <strong>Coverage tracking</strong> - Maintains test
+        quality</p>
+        <h3 id="example-output">Example Output</h3>
+        <pre><code>✓ Checkout code
+✓ Setup Node.js 20
+✓ Use npm cache
+✓ Install dependencies (15 seconds)
+✓ Run linter (8 seconds)
+  ├─ No ESLint errors found
+✓ Run tests (45 seconds)
+  ├─ Passed: 478 tests
+  ├─ Failed: 0 tests
+✓ Generate coverage report
+  ├─ Coverage: 87%
+✓ Verify test results
+  └─ All tests passed!</code></pre>
+        <hr />
+        <h2 id="stage-2-build--deploy-protected">Stage 2: Build &amp;
+        Deploy (Protected)</h2>
+        <p><strong>Trigger</strong>: Only on push to <code>master</code>
+        or <code>main</code> branch</p>
+        <p><strong>Runs After</strong>: Stage 1 succeeds</p>
+        <p><strong>Purpose</strong>: Build production bundle and deploy
+        to Vercel</p>
+        <h3 id="steps-1">Steps</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="at">1. Checkout code</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Gets the latest code</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">2. Setup Node.js 20</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Installs Node.js runtime</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">3. Use npm cache</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Speeds up builds</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">4. Install dependencies</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ npm ci (same as Stage 1)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">5. Build production bundle</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ npm run build (Vite)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Creates optimized dist/ directory</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Minifies and bundles code</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Optimizes assets</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">6. Verify build output</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Checks dist/ directory exists</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Verifies build artifacts</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Fails if build errors</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="at">7. Build Docker image</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ docker build (optional - for testing)</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Creates container image</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Tests multi-stage build</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="at">8. Deploy to Vercel</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Pushes production build</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Triggers Vercel deployment</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Makes app live</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="at">9. Deployment summary</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Shows deployment URL</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Logs build time</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="at">   └─ Provides rollback info</span></span></code></pre></div>
+        <h3 id="key-features-1">Key Features</h3>
+        <p>✅ <strong>Master/main only</strong> - Production only from
+        main branch<br />
+        ✅ <strong>Depends on Stage 1</strong> - Can't deploy if tests
+        fail<br />
+        ✅ <strong>Docker verification</strong> - Tests build before
+        deployment<br />
+        ✅ <strong>Automated deployment</strong> - No manual steps
+        needed<br />
+        ✅ <strong>Clear summary</strong> - Shows deployment status</p>
+        <h3 id="example-output-1">Example Output</h3>
+        <pre><code>✓ Checkout code
+✓ Setup Node.js 20
+✓ Use npm cache
+✓ Install dependencies (15 seconds)
+✓ Build production bundle (35 seconds)
+  ├─ dist/index.html: 2.5KB
+  ├─ dist/assets/index.js: 485KB
+  ├─ dist/assets/vendor.js: 250KB
+  └─ dist/assets/index.css: 45KB
+✓ Verify build output
+  ├─ dist/ directory found
+  ├─ All expected files present
+✓ Build Docker image (30 seconds)
+  ├─ Image size: 45MB
+  ├─ Layers: 5
+✓ Deploy to Vercel (20 seconds)
+  ├─ Build ID: abc123def456
+  ├─ URL: https://stockease-...vercel.app
+✓ Deployment summary
+  └─ ✅ Deployed to production</code></pre>
+        <hr />
+        <h2 id="conditional-execution-logic">Conditional Execution
+        Logic</h2>
+        <h3 id="when-tests-run">When Tests Run</h3>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> master</span><span class="kw">,</span><span class="at"> main </span><span class="kw">]</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull_request</span><span class="kw">:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> master</span><span class="kw">,</span><span class="at"> main </span><span class="kw">]</span></span></code></pre></div>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Event</th>
+        <th>Test Stage</th>
+        <th>Deploy Stage</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Push to master/main</td>
+        <td>✅ Runs</td>
+        <td>✅ Runs (if tests pass)</td>
+        </tr>
+        <tr class="even">
+        <td>Push to feature branch</td>
+        <td>✅ Runs</td>
+        <td>❌ Skipped</td>
+        </tr>
+        <tr class="odd">
+        <td>Pull request</td>
+        <td>✅ Runs</td>
+        <td>❌ Skipped</td>
+        </tr>
+        <tr class="even">
+        <td>Direct commit to master</td>
+        <td>✅ Runs</td>
+        <td>✅ Runs (if tests pass)</td>
+        </tr>
+        <tr class="odd">
+        <td>Draft PR</td>
+        <td>✅ Runs</td>
+        <td>❌ Skipped</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="deployment-protection">Deployment Protection</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">if</span><span class="kw">:</span><span class="at"> success() &amp;&amp; github.ref == &#39;refs/heads/master&#39;</span></span></code></pre></div>
+        <p><strong>Deployment only happens when</strong>:</p>
+        <ol type="1">
+        <li>All tests pass</li>
+        <li>Push is to master/main branch</li>
+        <li>No failures in previous stages</li>
+        <li>Commit is on main branch (not PR)</li>
+        </ol>
+        <hr />
+        <h2 id="required-configuration">Required Configuration</h2>
+        <h3 id="secrets">Secrets</h3>
+        <p>Two secrets must be configured in GitHub repository
+        settings:</p>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Secret</th>
+        <th>Purpose</th>
+        <th>Where to Get</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><code>VERCEL_TOKEN</code></td>
+        <td>Authentication for Vercel deployment</td>
+        <td><a href="https://vercel.com/account/tokens">Vercel
+        Settings</a></td>
+        </tr>
+        <tr class="even">
+        <td><code>FRONTEND_API_BASE_URL</code></td>
+        <td>Production API endpoint</td>
+        <td>Your backend API URL</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="environment-variables">Environment Variables</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">VITE_API_BASE_URL</span><span class="kw">:</span><span class="at"> ${{ secrets.FRONTEND_API_BASE_URL }}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NODE_ENV</span><span class="kw">:</span><span class="at"> production</span></span></code></pre></div>
+        <h3 id="github-actions-permissions">GitHub Actions
+        Permissions</h3>
+        <p>The workflow needs:</p>
+        <ul>
+        <li>Read access to repository code</li>
+        <li>Write access to deployment status</li>
+        <li>Secrets access (automatic)</li>
+        </ul>
+        <hr />
+        <h2 id="error-handling">Error Handling</h2>
+        <h3 id="test-failures">Test Failures</h3>
+        <p>If tests fail, the pipeline stops before deployment:</p>
+        <pre><code>❌ npm run test FAILED
+  └─ Error: 2 tests failed
+     ├─ LoginPage should render login form
+     └─ Dashboard should handle API errors
+  
+  Action: Fix the failing tests before pushing again</code></pre>
+        <h3 id="build-failures">Build Failures</h3>
+        <p>If the build fails, deployment is blocked:</p>
+        <pre><code>❌ npm run build FAILED
+  └─ Error: TypeScript compilation error
+     └─ src/components/Button.tsx:15: Type &#39;string&#39; is not assignable to type &#39;number&#39;
+  
+  Action: Fix the TypeScript error</code></pre>
+        <h3 id="deployment-failures">Deployment Failures</h3>
+        <p>If Vercel deployment fails, you're notified:</p>
+        <pre><code>❌ Deploy to Vercel FAILED
+  └─ Error: Deployment quota exceeded
+  
+  Action: Check Vercel dashboard or contact support</code></pre>
+        <hr />
+        <h2 id="monitoring--debugging">Monitoring &amp; Debugging</h2>
+        <h3 id="view-workflow-status">View Workflow Status</h3>
+        <ol type="1">
+        <li>Go to GitHub repository</li>
+        <li>Click "Actions" tab</li>
+        <li>Click workflow run to see details</li>
+        <li>Click job to see step-by-step output</li>
+        </ol>
+        <h3 id="common-issues--solutions">Common Issues &amp;
+        Solutions</h3>
+        <h4 id="tests-failing">Tests Failing</h4>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests locally first</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check linting</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Then push</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin feature-branch</span></code></pre></div>
+        <h4 id="build-failing">Build Failing</h4>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build locally to verify</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for build errors</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build <span class="at">--</span> <span class="at">--show-error</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Then push</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code></pre></div>
+        <h4 id="deployment-not-triggering">Deployment Not
+        Triggering</h4>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure you&#39;re pushing to master/main</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin master</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Not to a feature branch</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (deployment won&#39;t trigger on feature branches)</span></span></code></pre></div>
+        <hr />
+        <h2 id="performance-metrics">Performance Metrics</h2>
+        <h3 id="typical-pipeline-times">Typical Pipeline Times</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Stage</th>
+        <th>Time</th>
+        <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Test Stage</td>
+        <td>60-90 seconds</td>
+        <td>Includes npm install, lint, tests</td>
+        </tr>
+        <tr class="even">
+        <td>Build Stage</td>
+        <td>50-70 seconds</td>
+        <td>Includes npm install, build, Docker build</td>
+        </tr>
+        <tr class="odd">
+        <td>Deploy Stage</td>
+        <td>20-40 seconds</td>
+        <td>Vercel deployment</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Total</strong></td>
+        <td><strong>2-3 minutes</strong></td>
+        <td>From push to live</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="optimization">Optimization</h3>
+        <ul>
+        <li><strong>npm cache</strong>: Reduces install time from 30s →
+        10s</li>
+        <li><strong>Layer caching</strong>: Docker reuses dependencies
+        layer</li>
+        <li><strong>Parallel execution</strong>: Tests run in parallel
+        (if configured)</li>
+        </ul>
+        <hr />
+        <h2 id="best-practices">Best Practices</h2>
+        <h3 id="1-commit-frequently">1. Commit Frequently</h3>
+        <p>Push changes regularly to get fast feedback:</p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;feat: add user profile page&quot;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin feature-branch</span></code></pre></div>
+        <h3 id="2-keep-tests-passing">2. Keep Tests Passing</h3>
+        <p>Don't push code with failing tests:</p>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Always run locally first</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Then push</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code></pre></div>
+        <h3 id="3-use-meaningful-commit-messages">3. Use Meaningful
+        Commit Messages</h3>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;fix: handle API timeout in product list&quot;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;fix stuff&quot;</span></span></code></pre></div>
+        <h3 id="4-create-pull-requests">4. Create Pull Requests</h3>
+        <p>Don't push directly to master:</p>
+        <div class="sourceCode" id="cb17"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create feature branch</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/add-search</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Work and push</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin feature/add-search</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create PR on GitHub</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Let tests run on PR</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get review</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge to master</span></span></code></pre></div>
+        <h3 id="5-monitor-deployments">5. Monitor Deployments</h3>
+        <p>Check GitHub Actions and Vercel dashboards after merging:</p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check Actions</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> https://github.com/Keglev/stockease-frontend/actions</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check Vercel</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> https://vercel.com/keglev/stockease-frontend</span></code></pre></div>
+        <hr />
+        <h2 id="deployment-workflow">Deployment Workflow</h2>
+        <h3 id="complete-development-cycle">Complete Development
+        Cycle</h3>
+        <pre><code>1. Create feature branch
+   git checkout -b feature/new-feature
+
+2. Make changes
+   Edit files, commit regularly
+
+3. Run tests locally
+   npm run test
+   npm run lint
+
+4. Push to GitHub
+   git push origin feature/new-feature
+
+5. Create Pull Request
+   - Tests run on PR
+   - Get code review
+   - Fix any issues
+
+6. Merge to master
+   - Tests run again
+   - If all pass, deploy starts
+
+7. Vercel deployment
+   - Build happens
+   - Tests in production
+   - App goes live
+
+8. Monitor
+   - Check Vercel dashboard
+   - Monitor error tracking
+   - Watch logs</code></pre>
+        <hr />
+        <h2 id="troubleshooting">Troubleshooting</h2>
+        <h3 id="pipeline-not-running">Pipeline Not Running</h3>
+        <p><strong>Check</strong>:</p>
+        <ol type="1">
+        <li>Branch is master/main</li>
+        <li>Pushed to GitHub (not just committed locally)</li>
+        <li><code>.github/workflows/deploy-frontend.yml</code>
+        exists</li>
+        <li>Repository settings allow Actions</li>
+        </ol>
+        <p><strong>Fix</strong>:</p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify remote is GitHub</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote <span class="at">-v</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Push again</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin master</span></code></pre></div>
+        <h3 id="deployment-stuck">Deployment Stuck</h3>
+        <p><strong>Check</strong>:</p>
+        <ol type="1">
+        <li>GitHub Actions status</li>
+        <li>Vercel deployment status</li>
+        <li>Check for hanging processes</li>
+        </ol>
+        <p><strong>Fix</strong>:</p>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cancel workflow on GitHub (Actions tab)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Then push again</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin master</span></code></pre></div>
+        <h3 id="api-errors-after-deployment">API Errors After
+        Deployment</h3>
+        <p><strong>Check</strong>:</p>
+        <ol type="1">
+        <li><code>VITE_API_BASE_URL</code> is correct</li>
+        <li>API server is running</li>
+        <li>CORS is configured correctly</li>
+        </ol>
+        <p><strong>Fix</strong>:</p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what URL is in the build</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run your-image:latest cat /usr/share/nginx/html/assets/<span class="pp">*</span>.js <span class="kw">|</span> <span class="fu">grep</span> api</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Rebuild with correct URL</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--build-arg</span> VITE_API_BASE_URL=https://api.correct.com .</span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="./overview.html">Docker Overview</a></li>
+        <li><a href="./build-stage.html">Build Stage</a></li>
+        <li><a href="./production-stage.html">Production Stage</a></li>
+        <li><a href="./configuration.html">Configuration</a></li>
+        <li><a href="./local-usage.html">Local Usage</a></li>
+        <li><a href="./security-performance.html">Security &amp;
+        Performance</a></li>
+        <li><a href="../pipeline/overview.html">Main Pipeline
+        Documentation</a></li>
+        <li><a href="https://docs.github.com/en/actions">GitHub Actions
+        Official Docs</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 12, 2025<br />
+        <strong>Status</strong>: ✅ Production Ready<br />
+        <strong>Maintenance</strong>: Automated via GitHub Actions</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

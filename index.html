@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StockEase Frontend Documentation</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:#f8f9fa; color:#212529; }
+    .hero { background: linear-gradient(135deg, #0066cc 0%, #004a99 100%); color:#fff; padding:2rem 1.25rem; }
+    .container { max-width: 1100px; margin:0 auto; }
+    .hero h1 { font-size:2rem; margin-bottom:.5rem; }
+    .hero p { opacity:.9; }
+    .grid { display:grid; gap:1.25rem; padding:2rem 1.25rem; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
+    .card { background:#fff; border-top:3px solid #0066cc; border-radius:10px; padding:1.25rem; text-decoration:none; color:inherit; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:transform .2s, box-shadow .2s; }
+    .card:hover { transform: translateY(-4px); box-shadow:0 6px 18px rgba(0,0,0,.14); }
+    .card h3 { font-size:1.1rem; color:#0066cc; margin-bottom:.35rem; }
+    .card p { color:#666; font-size:.95rem; }
+    footer { background:#212529; color:#fff; padding:1.5rem; text-align:center; }
+    footer p { opacity:.9; margin:.25rem 0; font-size:.95rem; }
+    .hero { text-align: center; }     
+    .hero .container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="container">
+      <h1>📚 StockEase Frontend Docs</h1>
+      <p>React + TypeScript Architecture · TypeDoc · Coverage</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <!-- Architecture (EN/DE) -->
+      <a class="card" href="architecture/overview.html"><h3>🏗️ Architecture Overview</h3><p>Structure, state management, build & routing.</p></a>
+      <a class="card" href="architecture/overview.de.html"><h3>🏗️ Architektur Übersicht (DE)</h3><p>Struktur, State Management, Build & Routing.</p></a>
+
+      <!-- Key sections -->
+      <a class="card" href="architecture/src/components/overview.html"><h3>🧩 Components</h3><p>Design, composition, patterns.</p></a>
+      <a class="card" href="architecture/src/pages/overview.html"><h3>📄 Pages</h3><p>Pages, routing, loaders.</p></a>
+      <a class="card" href="architecture/src/services/overview.html"><h3>🛠️ Services</h3><p>Data access, caching, error handling.</p></a>
+      <a class="card" href="architecture/src/api/overview.html"><h3>🔗 API Layer</h3><p>Client config, interceptors, DTOs.</p></a>
+      <a class="card" href="architecture/src/i18n/overview.html"><h3>🌍 i18n</h3><p>Localization strategy & resources.</p></a>
+      <a class="card" href="architecture/src/tests/overview.html"><h3>✅ Testing</h3><p>Vitest, RTL, test pyramid.</p></a>
+      <a class="card" href="architecture/security/overview.html"><h3>🛡️ Security</h3><p>Security best practices and implementations.</p></a>
+      <a class="card" href="architecture/src/docker_structure/overview.html"><h3>🐳 Docker & Deploy</h3><p>Dev containers, prod images.</p></a>
+
+      <!-- Generated -->
+      <a class="card" href="typedoc/index.html"><h3>📘 TypeDoc (TS API)</h3><p>Generated TypeScript API docs.</p></a>
+      <a class="card" href="coverage/index.html"><h3>📊 Coverage (Vitest)</h3><p>Test coverage HTML report.</p></a>
+
+      <!-- Backend cross-links -->
+      <a class="card" href="https://keglev.github.io/stockease/" target="_blank" rel="noopener">
+        <h3>🖧 Backend Docs (Spring)</h3><p>Architecture, API, coverage.</p>
+      </a>
+      <a class="card" href="https://keglev.github.io/stockease/api-docs.html" target="_blank" rel="noopener">
+        <h3>🔌 Backend API (ReDoc)</h3><p>Swagger / OpenAPI reference.</p>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p><strong>StockEase</strong> — Frontend Documentation</p>
+    <p>Deployed under <code>/frontend/</code> on GitHub Pages</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="testing-architecture">Testing Architecture</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Comprehensive testing strategy covering unit tests, component
+        tests, integration tests, and API mocking with 478+ tests across
+        the codebase.</p>
+        <p><strong>Location</strong>: <code>src/__tests__/</code>
+        directory</p>
+        <hr />
+        <h2 id="quick-navigation">Quick Navigation</h2>
+        <ul>
+        <li><strong><a href="./structure.html">Test Structure &amp;
+        Organization</a></strong> - Directory layout and test file
+        statistics</li>
+        <li><strong><a href="./patterns.html">Testing
+        Patterns</a></strong> - Unit, component, integration, and
+        accessibility testing patterns</li>
+        <li><strong><a href="./setup-configuration.html">Setup &amp;
+        Configuration</a></strong> - Vitest, test utilities, and global
+        setup</li>
+        <li><strong><a href="./coverage.html">Test Coverage
+        Goals</a></strong> - Coverage metrics and reporting</li>
+        <li><strong><a href="./running-tests.html">Running
+        Tests</a></strong> - CLI commands and CI/CD integration</li>
+        <li><strong><a href="./overview.html">Overview</a></strong> -
+        This file</li>
+        </ul>
+        <hr />
+        <h2 id="testing-philosophy">Testing Philosophy</h2>
+        <h3 id="pyramid-strategy">Pyramid Strategy</h3>
+        <pre><code>           E2E Tests (Few)
+              /  \
+             /    \
+            /      \
+      Integration Tests (Medium)
+            /      \
+           /        \
+          /          \
+    Unit Tests (Many)</code></pre>
+        <p><strong>Distribution</strong>:</p>
+        <ul>
+        <li>Unit Tests: 70% - Fast, isolated, high granularity</li>
+        <li>Integration Tests: 20% - Realistic scenarios, moderate
+        speed</li>
+        <li>E2E Tests: 10% - Full workflows, slower but
+        comprehensive</li>
+        </ul>
+        <hr />
+        <h2 id="test-categories">Test Categories</h2>
+        <h3 id="1-unit-tests-320-tests">1. Unit Tests (320+ tests)</h3>
+        <p>Test individual functions and classes in isolation.</p>
+        <p><strong>Coverage</strong>:</p>
+        <ul>
+        <li>Services (ProductService, auth, etc.)</li>
+        <li>Utility functions</li>
+        <li>Hooks</li>
+        <li>Pure components</li>
+        <li>Type guards and validators</li>
+        </ul>
+        <p><strong>Speed</strong>: Fast (&lt; 1ms each)</p>
+        <pre><code>src/__tests__/
+├── api/
+│   ├── ProductService.test.ts (40+ tests)
+│   ├── auth.test.ts (20+ tests)
+│   └── client.test.ts (30+ tests)
+├── services/
+│   ├── useProducts.test.ts (25+ tests)
+│   ├── useForm.test.ts (30+ tests)
+│   └── useAuth.test.ts (20+ tests)
+└── utils/
+    ├── validation.test.ts (15+ tests)
+    └── helpers.test.ts (15+ tests)</code></pre>
+        <h3 id="2-component-tests-120-tests">2. Component Tests (120+
+        tests)</h3>
+        <p>Test React components with their props and interactions.</p>
+        <p><strong>Coverage</strong>:</p>
+        <ul>
+        <li>Shared components (Button, Header, Sidebar, etc.)</li>
+        <li>Page components</li>
+        <li>Props validation</li>
+        <li>Event handling</li>
+        <li>Accessibility</li>
+        </ul>
+        <p><strong>Speed</strong>: Medium (1-10ms each)</p>
+        <pre><code>src/__tests__/components/
+├── Buttons.test.tsx (15+ tests)
+├── Header.test.tsx (20+ tests)
+├── Sidebar.test.tsx (15+ tests)
+├── ErrorBoundary.test.tsx (10+ tests)
+└── pages/
+    ├── LoginPage.test.tsx (20+ tests)
+    ├── ListStockPage.test.tsx (25+ tests)
+    └── AdminDashboard.test.tsx (20+ tests)</code></pre>
+        <h3 id="3-integration-tests-30-tests">3. Integration Tests (30+
+        tests)</h3>
+        <p>Test multiple components/services working together.</p>
+        <p><strong>Coverage</strong>:</p>
+        <ul>
+        <li>Component + Service interactions</li>
+        <li>Redux integration</li>
+        <li>API flow workflows</li>
+        <li>Form submission flows</li>
+        </ul>
+        <p><strong>Speed</strong>: Slower (10-100ms each)</p>
+        <pre><code>src/__tests__/integration/
+├── productWorkflow.integration.test.ts
+├── authFlow.integration.test.ts
+└── dashboardIntegration.test.ts</code></pre>
+        <h3 id="4-api-mocking">4. API Mocking</h3>
+        <p>Mock Service Worker (MSW) for HTTP mocking.</p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/__tests__/mocks/server.ts</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { setupServer } <span class="im">from</span> <span class="st">&#39;msw/node&#39;</span><span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { rest } <span class="im">from</span> <span class="st">&#39;msw&#39;</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> server <span class="op">=</span> <span class="fu">setupServer</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  rest<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/api/products&#39;</span><span class="op">,</span> (req<span class="op">,</span> res<span class="op">,</span> ctx) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">res</span>(ctx<span class="op">.</span><span class="fu">status</span>(<span class="dv">200</span>)<span class="op">,</span> ctx<span class="op">.</span><span class="fu">json</span>([<span class="op">...</span>]))<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  })<span class="op">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  rest<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/api/products&#39;</span><span class="op">,</span> (req<span class="op">,</span> res<span class="op">,</span> ctx) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">res</span>(ctx<span class="op">.</span><span class="fu">status</span>(<span class="dv">201</span>)<span class="op">,</span> ctx<span class="op">.</span><span class="fu">json</span>({ id<span class="op">:</span> <span class="st">&#39;123&#39;</span><span class="op">,</span> <span class="op">...</span> }))<span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="quick-start">Quick Start</h2>
+        <h3 id="running-tests">Running Tests</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all tests</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests in watch mode</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:watch</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run specific file</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test ProductService.test.ts</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with coverage</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:coverage</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Run integration tests only</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test <span class="at">--</span> integration</span></code></pre></div>
+        <h3 id="test-command-examples">Test Command Examples</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verbose output</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test <span class="at">--</span> <span class="at">--reporter</span><span class="op">=</span>verbose</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Only failed tests</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test <span class="at">--</span> <span class="at">--reporter</span><span class="op">=</span>verbose <span class="at">--bail</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Update snapshots</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test <span class="at">--</span> <span class="at">-u</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Debug in Node inspector</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">--inspect-brk</span> ./node_modules/vitest/vitest.mjs run</span></code></pre></div>
+        <hr />
+        <h2 id="test-statistics">Test Statistics</h2>
+        <h3 id="coverage-summary">Coverage Summary</h3>
+        <pre><code>Statements   : 82% ( 1,234 / 1,505 )
+Branches     : 78% ( 456 / 584 )
+Functions    : 81% ( 203 / 251 )
+Lines        : 83% ( 1,199 / 1,443 )</code></pre>
+        <h3 id="tests-by-category">Tests by Category</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Category</th>
+        <th>Count</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td>Unit Tests</td>
+        <td>320+</td>
+        <td>✅</td>
+        </tr>
+        <tr class="even">
+        <td>Component Tests</td>
+        <td>120+</td>
+        <td>✅</td>
+        </tr>
+        <tr class="odd">
+        <td>Integration Tests</td>
+        <td>30+</td>
+        <td>✅</td>
+        </tr>
+        <tr class="even">
+        <td>API Tests</td>
+        <td>8+</td>
+        <td>✅</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Total</strong></td>
+        <td><strong>478+</strong></td>
+        <td>✅</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="test-duration">Test Duration</h3>
+        <pre><code>Total Time: 8.2 seconds
+- Unit Tests: 2.1s (fastest)
+- Component Tests: 4.5s
+- Integration Tests: 1.6s</code></pre>
+        <hr />
+        <h2 id="file-structure">File Structure</h2>
+        <h3 id="complete-test-directory">Complete Test Directory</h3>
+        <pre><code>src/__tests__/
+├── mocks/
+│   ├── server.ts (MSW setup)
+│   ├── handlers.ts (HTTP handlers)
+│   └── data.ts (Mock data factories)
+│
+├── api/
+│   ├── ProductService.test.ts
+│   ├── auth.test.ts
+│   ├── client.test.ts
+│   └── integration/
+│       └── apiWorkflow.test.ts
+│
+├── services/
+│   ├── hooks/
+│   │   ├── useProducts.test.ts
+│   │   ├── useForm.test.ts
+│   │   ├── useAuth.test.ts
+│   │   ├── useDebounce.test.ts
+│   │   └── useLocalStorage.test.ts
+│   └── apiClient.test.ts
+│
+├── components/
+│   ├── __snapshots__/
+│   │   ├── Button.test.tsx.snap
+│   │   └── Header.test.tsx.snap
+│   ├── Buttons.test.tsx
+│   ├── Header.test.tsx
+│   ├── Sidebar.test.tsx
+│   ├── ErrorBoundary.test.tsx
+│   ├── SkeletonLoader.test.tsx
+│   └── pages/
+│       ├── LoginPage.test.tsx
+│       ├── ListStockPage.test.tsx
+│       ├── AddProductPage.test.tsx
+│       ├── AdminDashboard.test.tsx
+│       └── UserDashboard.test.tsx
+│
+├── utils/
+│   ├── validation.test.ts
+│   ├── helpers.test.ts
+│   └── formatters.test.ts
+│
+├── integration/
+│   ├── productWorkflow.test.ts
+│   ├── authFlow.test.ts
+│   └── dashboardIntegration.test.ts
+│
+└── setup.ts (Global test setup)</code></pre>
+        <hr />
+        <h2 id="testing-best-practices">Testing Best Practices</h2>
+        <p>✅ <strong>DO:</strong></p>
+        <ul>
+        <li>Test behavior, not implementation</li>
+        <li>Use descriptive test names</li>
+        <li>Keep tests isolated and independent</li>
+        <li>Mock external dependencies</li>
+        <li>Test happy paths and error cases</li>
+        <li>Organize tests logically</li>
+        <li>Clean up after tests (vi.clearAllMocks)</li>
+        </ul>
+        <p>❌ <strong>DON'T:</strong></p>
+        <ul>
+        <li>Test implementation details</li>
+        <li>Make real API calls in tests</li>
+        <li>Create interdependent tests</li>
+        <li>Skip error scenarios</li>
+        <li>Use vague test descriptions</li>
+        <li>Mix concerns in single test</li>
+        <li>Ignore cleanup</li>
+        </ul>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="./structure.html">Structure</a></strong> -
+        Test organization and statistics</li>
+        <li><strong><a href="./patterns.html">Patterns</a></strong> -
+        Unit, component, integration patterns</li>
+        <li><strong><a
+        href="./setup-configuration.html">Setup</a></strong> -
+        Configuration and utilities</li>
+        <li><strong><a href="./coverage.html">Coverage</a></strong> -
+        Coverage metrics and goals</li>
+        <li><strong><a href="./running-tests.html">Running
+        Tests</a></strong> - Commands and CI/CD</li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated</strong>: November 2025</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

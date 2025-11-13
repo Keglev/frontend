@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>overview - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="frontend-security--client-side-protection">Frontend
+        Security &amp; Client-Side Protection</h1>
+        <h2 id="overview">Overview</h2>
+        <p>This section covers security practices for the React
+        frontend, including input validation, XSS prevention, CORS/CSRF
+        protection, and secure configuration management. Frontend
+        security is critical because it's the first line of defense
+        against client-side attacks.</p>
+        <hr />
+        <h2 id="security-architecture">Security Architecture</h2>
+        <pre><code>User Input
+    ↓
+Input Validation (sanitizeString, validateNonEmptyString)
+    ├─ Type check
+    ├─ Length limits
+    ├─ Special character removal
+    └─ Format validation
+    ↓
+React Component (Auto-Escaping)
+    ├─ JSX prevents XSS by default
+    ├─ HTML entities escaped
+    └─ Script tags rendered as text
+    ↓
+API Request (Safe Transmission)
+    ├─ Bearer token in header (not URL)
+    ├─ HTTPS encryption
+    ├─ CORS validation by backend
+    └─ CSRF tokens (if using cookies)
+    ↓
+Backend Validation (Defense in Depth)
+    ├─ Re-validate all input
+    ├─ Verify token signature
+    ├─ Check CORS origin
+    └─ Validate authorization
+    ↓
+Database Storage (Safe Data)</code></pre>
+        <hr />
+        <h2 id="documentation-files">Documentation Files</h2>
+        <h3 id="-xss-prevention--input-sanitization">📄 <a
+        href="./xss-and-sanitization.html">XSS Prevention &amp; Input
+        Sanitization</a></h3>
+        <p><strong>Covers:</strong></p>
+        <ul>
+        <li>What is XSS and attack scenarios</li>
+        <li>Input validation rules by field type</li>
+        <li>Sanitization implementation
+        (<code>sanitizeString</code>)</li>
+        <li>Dangerous sinks (innerHTML, eval, etc.)</li>
+        <li>Safe alternatives (React JSX, text content)</li>
+        <li>Testing for XSS vulnerabilities</li>
+        <li>Best practices and patterns</li>
+        </ul>
+        <p><strong>Key Components:</strong></p>
+        <ul>
+        <li><code>sanitizeString()</code> — Remove angle brackets and
+        trim</li>
+        <li><code>validateNonEmptyString()</code> — Type and empty
+        checking</li>
+        <li>React JSX auto-escaping</li>
+        <li>Dangerous sink prevention</li>
+        </ul>
+        <hr />
+        <h3 id="-content-security-policy-csp">📄 <a
+        href="./csp.html">Content Security Policy (CSP)</a></h3>
+        <p><strong>Covers:</strong></p>
+        <ul>
+        <li>What is CSP and how it works</li>
+        <li>CSP directives and policy sources</li>
+        <li>Implementation in nginx</li>
+        <li>Report-Only mode for safe testing</li>
+        <li>Gradual rollout strategy (Phase 1-3)</li>
+        <li>Dealing with <code>unsafe-inline</code></li>
+        <li>Testing and violation handling</li>
+        </ul>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+        <li>Prevents unauthorized script execution</li>
+        <li>Enforced via HTTP headers (not code)</li>
+        <li>Complements input validation</li>
+        <li>Recommended for production implementation</li>
+        </ul>
+        <hr />
+        <h3 id="-cors--csrf-protection">📄 <a
+        href="./cors-and-csrf.html">CORS &amp; CSRF Protection</a></h3>
+        <p><strong>Covers:</strong></p>
+        <ul>
+        <li>CORS (Cross-Origin Resource Sharing)</li>
+        <li>How CORS headers work</li>
+        <li>Preflight requests (OPTIONS)</li>
+        <li>CORS validation (backend responsibility)</li>
+        <li>CSRF (Cross-Site Request Forgery)</li>
+        <li>Token-based CSRF protection</li>
+        <li>Cookie-less architecture advantages</li>
+        </ul>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+        <li>CORS enforced by browser</li>
+        <li>StockEase is CSRF-safe (token-based auth)</li>
+        <li>CORS validation is backend responsibility</li>
+        <li>Frontend cannot override CORS policy</li>
+        </ul>
+        <hr />
+        <h3 id="-secrets--configuration-management">📄 <a
+        href="./secrets-config.html">Secrets &amp; Configuration
+        Management</a></h3>
+        <p><strong>Covers:</strong></p>
+        <ul>
+        <li>Environment variables (.env files)</li>
+        <li>Vite build-time variable replacement</li>
+        <li>Production secrets in GitHub Actions</li>
+        <li>Never logging sensitive data</li>
+        <li>Sanitizing logs and console output</li>
+        <li>Checking for accidental secrets in code</li>
+        <li>Configuration by environment</li>
+        </ul>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+        <li>Secrets in GitHub Actions only</li>
+        <li>Vite variables baked into bundle</li>
+        <li>Redact sensitive headers before logging</li>
+        <li>Conditional logging (dev vs prod)</li>
+        <li><code>.env.local</code> for local development</li>
+        </ul>
+        <hr />
+        <h2 id="security-checklist">Security Checklist</h2>
+        <h3 id="input-validation">Input Validation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />All text inputs validated
+        (non-empty, type, length)</label></li>
+        <li><label><input type="checkbox" />Email fields use regex
+        validation</label></li>
+        <li><label><input type="checkbox" />Numbers validated as
+        positive integers</label></li>
+        <li><label><input type="checkbox" />Special characters removed
+        where needed</label></li>
+        <li><label><input type="checkbox" />Backend re-validates all
+        input</label></li>
+        </ul>
+        <h3 id="xss-prevention">XSS Prevention</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No <code>innerHTML</code>
+        with user data</label></li>
+        <li><label><input type="checkbox" />No
+        <code>dangerouslySetInnerHTML</code> without
+        DOMPurify</label></li>
+        <li><label><input type="checkbox" />React JSX auto-escaping
+        used</label></li>
+        <li><label><input type="checkbox" />User content displayed as
+        text</label></li>
+        <li><label><input type="checkbox" />No <code>eval()</code> or
+        <code>Function()</code> with user input</label></li>
+        <li><label><input type="checkbox" />Input sanitization applied
+        before storage</label></li>
+        </ul>
+        <h3 id="cors-protection">CORS Protection</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Backend validates CORS
+        origin</label></li>
+        <li><label><input type="checkbox" />OPTIONS preflight
+        handled</label></li>
+        <li><label><input type="checkbox" />Specific origins whitelisted
+        (not <code>*</code>)</label></li>
+        <li><label><input type="checkbox" />Authorization header allowed
+        in CORS headers</label></li>
+        <li><label><input type="checkbox" />Credentials only sent to
+        allowed origins</label></li>
+        </ul>
+        <h3 id="csrf-protection">CSRF Protection</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Using token-based auth (not
+        cookies)</label></li>
+        <li><label><input type="checkbox" />Tokens in Authorization
+        header</label></li>
+        <li><label><input type="checkbox" />Tokens not in URL
+        parameters</label></li>
+        <li><label><input type="checkbox" />HTTPS enforced (no
+        HTTP)</label></li>
+        <li><label><input type="checkbox" />If using cookies: SameSite
+        attribute set</label></li>
+        </ul>
+        <h3 id="secrets-management">Secrets Management</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />No hardcoded secrets in
+        code</label></li>
+        <li><label><input type="checkbox" /><code>.env.local</code> in
+        <code>.gitignore</code></label></li>
+        <li><label><input type="checkbox" />GitHub Secrets used for
+        CI/CD</label></li>
+        <li><label><input type="checkbox" />Sensitive headers redacted
+        in logs</label></li>
+        <li><label><input type="checkbox" />No tokens logged to
+        console</label></li>
+        <li><label><input type="checkbox" />Environment-specific
+        configuration</label></li>
+        </ul>
+        <h3 id="content-security-policy">Content Security Policy</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />CSP header configured in
+        nginx</label></li>
+        <li><label><input
+        type="checkbox" /><code>default-src 'self'</code>
+        set</label></li>
+        <li><label><input type="checkbox" />External resources
+        whitelisted</label></li>
+        <li><label><input type="checkbox" /><code>unsafe-eval</code> not
+        used</label></li>
+        <li><label><input type="checkbox" /><code>unsafe-inline</code>
+        minimized</label></li>
+        </ul>
+        <hr />
+        <h2 id="common-vulnerabilities--fixes">Common Vulnerabilities
+        &amp; Fixes</h2>
+        <h3 id="vulnerability-1-xss-via-user-input">Vulnerability 1: XSS
+        via User Input</h3>
+        <p><strong>Scenario:</strong></p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Attacker enters: &lt;img src=x onerror=&quot;stealToken()&quot;&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> productName <span class="op">=</span> userInput<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;name&#39;</span>)<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> productName<span class="op">;</span>  <span class="co">// ❌ VULNERABLE</span></span></code></pre></div>
+        <p><strong>Fix:</strong></p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Validate and sanitize</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> validation <span class="op">=</span> <span class="fu">validateProductName</span>(productName)<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="op">!</span>validation<span class="op">.</span><span class="at">valid</span>) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">showError</span>(validation<span class="op">.</span><span class="at">error</span>)<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> sanitized <span class="op">=</span> <span class="fu">sanitizeString</span>(productName)<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Display safely with React</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>div<span class="op">&gt;</span>{productName}<span class="op">&lt;/</span>div<span class="op">&gt;</span>  <span class="co">// ✅ SAFE (auto-escaped)</span></span></code></pre></div>
+        <h3
+        id="vulnerability-2-exposed-secrets-in-console">Vulnerability 2:
+        Exposed Secrets in Console</h3>
+        <p><strong>Scenario:</strong></p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> config)<span class="op">;</span>  <span class="co">// ❌ Logs Authorization header with token</span></span></code></pre></div>
+        <p><strong>Fix:</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> safeConfig <span class="op">=</span> <span class="fu">sanitizeConfigForLogging</span>(config)<span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;API Request:&#39;</span><span class="op">,</span> safeConfig)<span class="op">;</span>  <span class="co">// ✅ Token is [REDACTED]</span></span></code></pre></div>
+        <h3 id="vulnerability-3-csrf-attack-via-form">Vulnerability 3:
+        CSRF Attack via Form</h3>
+        <p><strong>Scenario (if using cookies):</strong></p>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode html"><code class="sourceCode html"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Attacker&#39;s site --&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span> <span class="er">action</span><span class="ot">=</span><span class="st">&quot;https://stockease.com/api/products&quot;</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;POST&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">input</span> <span class="er">name</span><span class="ot">=</span><span class="st">&quot;name&quot;</span> <span class="er">value</span><span class="ot">=</span><span class="st">&quot;Malware&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">document</span><span class="op">.</span><span class="at">forms</span>[<span class="dv">0</span>]<span class="op">.</span><span class="fu">submit</span>()<span class="op">;</span>  <span class="co">// ❌ Auto-submits with user&#39;s cookie</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code></pre></div>
+        <p><strong>Protection (Current):</strong></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Token-based auth prevents this</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Attacker cannot access token from localStorage</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Request fails without Authorization header</span></span></code></pre></div>
+        <h3
+        id="vulnerability-4-accidental-secret-exposure">Vulnerability 4:
+        Accidental Secret Exposure</h3>
+        <p><strong>Scenario:</strong></p>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Committed to repo</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_KEY</span><span class="op">=</span>secret_key_123  <span class="co"># ❌ Exposed to anyone with repo access</span></span></code></pre></div>
+        <p><strong>Fix:</strong></p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use GitHub Secrets instead</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># In .github/workflows/deploy.yml:</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--build-arg</span> VITE_API_KEY=<span class="st">&quot;</span><span class="va">${</span><span class="er">{ secrets.API_KEY </span><span class="va">}</span><span class="st">}&quot;</span> .</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># .env.local (local development, never committed)</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_KEY</span><span class="op">=</span>local_test_key</span></code></pre></div>
+        <hr />
+        <h2 id="performance--security-trade-offs">Performance &amp;
+        Security Trade-offs</h2>
+        <h3 id="csp-impact">CSP Impact</h3>
+        <p><strong>Benefit:</strong> Strong XSS protection<br />
+        <strong>Trade-off:</strong> Cannot use inline scripts/styles
+        (requires refactoring)<br />
+        <strong>Recommendation:</strong> Implement report-only mode
+        first, migrate gradually</p>
+        <h3 id="input-sanitization">Input Sanitization</h3>
+        <p><strong>Benefit:</strong> Prevents injection attacks<br />
+        <strong>Trade-off:</strong> Some characters removed (e.g.,
+        <code>&lt;&gt;</code>)<br />
+        <strong>Recommendation:</strong> Validate at both frontend and
+        backend</p>
+        <h3 id="token-lifetime">Token Lifetime</h3>
+        <p><strong>Benefit (Short-lived):</strong> Limits damage if
+        token compromised<br />
+        <strong>Trade-off:</strong> User must re-authenticate
+        frequently<br />
+        <strong>Recommendation:</strong> 24 hours (balance security and
+        UX)</p>
+        <h3 id="httponly-cookies-vs-localstorage">HttpOnly Cookies vs
+        localStorage</h3>
+        <p><strong>Benefit (HttpOnly):</strong> Protected from XSS<br />
+        <strong>Trade-off:</strong> Cannot manually manage, requires
+        backend support<br />
+        <strong>Current:</strong> localStorage (good if XSS prevention
+        strict)</p>
+        <hr />
+        <h2 id="environment-specific-configuration">Environment-Specific
+        Configuration</h2>
+        <h3 id="development">Development</h3>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>http://localhost:8081</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_DEBUG</span><span class="op">=</span>true</span></code></pre></div>
+        <ul>
+        <li>Localhost backend</li>
+        <li>Verbose logging</li>
+        <li>All features enabled</li>
+        </ul>
+        <h3 id="staging">Staging</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>https://api.staging.stockease.com</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_DEBUG</span><span class="op">=</span>false</span></code></pre></div>
+        <ul>
+        <li>Production-like setup</li>
+        <li>Feature validation</li>
+        <li>Real backend</li>
+        </ul>
+        <h3 id="production">Production</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_API_BASE_URL</span><span class="op">=</span>https://api.stockease.com</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="va">VITE_DEBUG</span><span class="op">=</span>false</span></code></pre></div>
+        <ul>
+        <li>Optimized bundle</li>
+        <li>Minimal logging</li>
+        <li>CDN delivery</li>
+        </ul>
+        <hr />
+        <h2 id="testing-frontend-security">Testing Frontend
+        Security</h2>
+        <h3 id="unit-tests">Unit Tests</h3>
+        <div class="sourceCode" id="cb13"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Test input validation</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;Input Validation&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should reject empty strings&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> result <span class="op">=</span> <span class="fu">validateNonEmptyString</span>(<span class="st">&#39;&#39;</span>)<span class="op">;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">valid</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="kw">false</span>)<span class="op">;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should remove XSS vectors&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> sanitized <span class="op">=</span> <span class="fu">sanitizeString</span>(<span class="st">&#39;&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;&#39;</span>)<span class="op">;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(sanitized)<span class="op">.</span><span class="at">not</span><span class="op">.</span><span class="fu">toContain</span>(<span class="st">&#39;&lt;&#39;</span>)<span class="op">;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="integration-tests">Integration Tests</h3>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Test API requests with tokens</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;API Security&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should include Authorization header&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;token&#39;</span><span class="op">,</span> <span class="st">&#39;test-token&#39;</span>)<span class="op">;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Make request, verify header included</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should handle 401 by clearing token&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Simulate 401 response</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Verify token removed from localStorage</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="manual-testing">Manual Testing</h3>
+        <div class="sourceCode" id="cb15"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test XSS payloads</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> <span class="op">&lt;</span>script<span class="op">&gt;</span>alert<span class="er">(</span><span class="st">&#39;xss&#39;</span><span class="kw">)</span><span class="op">&lt;</span>/script<span class="op">&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> <span class="op">&lt;</span>img src=x onerror=<span class="st">&quot;alert(&#39;xss&#39;)&quot;</span><span class="op">&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> <span class="op">&lt;</span>svg onload=<span class="st">&quot;alert(&#39;xss&#39;)&quot;</span><span class="op">&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: Rejected or displayed as text</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Test CSRF</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Open DevTools console</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Try: fetch<span class="er">(</span><span class="st">&#39;https://api.stockease.com/api/products&#39;</span><span class="ex">,</span> {method: <span class="st">&#39;POST&#39;</span>}<span class="kw">)</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: CORS error (no Authorization header)</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check CSP violations</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Open DevTools Console</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Look for CSP error messages</span></span></code></pre></div>
+        <hr />
+        <h2 id="security-metrics">Security Metrics</h2>
+        <h3 id="track-these">Track These</h3>
+        <pre><code>Input Validation
+├─ Failed validation attempts
+├─ Blocked XSS payloads
+└─ Sanitization impact (characters removed)
+
+API Security
+├─ 401 errors (token issues)
+├─ 403 errors (authorization failures)
+├─ CORS preflight success rate
+└─ Average request latency
+
+Configuration
+├─ Accidentally committed secrets (0 goal)
+├─ Exposed API keys (0 goal)
+├─ Configuration mismatches between environments
+└─ Unredacted logs in production</code></pre>
+        <hr />
+        <h2 id="best-practices-summary">Best Practices Summary</h2>
+        <h3 id="-always-do">✅ Always Do</h3>
+        <ol type="1">
+        <li><strong>Validate All Input</strong> — Type, length,
+        format</li>
+        <li><strong>Use React JSX</strong> — Automatic HTML
+        escaping</li>
+        <li><strong>Secure API Requests</strong> — Bearer tokens,
+        HTTPS</li>
+        <li><strong>Redact Logs</strong> — Remove sensitive headers
+        before logging</li>
+        <li><strong>Test Regularly</strong> — XSS payloads, CSRF
+        scenarios</li>
+        <li><strong>Backend Defense</strong> — Re-validate
+        everything</li>
+        </ol>
+        <h3 id="-never-do">❌ Never Do</h3>
+        <ol type="1">
+        <li><strong>Trust Client-Side Validation</strong> — Backend must
+        validate too</li>
+        <li><strong>Log Sensitive Data</strong> — Redact tokens,
+        passwords</li>
+        <li><strong>Use innerHTML with User Data</strong> — Use React
+        JSX</li>
+        <li><strong>Hardcode Secrets</strong> — Use environment
+        variables</li>
+        <li><strong>Skip HTTPS</strong> — Always use HTTPS in
+        production</li>
+        <li><strong>Allow Unlimited Origins</strong> — Whitelist
+        specific origins</li>
+        </ol>
+        <hr />
+        <h2 id="incident-response">Incident Response</h2>
+        <h3 id="if-xss-is-discovered">If XSS is Discovered</h3>
+        <ol type="1">
+        <li><strong>Isolate</strong> — Disable affected feature</li>
+        <li><strong>Investigate</strong> — Find root cause</li>
+        <li><strong>Fix</strong> — Patch vulnerability</li>
+        <li><strong>Test</strong> — Verify with XSS payloads</li>
+        <li><strong>Deploy</strong> — Roll out fix immediately</li>
+        <li><strong>Monitor</strong> — Watch for exploitation
+        attempts</li>
+        </ol>
+        <h3 id="if-secret-is-exposed">If Secret is Exposed</h3>
+        <ol type="1">
+        <li><strong>Revoke</strong> — Deactivate exposed secret
+        immediately</li>
+        <li><strong>Search</strong> — Check git history for other
+        exposures</li>
+        <li><strong>Rotate</strong> — Generate new secret</li>
+        <li><strong>Update</strong> — Update in GitHub Secrets</li>
+        <li><strong>Redeploy</strong> — Deploy with new secret</li>
+        <li><strong>Audit</strong> — Check logs for misuse</li>
+        </ol>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong><a href="../api-communication/overview.html">API
+        Communication Security</a></strong> — JWT tokens, request
+        interceptors, error handling</li>
+        <li><strong><a href="../auth/overview.html">Authentication &amp;
+        Authorization</a></strong> — Login flow, RBAC, token
+        management</li>
+        <li><strong><a href="../../pipeline/secrets.html">Deployment
+        Security</a></strong> — CI/CD secrets, GitHub Actions
+        configuration</li>
+        </ul>
+        <hr />
+        <h2 id="quick-links">Quick Links</h2>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Document</th>
+        <th>Purpose</th>
+        <th>Priority</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><a href="./xss-and-sanitization.html">XSS &amp;
+        Sanitization</a></td>
+        <td>Input validation, attack prevention</td>
+        <td>🔴 Critical</td>
+        </tr>
+        <tr class="even">
+        <td><a href="./csp.html">Content Security Policy</a></td>
+        <td>Extra XSS protection layer</td>
+        <td>🟡 High</td>
+        </tr>
+        <tr class="odd">
+        <td><a href="./cors-and-csrf.html">CORS &amp; CSRF</a></td>
+        <td>API security, request validation</td>
+        <td>🟡 High</td>
+        </tr>
+        <tr class="even">
+        <td><a href="./secrets-config.html">Secrets &amp;
+        Config</a></td>
+        <td>Prevent data leaks</td>
+        <td>🔴 Critical</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Production-Ready<br />
+        <strong>Maintained By:</strong> Security Team<br />
+        <strong>Review Cycle:</strong> Quarterly</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

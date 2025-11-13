@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>revoke-tokens - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="token-revocation--forced-logout-playbook">Token
+        Revocation &amp; Forced Logout Playbook</h1>
+        <h2 id="overview">Overview</h2>
+        <p>Token revocation is the process of invalidating JWT tokens
+        before their natural expiration. This playbook documents when
+        and how to force logout users by revoking their active tokens in
+        StockEase Frontend.</p>
+        <hr />
+        <h2 id="when-to-revoke-tokens">When to Revoke Tokens</h2>
+        <h3 id="critical-security-incidents">Critical Security
+        Incidents</h3>
+        <h4 id="1-suspected-account-compromise">1. <strong>Suspected
+        Account Compromise</strong></h4>
+        <pre><code>Scenario: User&#39;s password is suspected compromised
+├─ User reports unusual login activity
+├─ Multiple failed login attempts detected
+├─ Account shows activity from unexpected locations
+└─ Action: Revoke all tokens immediately</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Force user logout on all devices</li>
+        <li>Invalidate all issued tokens</li>
+        <li>Require password reset before re-login</li>
+        <li>Send security alert to user email</li>
+        </ol>
+        <h4 id="2-data-breach">2. <strong>Data Breach</strong></h4>
+        <pre><code>Scenario: Application security incident with potential token exposure
+├─ JWT tokens leaked in logs
+├─ Database breach with token storage
+├─ Client-side token exposure (XSS)
+└─ Action: Revoke tokens for affected users</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Identify affected users</li>
+        <li>Batch revoke their tokens</li>
+        <li>Force re-authentication</li>
+        <li>Rotate signing keys (see key-rotation.md)</li>
+        </ol>
+        <h4 id="3-unauthorized-access">3. <strong>Unauthorized
+        Access</strong></h4>
+        <pre><code>Scenario: Unauthorized user actions detected
+├─ Admin account used without authorization
+├─ Unusual API calls from user token
+├─ Permission escalation detected
+└─ Action: Revoke suspect token immediately</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Terminate active session</li>
+        <li>Revoke all tokens for affected user</li>
+        <li>Log security incident</li>
+        <li>Notify user of suspicious activity</li>
+        </ol>
+        <h3 id="planned-maintenance">Planned Maintenance</h3>
+        <h4 id="4-policy-changes">4. <strong>Policy
+        Changes</strong></h4>
+        <pre><code>Scenario: Security policy updated requiring re-authentication
+├─ MFA now required
+├─ Permission levels changed
+├─ Role assignments modified
+└─ Action: Revoke tokens to enforce new policy</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Notify users of upcoming change</li>
+        <li>Set revocation date/time</li>
+        <li>Batch revoke tokens</li>
+        <li>Users automatically redirect to login</li>
+        </ol>
+        <h4 id="5-account-deletion">5. <strong>Account
+        Deletion</strong></h4>
+        <pre><code>Scenario: User account is deleted or suspended
+├─ User requests account deletion
+├─ Account suspended for policy violation
+├─ Employee terminated (HR system)
+└─ Action: Revoke all tokens immediately</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Immediately terminate all sessions</li>
+        <li>Revoke all issued tokens</li>
+        <li>Delete or archive account data</li>
+        <li>Update audit logs</li>
+        </ol>
+        <h3 id="operational-changes">Operational Changes</h3>
+        <h4 id="6-role-or-permission-changes">6. <strong>Role or
+        Permission Changes</strong></h4>
+        <pre><code>Scenario: User role or permissions are modified
+├─ User promoted/demoted
+├─ Permission level changed
+├─ Department transfer
+└─ Action: Revoke token to force re-authentication with new permissions</code></pre>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Update user role in database</li>
+        <li>Revoke all tokens for user</li>
+        <li>User forced to re-login</li>
+        <li>New token issued with updated claims</li>
+        </ol>
+        <hr />
+        <h2 id="current-token-architecture">Current Token
+        Architecture</h2>
+        <h3 id="token-storage-in-stockease">Token Storage in
+        StockEase</h3>
+        <p><strong>Location:</strong>
+        <code>localStorage.token</code></p>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// From src/services/apiClient.ts</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> token <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (token) {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  config<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">Authorization</span> <span class="op">=</span> <span class="vs">`Bearer </span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Token Lifecycle:</strong></p>
+        <pre><code>1. Login → Backend generates JWT → Frontend stores in localStorage
+2. API Request → Request interceptor attaches Bearer token
+3. Response → Response interceptor checks status
+4. 401 Error → Response interceptor removes token (cleanup)
+5. Token Expired → Frontend redirect to login
+6. Logout → Frontend removes token from localStorage</code></pre>
+        <h3 id="current-logout-implementation">Current Logout
+        Implementation</h3>
+        <p><strong>File:</strong>
+        <code>src/services/apiClient.ts</code></p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Response interceptor</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (error<span class="op">.</span><span class="at">response</span><span class="op">?.</span><span class="at">status</span> <span class="op">===</span> <span class="dv">401</span>) {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/login&#39;</span><span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>How it works:</strong></p>
+        <ol type="1">
+        <li>Backend returns 401 (Unauthorized)</li>
+        <li>Frontend interceptor removes token</li>
+        <li>User redirected to login page</li>
+        <li>Effectively logs user out ✅</li>
+        </ol>
+        <p><strong>Limitation:</strong> This requires server to reject
+        the token. If token is still valid in backend, user can reuse it
+        if:</p>
+        <ul>
+        <li>Request doesn't trigger 401 response</li>
+        <li>Token is cached in browser memory</li>
+        <li>localStorage is not fully cleared</li>
+        </ul>
+        <hr />
+        <h2 id="forced-logout-implementation">Forced Logout
+        Implementation</h2>
+        <h3 id="option-1-server-side-token-blacklist-recommended">Option
+        1: Server-Side Token Blacklist (Recommended)</h3>
+        <p><strong>Concept:</strong></p>
+        <pre><code>Backend maintains list of revoked tokens
+Frontend presents token
+Backend checks: &quot;Is this token in revoked list?&quot;
+├─ Yes → Reject request (401)
+└─ No → Accept request (200)</code></pre>
+        <p><strong>Implementation:</strong></p>
+        <p><strong>Backend (Node.js example):</strong></p>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Redis cache for revoked tokens</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> redis <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;redis&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> client <span class="op">=</span> redis<span class="op">.</span><span class="fu">createClient</span>()<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">// On token revocation request</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke&#39;</span><span class="op">,</span> authMiddleware<span class="op">,</span> <span class="kw">async</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> req<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">authorization</span><span class="op">.</span><span class="fu">split</span>(<span class="st">&#39; &#39;</span>)[<span class="dv">1</span>]<span class="op">;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">decode</span>(token)<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Add token to revoked list</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// TTL = token expiration time (prevents memory leak)</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ttl <span class="op">=</span> decoded<span class="op">.</span><span class="at">exp</span> <span class="op">-</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>)<span class="op">;</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> client<span class="op">.</span><span class="fu">setex</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> ttl<span class="op">,</span> <span class="st">&#39;1&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  res<span class="op">.</span><span class="fu">json</span>({ <span class="dt">success</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">message</span><span class="op">:</span> <span class="st">&#39;Token revoked&#39;</span> })<span class="op">;</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">// In JWT verification middleware</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> <span class="kw">async</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> isRevoked <span class="op">=</span> <span class="cf">await</span> client<span class="op">.</span><span class="fu">get</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (isRevoked) {</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Token has been revoked&#39;</span>)<span class="op">;</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> secret)<span class="op">;</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <p><strong>Frontend (StockEase):</strong></p>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/services/apiClient.ts - Add revocation endpoint</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">async</span> <span class="kw">function</span> <span class="fu">revokeToken</span>()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">void</span><span class="op">&gt;</span> {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> axios<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke&#39;</span><span class="op">,</span> {}<span class="op">,</span> {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      headers<span class="op">:</span> {</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        Authorization<span class="op">:</span> <span class="vs">`Bearer </span><span class="sc">${</span>localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;token&#39;</span>)<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">finally</span> {</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Clear local storage regardless of response</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;username&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;role&#39;</span>)<span class="op">;</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/login&#39;</span><span class="op">;</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage in logout</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">logout</span>()<span class="op">:</span> <span class="dt">void</span> {</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">revokeToken</span>()<span class="op">;</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Advantages:</strong></p>
+        <ul>
+        <li>✅ Immediate invalidation</li>
+        <li>✅ Works across all sessions</li>
+        <li>✅ Prevents token reuse</li>
+        <li>✅ Secure and reliable</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+        <li>⚠️ Requires backend changes</li>
+        <li>⚠️ Uses backend resources (Redis/cache)</li>
+        <li>⚠️ Need to manage TTL expiration</li>
+        </ul>
+        <hr />
+        <h3 id="option-2-distributed-cache-invalidation">Option 2:
+        Distributed Cache Invalidation</h3>
+        <p><strong>Concept:</strong></p>
+        <pre><code>Multiple backend servers share revoked token list
+├─ Server A revokes token
+├─ Writes to distributed cache (Redis/Memcached)
+├─ All servers check same cache
+└─ Token invalidated everywhere</code></pre>
+        <p><strong>Implementation:</strong></p>
+        <div class="sourceCode" id="cb14"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Backend - Redis distributed cache</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> redis <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;redis&#39;</span>)<span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> client <span class="op">=</span> redis<span class="op">.</span><span class="fu">createClient</span>({</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">host</span><span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">REDIS_HOST</span><span class="op">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">port</span><span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">REDIS_PORT</span><span class="op">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">db</span><span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">REDIS_DB</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Revoke token endpoint</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke&#39;</span><span class="op">,</span> authMiddleware<span class="op">,</span> <span class="kw">async</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> req<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">authorization</span><span class="op">.</span><span class="fu">split</span>(<span class="st">&#39; &#39;</span>)[<span class="dv">1</span>]<span class="op">;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">decode</span>(token)<span class="op">;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ttl <span class="op">=</span> decoded<span class="op">.</span><span class="at">exp</span> <span class="op">-</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>)<span class="op">;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Publish revocation event to all servers</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> client<span class="op">.</span><span class="fu">publish</span>(<span class="st">&#39;token_revoked&#39;</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">token</span><span class="op">:</span> token<span class="op">,</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">userId</span><span class="op">:</span> decoded<span class="op">.</span><span class="at">sub</span><span class="op">,</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">timestamp</span><span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  }))<span class="op">;</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Store in revoked list</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> client<span class="op">.</span><span class="fu">setex</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> ttl<span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">userId</span><span class="op">:</span> decoded<span class="op">.</span><span class="at">sub</span><span class="op">,</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">revokedAt</span><span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  }))<span class="op">;</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  res<span class="op">.</span><span class="fu">json</span>({ <span class="dt">success</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">message</span><span class="op">:</span> <span class="st">&#39;Token revoked&#39;</span> })<span class="op">;</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <p><strong>Advantages:</strong></p>
+        <ul>
+        <li>✅ Works across distributed systems</li>
+        <li>✅ Real-time propagation</li>
+        <li>✅ Scalable to many servers</li>
+        </ul>
+        <p><strong>Disadvantages:</strong></p>
+        <ul>
+        <li>⚠️ Complex infrastructure</li>
+        <li>⚠️ Requires Redis/Memcached setup</li>
+        <li>⚠️ Network latency</li>
+        </ul>
+        <hr />
+        <h3 id="option-3-client-side-only-current---limited">Option 3:
+        Client-Side Only (Current - Limited)</h3>
+        <p><strong>Concept:</strong></p>
+        <pre><code>Frontend removes token from localStorage
+├─ Token invalidated in browser
+├─ But remains valid on backend
+└─ If leaked/cached, can still be used</code></pre>
+        <p><strong>Current Implementation:</strong></p>
+        <div class="sourceCode" id="cb16"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/services/apiClient.ts</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">logout</span>()<span class="op">:</span> <span class="dt">void</span> {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;username&#39;</span>)<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;role&#39;</span>)<span class="op">;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/login&#39;</span><span class="op">;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>Limitations:</strong></p>
+        <ul>
+        <li>❌ Token still valid on backend</li>
+        <li>❌ Cached token can be reused</li>
+        <li>❌ No protection against token theft</li>
+        <li>❌ Not suitable for security incidents</li>
+        </ul>
+        <p><strong>Use Case:</strong></p>
+        <ul>
+        <li>Normal user-initiated logout only</li>
+        <li>Not for security incidents</li>
+        </ul>
+        <hr />
+        <h2 id="forced-logout-workflow">Forced Logout Workflow</h2>
+        <h3 id="user-initiated-logout-current">User-Initiated Logout
+        (Current)</h3>
+        <pre><code>User clicks &quot;Logout&quot;
+        ↓
+logout() called
+        ↓
+Remove token from localStorage
+Remove username from localStorage
+Remove role from localStorage
+        ↓
+Redirect to /login
+        ↓
+User must re-login</code></pre>
+        <p><strong>File:</strong>
+        <code>src/services/apiClient.ts</code></p>
+        <p><strong>Current Code:</strong></p>
+        <div class="sourceCode" id="cb18"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">function</span> <span class="fu">logout</span>()<span class="op">:</span> <span class="dt">void</span> {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;username&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;role&#39;</span>)<span class="op">;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/login&#39;</span><span class="op">;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <h3 id="admin-initiated-revocation-recommended">Admin-Initiated
+        Revocation (Recommended)</h3>
+        <pre><code>Admin revokes user token
+        ↓
+Backend receives revoke request
+        ↓
+Add token to blacklist (Redis)
+        ↓
+Publish revocation event
+        ↓
+If user online:
+  ├─ Next API call returns 401
+  ├─ Frontend interceptor removes token
+  └─ User redirected to login
+        ↓
+User must re-authenticate</code></pre>
+        <p><strong>Implementation Steps:</strong></p>
+        <p><strong>1. Backend Revocation Endpoint</strong></p>
+        <div class="sourceCode" id="cb20"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>POST <span class="op">/</span>auth<span class="op">/</span>revoke</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>Headers<span class="op">:</span> { <span class="dt">Authorization</span><span class="op">:</span> <span class="st">&#39;Bearer &lt;token&gt;&#39;</span> }</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>Body<span class="op">:</span> { userId<span class="op">?:</span> <span class="st">&#39;&lt;user-id&gt;&#39;</span> } <span class="co">// Optional: revoke other user</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>Response<span class="op">:</span> { <span class="dt">success</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">message</span><span class="op">:</span> <span class="st">&#39;Token revoked&#39;</span> }</span></code></pre></div>
+        <p><strong>2. Frontend Logout Component</strong></p>
+        <div class="sourceCode" id="cb21"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/services/apiClient.ts</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">async</span> <span class="kw">function</span> <span class="fu">revokeAndLogout</span>()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">void</span><span class="op">&gt;</span> {</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> axios<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke&#39;</span><span class="op">,</span> {})<span class="op">;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Revocation failed:&#39;</span><span class="op">,</span> error)<span class="op">;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">finally</span> {</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Clear local storage</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;token&#39;</span>)<span class="op">;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;username&#39;</span>)<span class="op">;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">removeItem</span>(<span class="st">&#39;role&#39;</span>)<span class="op">;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Redirect to login</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">window</span><span class="op">.</span><span class="at">location</span><span class="op">.</span><span class="at">href</span> <span class="op">=</span> <span class="st">&#39;/login&#39;</span><span class="op">;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+        <p><strong>3. Component Usage</strong></p>
+        <div class="sourceCode" id="cb22"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">// In logout button handler</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { revokeAndLogout } <span class="im">from</span> <span class="st">&#39;../services/apiClient&#39;</span><span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>button onClick<span class="op">=</span>{revokeAndLogout}<span class="op">&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  Logout</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>button<span class="op">&gt;</span></span></code></pre></div>
+        <hr />
+        <h2 id="batch-token-revocation">Batch Token Revocation</h2>
+        <h3 id="scenario-security-incident">Scenario: Security
+        Incident</h3>
+        <p><strong>Use Case:</strong> Revoke tokens for multiple users
+        after data breach</p>
+        <p><strong>Backend Implementation:</strong></p>
+        <div class="sourceCode" id="cb23"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">// POST /auth/revoke-batch (admin only)</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke-batch&#39;</span><span class="op">,</span> adminAuth<span class="op">,</span> <span class="kw">async</span> (req<span class="op">,</span> res) <span class="kw">=&gt;</span> {</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { userIds<span class="op">,</span> reason } <span class="op">=</span> req<span class="op">.</span><span class="at">body</span><span class="op">;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>userIds <span class="op">||</span> <span class="op">!</span><span class="bu">Array</span><span class="op">.</span><span class="fu">isArray</span>(userIds)) {</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res<span class="op">.</span><span class="fu">status</span>(<span class="dv">400</span>)<span class="op">.</span><span class="fu">json</span>({ <span class="dt">error</span><span class="op">:</span> <span class="st">&#39;userIds must be array&#39;</span> })<span class="op">;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Find all tokens for these users</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> tokens <span class="op">=</span> <span class="cf">await</span> Token<span class="op">.</span><span class="fu">find</span>({ <span class="dt">userId</span><span class="op">:</span> { <span class="dt">$in</span><span class="op">:</span> userIds } })<span class="op">;</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Add to revocation list</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> token <span class="kw">of</span> tokens) {</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">decode</span>(token<span class="op">.</span><span class="at">token</span>)<span class="op">;</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> ttl <span class="op">=</span> decoded<span class="op">.</span><span class="at">exp</span> <span class="op">-</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">/</span> <span class="dv">1000</span>)<span class="op">;</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">await</span> redis<span class="op">.</span><span class="fu">setex</span>(</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        <span class="vs">`revoked_</span><span class="sc">${</span>token<span class="op">.</span><span class="at">token</span><span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        ttl<span class="op">,</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>          <span class="dt">userId</span><span class="op">:</span> token<span class="op">.</span><span class="at">userId</span><span class="op">,</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>          <span class="dt">reason</span><span class="op">:</span> reason<span class="op">,</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>          <span class="dt">revokedAt</span><span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">.</span><span class="fu">toISOString</span>()<span class="op">,</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>          <span class="dt">revokedBy</span><span class="op">:</span> req<span class="op">.</span><span class="at">user</span><span class="op">.</span><span class="at">id</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>      )<span class="op">;</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Log security incident</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> AuditLog<span class="op">.</span><span class="fu">create</span>({</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">action</span><span class="op">:</span> <span class="st">&#39;BATCH_TOKEN_REVOCATION&#39;</span><span class="op">,</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">userIds</span><span class="op">:</span> userIds<span class="op">,</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">reason</span><span class="op">:</span> reason<span class="op">,</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">count</span><span class="op">:</span> tokens<span class="op">.</span><span class="at">length</span><span class="op">,</span></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">performedBy</span><span class="op">:</span> req<span class="op">.</span><span class="at">user</span><span class="op">.</span><span class="at">id</span><span class="op">,</span></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>      <span class="dt">timestamp</span><span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">json</span>({</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>      <span class="dt">success</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>      <span class="dt">message</span><span class="op">:</span> <span class="vs">`Revoked </span><span class="sc">${</span>tokens<span class="op">.</span><span class="at">length</span><span class="sc">}</span><span class="vs"> tokens for </span><span class="sc">${</span>userIds<span class="op">.</span><span class="at">length</span><span class="sc">}</span><span class="vs"> users`</span><span class="op">,</span></span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>      <span class="dt">tokensRevoked</span><span class="op">:</span> tokens<span class="op">.</span><span class="at">length</span></span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Batch revocation error:&#39;</span><span class="op">,</span> error)<span class="op">;</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>    res<span class="op">.</span><span class="fu">status</span>(<span class="dv">500</span>)<span class="op">.</span><span class="fu">json</span>({ <span class="dt">error</span><span class="op">:</span> <span class="st">&#39;Batch revocation failed&#39;</span> })<span class="op">;</span></span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <p><strong>Frontend Admin Panel:</strong></p>
+        <div class="sourceCode" id="cb24"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> axios <span class="im">from</span> <span class="st">&#39;axios&#39;</span><span class="op">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">batchRevokeTokens</span>(userIds<span class="op">:</span> <span class="dt">string</span>[]<span class="op">,</span> reason<span class="op">:</span> <span class="dt">string</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">void</span><span class="op">&gt;</span> {</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> axios<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/auth/revoke-batch&#39;</span><span class="op">,</span> {</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>      userIds<span class="op">,</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>      reason</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Revoked </span><span class="sc">${</span>response<span class="op">.</span><span class="at">data</span><span class="op">.</span><span class="at">tokensRevoked</span><span class="sc">}</span><span class="vs"> tokens`</span>)<span class="op">;</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">alert</span>(<span class="vs">`Successfully revoked tokens for </span><span class="sc">${</span>userIds<span class="op">.</span><span class="at">length</span><span class="sc">}</span><span class="vs"> users`</span>)<span class="op">;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;Batch revocation failed:&#39;</span><span class="op">,</span> error)<span class="op">;</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">alert</span>(<span class="st">&#39;Failed to revoke tokens&#39;</span>)<span class="op">;</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co">// Usage</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">batchRevokeTokens</span>(</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  [<span class="st">&#39;user1&#39;</span><span class="op">,</span> <span class="st">&#39;user2&#39;</span><span class="op">,</span> <span class="st">&#39;user3&#39;</span>]<span class="op">,</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;Security incident - potential data breach&#39;</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="monitoring--verification">Monitoring &amp;
+        Verification</h2>
+        <h3 id="verify-token-revocation">Verify Token Revocation</h3>
+        <p><strong>Check if token is revoked:</strong></p>
+        <div class="sourceCode" id="cb25"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using curl</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> GET https://api.stockease.com/auth/verify <span class="dt">\</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Authorization: Bearer &lt;token&gt;&quot;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If token is revoked:</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Response: 401 Unauthorized</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># If token is valid:</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Response: 200 OK { &quot;valid&quot;: true, &quot;userId&quot;: &quot;...&quot; }</span></span></code></pre></div>
+        <p><strong>Check revoked token count:</strong></p>
+        <div class="sourceCode" id="cb26"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Redis CLI</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">redis-cli</span> keys <span class="st">&quot;revoked_*&quot;</span> <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: Number of revoked tokens in cache</span></span></code></pre></div>
+        <h3 id="audit-logging">Audit Logging</h3>
+        <p><strong>Log all revocation events:</strong></p>
+        <div class="sourceCode" id="cb27"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// After revocation</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">logAuditEvent</span>({</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  action<span class="op">:</span> <span class="st">&#39;TOKEN_REVOKED&#39;</span><span class="op">,</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  timestamp<span class="op">:</span> <span class="kw">new</span> <span class="bu">Date</span>()<span class="op">,</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  userId<span class="op">:</span> revokedUserId<span class="op">,</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  initiator<span class="op">:</span> initiatorId<span class="op">,</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  reason<span class="op">:</span> revocationReason<span class="op">,</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  ipAddress<span class="op">:</span> req<span class="op">.</span><span class="at">ip</span><span class="op">,</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  userAgent<span class="op">:</span> req<span class="op">.</span><span class="at">headers</span>[<span class="st">&#39;user-agent&#39;</span>]</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <p><strong>Audit Trail Example:</strong></p>
+        <pre><code>2025-11-13T14:32:15Z | TOKEN_REVOKED | user123 | admin456 | Security incident | 192.168.1.100
+2025-11-13T14:35:42Z | TOKEN_REVOKED | user456 | user456 | User logout | 10.0.0.50
+2025-11-13T15:01:08Z | BATCH_TOKEN_REVOCATION | users: [u1,u2,u3] | admin789 | Data breach response | 203.0.113.42</code></pre>
+        <hr />
+        <h2 id="checklist-for-token-revocation">Checklist for Token
+        Revocation</h2>
+        <h3 id="-before-implementing">✅ Before Implementing</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Decide on revocation method
+        (server-side blacklist recommended)</label></li>
+        <li><label><input type="checkbox" />Set up Redis or caching
+        system</label></li>
+        <li><label><input type="checkbox" />Plan token TTL
+        management</label></li>
+        <li><label><input type="checkbox" />Define revocation audit
+        logging</label></li>
+        <li><label><input type="checkbox" />Determine who can revoke
+        tokens (admins only)</label></li>
+        <li><label><input type="checkbox" />Test revocation flow
+        end-to-end</label></li>
+        </ul>
+        <h3 id="-during-implementation">✅ During Implementation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Create backend revocation
+        endpoint</label></li>
+        <li><label><input type="checkbox" />Update frontend logout
+        function</label></li>
+        <li><label><input type="checkbox" />Add revocation to response
+        interceptor</label></li>
+        <li><label><input type="checkbox" />Implement batch revocation
+        for incidents</label></li>
+        <li><label><input type="checkbox" />Add audit logging for all
+        revocations</label></li>
+        <li><label><input type="checkbox" />Test with live
+        tokens</label></li>
+        </ul>
+        <h3 id="-after-implementation">✅ After Implementation</h3>
+        <ul class="task-list">
+        <li><label><input type="checkbox" />Monitor revocation
+        metrics</label></li>
+        <li><label><input type="checkbox" />Test security incident
+        response</label></li>
+        <li><label><input type="checkbox" />Verify tokens are actually
+        invalidated</label></li>
+        <li><label><input type="checkbox" />Check audit logs for
+        completeness</label></li>
+        <li><label><input type="checkbox" />Document revocation
+        procedures</label></li>
+        <li><label><input type="checkbox" />Train team on emergency
+        procedures</label></li>
+        </ul>
+        <hr />
+        <h2 id="common-issues--solutions">Common Issues &amp;
+        Solutions</h2>
+        <h3 id="issue-1-token-still-works-after-revocation">Issue 1:
+        Token Still Works After Revocation</h3>
+        <p><strong>Problem:</strong> User is revoked but can still
+        access API</p>
+        <p><strong>Cause:</strong> Backend not checking revocation
+        list</p>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb29"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Ensure middleware checks revocation</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> verifyToken <span class="op">=</span> <span class="kw">async</span> (req<span class="op">,</span> res<span class="op">,</span> next) <span class="kw">=&gt;</span> {</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> token <span class="op">=</span> req<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="at">authorization</span><span class="op">?.</span><span class="fu">split</span>(<span class="st">&#39; &#39;</span>)[<span class="dv">1</span>]<span class="op">;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Check if revoked FIRST</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> isRevoked <span class="op">=</span> <span class="cf">await</span> redis<span class="op">.</span><span class="fu">get</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (isRevoked) {</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res<span class="op">.</span><span class="fu">status</span>(<span class="dv">401</span>)<span class="op">.</span><span class="fu">json</span>({ <span class="dt">error</span><span class="op">:</span> <span class="st">&#39;Token has been revoked&#39;</span> })<span class="op">;</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Then verify signature</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">verify</span>(token<span class="op">,</span> SECRET)<span class="op">;</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  req<span class="op">.</span><span class="at">user</span> <span class="op">=</span> decoded<span class="op">;</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">next</span>()<span class="op">;</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <h3 id="issue-2-redis-not-connected">Issue 2: Redis Not
+        Connected</h3>
+        <p><strong>Problem:</strong> Revocation endpoint fails, tokens
+        not actually revoked</p>
+        <p><strong>Cause:</strong> Redis connection issue</p>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb30"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Add retry logic</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> redis <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;redis&#39;</span>)<span class="op">;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> client <span class="op">=</span> redis<span class="op">.</span><span class="fu">createClient</span>({</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">retry_strategy</span><span class="op">:</span> (options) <span class="kw">=&gt;</span> {</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (options<span class="op">.</span><span class="at">error</span> <span class="op">&amp;&amp;</span> options<span class="op">.</span><span class="at">error</span><span class="op">.</span><span class="at">code</span> <span class="op">===</span> <span class="st">&#39;ECONNREFUSED&#39;</span>) {</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Redis connection failed&#39;</span>)<span class="op">;</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (options<span class="op">.</span><span class="at">total_retry_time</span> <span class="op">&gt;</span> <span class="dv">1000</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">60</span>) {</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="st">&#39;Retry time exhausted&#39;</span>)<span class="op">;</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(options<span class="op">.</span><span class="at">attempt</span> <span class="op">*</span> <span class="dv">100</span><span class="op">,</span> <span class="dv">3000</span>)<span class="op">;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">// Fallback: Use database instead of Redis</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> revokeToken <span class="op">=</span> <span class="kw">async</span> (token) <span class="kw">=&gt;</span> {</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (redisAvailable) {</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> redis<span class="op">.</span><span class="fu">setex</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> ttl<span class="op">,</span> <span class="st">&#39;1&#39;</span>)<span class="op">;</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> RevokedToken<span class="op">.</span><span class="fu">create</span>({ token<span class="op">,</span> expiresAt })<span class="op">;</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+        <h3 id="issue-3-revocation-list-memory-leak">Issue 3: Revocation
+        List Memory Leak</h3>
+        <p><strong>Problem:</strong> Redis keeps growing, memory runs
+        out</p>
+        <p><strong>Cause:</strong> Not setting TTL on revoked tokens</p>
+        <p><strong>Solution:</strong></p>
+        <div class="sourceCode" id="cb31"><pre
+        class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Always set TTL = token expiration time</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> decoded <span class="op">=</span> jwt<span class="op">.</span><span class="fu">decode</span>(token)<span class="op">;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> expirationTime <span class="op">=</span> decoded<span class="op">.</span><span class="at">exp</span> <span class="op">*</span> <span class="dv">1000</span><span class="op">;</span> <span class="co">// Convert to ms</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ttl <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">ceil</span>((expirationTime <span class="op">-</span> <span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>()) <span class="op">/</span> <span class="dv">1000</span>)<span class="op">;</span> <span class="co">// Seconds</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Only cache until token would expire anyway</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> redis<span class="op">.</span><span class="fu">setex</span>(<span class="vs">`revoked_</span><span class="sc">${</span>token<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> ttl<span class="op">,</span> <span class="st">&#39;1&#39;</span>)<span class="op">;</span></span></code></pre></div>
+        <hr />
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><strong>JWT Tokens:</strong> See <a
+        href="../auth/jwt-tokens.html">JWT Token Handling</a></li>
+        <li><strong>Authentication:</strong> See <a
+        href="../auth/authentication.html">Authentication Flow</a></li>
+        <li><strong>Key Rotation:</strong> See <a
+        href="./key-rotation.html">Key Rotation &amp; Rollout</a></li>
+        <li><strong>API Security:</strong> See <a
+        href="../api-communication/api-security.html">API Communication
+        Security</a></li>
+        </ul>
+        <hr />
+        <p><strong>Last Updated:</strong> November 13, 2025<br />
+        <strong>Status:</strong> Recommended Implementation<br />
+        <strong>Priority:</strong> High (Security Incident
+        Response)<br />
+        <strong>Maintainer:</strong> Security Team</p>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>

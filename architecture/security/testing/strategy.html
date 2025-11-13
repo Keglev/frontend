@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>strategy - StockEase Frontend Docs</title>
+  <!-- Will be set to a repo-relative path at runtime -->
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a id="home-link" href="#" class="logo">📚 StockEase Frontend Docs</a>
+      <nav class="nav-breadcrumb">
+        <a id="home-crumb" href="#">Home</a> / <span id="breadcrumb">Documentation</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside id="sidebar"></aside>
+    <main>
+      <div class="content">
+        <h1 id="security-testing-strategy">Security Testing
+        Strategy</h1>
+        <p><strong>Version:</strong> 1.0.0<br />
+        <strong>Last Updated:</strong> 2024<br />
+        <strong>Status:</strong> Active</p>
+        <h2 id="overview">Overview</h2>
+        <p>The StockEase Frontend employs a comprehensive, multi-layered
+        security testing strategy that combines static analysis, unit
+        testing, integration testing, and scenario-based testing to
+        identify and prevent security vulnerabilities throughout the
+        development lifecycle. This document outlines our testing
+        approach, covering tools, methodologies, and test
+        organization.</p>
+        <h2 id="table-of-contents">Table of Contents</h2>
+        <ol type="1">
+        <li><a href="#testing-architecture">Testing
+        Architecture</a></li>
+        <li><a href="#unit-security-testing">Unit Security
+        Testing</a></li>
+        <li><a href="#integration-testing">Integration Testing</a></li>
+        <li><a href="#scenario-based-testing">Scenario-Based
+        Testing</a></li>
+        <li><a href="#abuse-case-testing">Abuse Case Testing</a></li>
+        <li><a href="#test-coverage--metrics">Test Coverage &amp;
+        Metrics</a></li>
+        <li><a href="#testing-frameworks--tools">Testing Frameworks
+        &amp; Tools</a></li>
+        <li><a href="#security-test-domains">Security Test
+        Domains</a></li>
+        <li><a href="#continuous-integration">Continuous
+        Integration</a></li>
+        </ol>
+        <h2 id="testing-architecture">Testing Architecture</h2>
+        <h3 id="test-pyramid">Test Pyramid</h3>
+        <pre><code>    ▲
+   / \
+  /   \   Scenario-Based &amp; Abuse Case Tests
+ /     \  (Integration tests, real-world scenarios)
+/-------\
+|       | Unit Security Tests
+|       | (XSS, CSRF, CSP, Auth, Secrets)
+|       |
+|       |
+|_______|
+SAST (Static Analysis)
+ESLint, TypeScript Compiler</code></pre>
+        <h3 id="test-organization">Test Organization</h3>
+        <p>The frontend test suite is organized into <strong>15 primary
+        test categories</strong>:</p>
+        <pre><code>src/__tests__/
+├── security/              # Security-focused tests (6 domains)
+│   ├── components/        # Component-level security vulnerabilities
+│   ├── csp/               # Content Security Policy validation
+│   ├── csrf/              # Cross-Site Request Forgery prevention
+│   ├── headers/           # Security header validation
+│   ├── secrets/           # Sensitive data protection
+│   └── xss/               # Cross-Site Scripting prevention
+├── api/                   # API integration security tests
+│   ├── auth/              # Authentication API testing
+│   ├── product-service/   # Product API security
+│   └── API.template.test.ts
+├── auth/                  # Authentication &amp; authorization
+│   └── authorization/     # Role-based access control tests
+├── components/            # Component security &amp; functionality
+│   ├── buttons/
+│   ├── error-boundary/
+│   ├── header/
+│   ├── help-modal/
+│   ├── sidebar/
+│   └── Component.template.test.tsx
+├── services/              # Service layer security
+│   └── api-client-operations/
+│       ├── config/        # Configuration security
+│       ├── errors/        # Error handling security
+│       └── security/      # Service-level security tests
+├── accessibility/         # WCAG &amp; accessibility testing
+├── integration/           # End-to-end workflow testing
+├── logic/                 # Business logic security
+├── pages/                 # Page-level security testing
+├── playbooks/             # Security scenario playbooks
+├── fixtures/              # Test data &amp; fixtures
+├── mocks/                 # Mock objects &amp; services
+├── types/                 # Type safety tests
+├── utils/                 # Utility function security
+└── setup.ts               # Global test setup &amp; configuration</code></pre>
+        <h2 id="unit-security-testing">Unit Security Testing</h2>
+        <h3 id="purpose">Purpose</h3>
+        <p>Unit security tests validate that individual functions and
+        components properly handle security-critical operations without
+        introducing vulnerabilities.</p>
+        <h3 id="coverage-areas">Coverage Areas</h3>
+        <h4 id="1-secrets--sensitive-data-protection-securitysecrets">1.
+        <strong>Secrets &amp; Sensitive Data Protection</strong>
+        (<code>security/secrets/</code>)</h4>
+        <ul>
+        <li><strong>Storage Security</strong>: Tokens stored in
+        localStorage only, never in sessionStorage or memory</li>
+        <li><strong>Error Message Sanitization</strong>: Stack traces
+        and error messages don't leak tokens, API keys, or
+        credentials</li>
+        <li><strong>Logging Security</strong>: Console logs don't expose
+        sensitive data</li>
+        <li><strong>Environment Variables</strong>: VITE_ prefixed
+        variables only, no secret exposure</li>
+        <li><strong>Build-Time Security</strong>: No secrets embedded in
+        minified builds</li>
+        </ul>
+        <p><strong>Test Files:</strong></p>
+        <ul>
+        <li><code>storage-and-errors.test.ts</code> - Token storage,
+        token clearance, error message safety</li>
+        <li><code>logging-security.test.ts</code> - Console logging,
+        message redaction, URL sanitization</li>
+        <li><code>env-variable-security.test.ts</code> - VITE_ prefix
+        enforcement, API URL validation</li>
+        <li><code>build-and-cicd-secrets.test.ts</code> - Build-time
+        variable immutability, secret prevention</li>
+        </ul>
+        <h4 id="2-cross-site-scripting-xss-prevention-securityxss">2.
+        <strong>Cross-Site Scripting (XSS) Prevention</strong>
+        (<code>security/xss/</code>)</h4>
+        <ul>
+        <li>Validates that user input is properly escaped</li>
+        <li>Verifies innerHTML usage is only on trusted content</li>
+        <li>Tests that dangerouslySetInnerHTML is restricted to safe
+        sources</li>
+        <li>Validates DOM-based XSS patterns are prevented</li>
+        </ul>
+        <h4
+        id="3-cross-site-request-forgery-csrf-prevention-securitycsrf">3.
+        <strong>Cross-Site Request Forgery (CSRF) Prevention</strong>
+        (<code>security/csrf/</code>)</h4>
+        <ul>
+        <li>Validates CSRF token handling in forms</li>
+        <li>Verifies CSRF token is included in state-changing requests
+        (POST, PUT, DELETE)</li>
+        <li>Tests token refresh mechanisms</li>
+        <li>Validates double-submit cookie patterns</li>
+        </ul>
+        <h4 id="4-content-security-policy-csp-validation-securitycsp">4.
+        <strong>Content Security Policy (CSP) Validation</strong>
+        (<code>security/csp/</code>)</h4>
+        <ul>
+        <li>Tests that CSP directives are properly configured</li>
+        <li>Validates inline scripts are properly nonce-protected</li>
+        <li>Verifies external resources conform to CSP rules</li>
+        <li>Tests CSP violation reporting mechanisms</li>
+        </ul>
+        <h4 id="5-http-header-security-securityheaders">5. <strong>HTTP
+        Header Security</strong> (<code>security/headers/</code>)</h4>
+        <ul>
+        <li>CORS header validation (whitelist enforcement, no wildcard
+        origins)</li>
+        <li>Security headers: X-Content-Type-Options, X-Frame-Options,
+        Strict-Transport-Security</li>
+        <li>Cache control headers prevent sensitive data caching</li>
+        <li>Credentials handling in cross-origin requests</li>
+        </ul>
+        <h4 id="6-component-level-security-securitycomponents">6.
+        <strong>Component-Level Security</strong>
+        (<code>security/components/</code>)</h4>
+        <ul>
+        <li>Error boundary security (doesn't expose stack traces in
+        production)</li>
+        <li>Authorization checks in component renders</li>
+        <li>Secure form handling and input validation</li>
+        <li>Session timeout handling in components</li>
+        </ul>
+        <h4 id="7-authentication--authorization-authauthorization">7.
+        <strong>Authentication &amp; Authorization</strong>
+        (<code>auth/authorization/</code>)</h4>
+        <ul>
+        <li>Role-based access control validation</li>
+        <li>Permission checking on protected resources</li>
+        <li>Token expiration and refresh handling</li>
+        <li>Session management security</li>
+        </ul>
+        <h3 id="test-execution">Test Execution</h3>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all unit security tests</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run specific security domain</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/xss/</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/csrf/</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/secrets/</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with coverage</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span> security/</span></code></pre></div>
+        <h3 id="coverage-metrics">Coverage Metrics</h3>
+        <p>Target coverage:</p>
+        <ul>
+        <li><strong>Statements:</strong> ≥85% for security-critical
+        code</li>
+        <li><strong>Branches:</strong> ≥80% for authentication and
+        authorization</li>
+        <li><strong>Functions:</strong> ≥85% for security utilities</li>
+        <li><strong>Lines:</strong> ≥85% for sensitive data
+        handling</li>
+        </ul>
+        <h2 id="integration-testing">Integration Testing</h2>
+        <h3 id="purpose-1">Purpose</h3>
+        <p>Integration tests verify that security controls work
+        correctly when multiple components interact with each other and
+        external services.</p>
+        <h3 id="coverage-areas-1">Coverage Areas</h3>
+        <h4 id="1-api-integration-security-api">1. <strong>API
+        Integration Security</strong> (<code>api/</code>)</h4>
+        <ul>
+        <li>Authentication flow with API backend</li>
+        <li>Token refresh token lifecycle</li>
+        <li>Error response handling (401, 403, 400, 500, 429)</li>
+        <li>CORS preflight handling for complex requests</li>
+        <li>Concurrent request security (race conditions in auth)</li>
+        </ul>
+        <h4
+        id="2-service-layer-integration-servicesapi-client-operations">2.
+        <strong>Service Layer Integration</strong>
+        (<code>services/api-client-operations/</code>)</h4>
+        <ul>
+        <li><strong>Configuration Security</strong>: API base URL
+        validation, environment-specific config</li>
+        <li><strong>Error Handling</strong>: Sensitive data redaction in
+        error responses</li>
+        <li><strong>Security</strong>: Service-level request/response
+        interceptors</li>
+        </ul>
+        <h4 id="3-component-integration-components">3. <strong>Component
+        Integration</strong> (<code>components/</code>)</h4>
+        <ul>
+        <li>Component interactions with authentication state</li>
+        <li>Form submission with CSRF token integration</li>
+        <li>Error boundary behavior in authenticated contexts</li>
+        </ul>
+        <h4 id="4-page-level-integration-pages">4. <strong>Page-Level
+        Integration</strong> (<code>pages/</code>)</h4>
+        <ul>
+        <li>Full page workflows with security controls</li>
+        <li>Authentication state persistence across navigation</li>
+        <li>Protected page access control</li>
+        <li>Login/logout flows</li>
+        </ul>
+        <h3 id="test-execution-1">Test Execution</h3>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all integration tests</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> integration/</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> api/</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> services/</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Run integration tests with real API mocks</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--reporter</span><span class="op">=</span>verbose api/</span></code></pre></div>
+        <h2 id="scenario-based-testing">Scenario-Based Testing</h2>
+        <h3 id="purpose-2">Purpose</h3>
+        <p>Scenario-based tests simulate real-world security challenges
+        and user workflows to identify vulnerabilities that unit and
+        integration tests might miss.</p>
+        <h3 id="coverage-areas-2">Coverage Areas</h3>
+        <h4 id="1-token-lifecycle-management-playbooks">1. <strong>Token
+        Lifecycle Management</strong> (<code>playbooks/</code>)</h4>
+        <ul>
+        <li>Token acquisition and storage</li>
+        <li>Token refresh on expiration</li>
+        <li>Token invalidation on logout</li>
+        <li>Concurrent request handling during token refresh</li>
+        <li>Race condition prevention</li>
+        </ul>
+        <p><strong>Example Scenario:</strong></p>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// User logs in, receives token</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Multiple API requests fire while token is being refreshed</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Verify all requests use correct token after refresh</span></span></code></pre></div>
+        <h4 id="2-concurrent-request-security-integration">2.
+        <strong>Concurrent Request Security</strong>
+        (<code>integration/</code>)</h4>
+        <ul>
+        <li>Multiple requests with different tokens</li>
+        <li>Request cancellation during auth state changes</li>
+        <li>Race conditions in session management</li>
+        <li>Duplicate request prevention</li>
+        </ul>
+        <h4 id="3-error-recovery-security">3. <strong>Error
+        Recovery</strong> (<code>security/</code>)</h4>
+        <ul>
+        <li>Network error handling without leaking sensitive data</li>
+        <li>Server error responses (500, 502, 503) handled safely</li>
+        <li>Rate limiting (429) properly handled</li>
+        <li>Error message display to users is sanitized</li>
+        </ul>
+        <h4 id="4-authentication-edge-cases">4. <strong>Authentication
+        Edge Cases</strong></h4>
+        <ul>
+        <li>Session timeout during active use</li>
+        <li>Token expiration with pending requests</li>
+        <li>Simultaneous login attempts</li>
+        <li>Browser back button after logout</li>
+        <li>Tab synchronization of auth state</li>
+        </ul>
+        <h4 id="5-cors--origin-handling">5. <strong>CORS &amp; Origin
+        Handling</strong></h4>
+        <ul>
+        <li>Wildcard origin rejection</li>
+        <li>Subdomain detection and validation</li>
+        <li>Protocol enforcement (http vs https)</li>
+        <li>Port manipulation prevention</li>
+        <li>Dangerous HTTP methods rejection</li>
+        </ul>
+        <h3 id="test-execution-2">Test Execution</h3>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run scenario-based playbook tests</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> playbooks/</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run integration tests that simulate scenarios</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> integration/ <span class="at">--reporter</span><span class="op">=</span>verbose</span></code></pre></div>
+        <h2 id="abuse-case-testing">Abuse Case Testing</h2>
+        <h3 id="purpose-3">Purpose</h3>
+        <p>Abuse case testing identifies how the application handles
+        malicious or unexpected usage patterns that could lead to
+        security vulnerabilities or denial of service.</p>
+        <h3 id="coverage-areas-3">Coverage Areas</h3>
+        <h4 id="1-malformed-input-handling">1. <strong>Malformed Input
+        Handling</strong></h4>
+        <ul>
+        <li>Oversized payloads</li>
+        <li>Invalid JSON</li>
+        <li>Null bytes in strings</li>
+        <li>Unicode normalization attacks</li>
+        <li>Special character injection</li>
+        </ul>
+        <h4 id="2-authentication-abuse">2. <strong>Authentication
+        Abuse</strong></h4>
+        <ul>
+        <li>Brute force attempts (rate limiting)</li>
+        <li>Credential stuffing detection</li>
+        <li>Session fixation attempts</li>
+        <li>Token replay attacks</li>
+        <li>Concurrent session limits</li>
+        </ul>
+        <h4 id="3-api-abuse">3. <strong>API Abuse</strong></h4>
+        <ul>
+        <li>Rate limiting enforcement</li>
+        <li>Quota enforcement per user</li>
+        <li>Pagination abuse (requesting large page sizes)</li>
+        <li>Filter/search bypasses</li>
+        <li>SQL injection patterns (if applicable)</li>
+        </ul>
+        <h4 id="4-xss-abuse-cases">4. <strong>XSS Abuse
+        Cases</strong></h4>
+        <ul>
+        <li>Event handler injection (onclick, onerror)</li>
+        <li>JavaScript protocol URLs</li>
+        <li>SVG-based XSS</li>
+        <li>DOM-based XSS through fragment identifiers</li>
+        <li>Polyglot payloads</li>
+        </ul>
+        <h4 id="5-csrf-abuse-cases">5. <strong>CSRF Abuse
+        Cases</strong></h4>
+        <ul>
+        <li>Form CSRF without CSRF token</li>
+        <li>JSON POST without CSRF protection</li>
+        <li>GET requests used for state changes</li>
+        <li>CSRF token reuse across sessions</li>
+        <li>Multipart form CSRF</li>
+        </ul>
+        <h4 id="6-authorization-bypass-attempts">6.
+        <strong>Authorization Bypass Attempts</strong></h4>
+        <ul>
+        <li>Direct object reference (IDOR) attacks</li>
+        <li>Parameter tampering (changing user IDs)</li>
+        <li>Role escalation attempts</li>
+        <li>Resource access without permissions</li>
+        <li>Horizontal/vertical privilege escalation</li>
+        </ul>
+        <h3 id="test-patterns">Test Patterns</h3>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;Abuse Case: Malformed Input&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should reject oversized payloads&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> hugeString <span class="op">=</span> <span class="st">&#39;a&#39;</span><span class="op">.</span><span class="fu">repeat</span>(<span class="dv">1000000</span>)<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(() <span class="kw">=&gt;</span> validator<span class="op">.</span><span class="fu">validate</span>(hugeString))<span class="op">.</span><span class="fu">toThrow</span>()<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should reject invalid JSON gracefully&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> result <span class="op">=</span> parser<span class="op">.</span><span class="fu">parse</span>(<span class="st">&#39;{invalid json}&#39;</span>)<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">error</span>)<span class="op">.</span><span class="fu">toBeDefined</span>()<span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">error</span>)<span class="op">.</span><span class="at">not</span><span class="op">.</span><span class="fu">toIncludeSensitiveData</span>()<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h3 id="test-execution-3">Test Execution</h3>
+        <div class="sourceCode" id="cb8"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run abuse case tests (mixed with integration tests)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--grep</span><span class="op">=</span><span class="st">&quot;abuse|malicious|invalid&quot;</span></span></code></pre></div>
+        <h2 id="test-coverage--metrics">Test Coverage &amp; Metrics</h2>
+        <h3 id="coverage-reports">Coverage Reports</h3>
+        <p>Coverage reports are generated using <strong>v8
+        provider</strong> and published to
+        <code>public-docs/coverage/</code>:</p>
+        <div class="sourceCode" id="cb9"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate coverage report</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View coverage report</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> public-docs/coverage/index.html</span></code></pre></div>
+        <h3 id="coverage-standards">Coverage Standards</h3>
+        <ul>
+        <li><p><strong>Security-Critical Code:</strong> ≥95% statement
+        coverage</p>
+        <ul>
+        <li>Authentication/authorization logic</li>
+        <li>Token handling and refresh</li>
+        <li>CORS validation</li>
+        <li>XSS prevention mechanisms</li>
+        </ul></li>
+        <li><p><strong>Security Utilities:</strong> ≥85% statement
+        coverage</p>
+        <ul>
+        <li>Sanitization functions</li>
+        <li>Validation functions</li>
+        <li>Error handling utilities</li>
+        </ul></li>
+        <li><p><strong>Non-Critical Code:</strong> ≥70% statement
+        coverage</p>
+        <ul>
+        <li>UI components</li>
+        <li>Layout components</li>
+        <li>Utility functions</li>
+        </ul></li>
+        </ul>
+        <h3 id="coverage-maintenance">Coverage Maintenance</h3>
+        <ul>
+        <li>Coverage baseline is tracked in git</li>
+        <li>CI/CD pipeline fails if coverage decreases below
+        baseline</li>
+        <li>New security features require matching test coverage</li>
+        <li>Code review requires coverage compliance</li>
+        </ul>
+        <h2 id="testing-frameworks--tools">Testing Frameworks &amp;
+        Tools</h2>
+        <h3 id="vitest">Vitest</h3>
+        <p><strong>Purpose:</strong> Modern test runner for
+        JavaScript/TypeScript with fast execution.</p>
+        <p><strong>Configuration:</strong></p>
+        <ul>
+        <li><strong>Environment:</strong> <code>jsdom</code>
+        (browser-like environment for DOM testing)</li>
+        <li><strong>Coverage Provider:</strong> <code>v8</code>
+        (high-performance coverage analysis)</li>
+        <li><strong>Globals:</strong> Test utilities available without
+        imports (<code>describe</code>, <code>it</code>,
+        <code>expect</code>)</li>
+        </ul>
+        <p><strong>Key Features:</strong></p>
+        <ul>
+        <li>Fast parallel test execution</li>
+        <li>ESM support for modern imports</li>
+        <li>Coverage reporting with filtering</li>
+        <li>Watch mode for development</li>
+        </ul>
+        <h3 id="testing-utilities">Testing Utilities</h3>
+        <p><strong>Setup File:</strong>
+        <code>src/__tests__/setup.ts</code></p>
+        <ul>
+        <li>Global mocks and fixtures</li>
+        <li>Test environment initialization</li>
+        <li>Common helper functions</li>
+        </ul>
+        <p><strong>Mock Management:</strong></p>
+        <ul>
+        <li>Service mocks in <code>src/__tests__/mocks/</code></li>
+        <li>API mocks with realistic responses</li>
+        <li>Error scenario mocks</li>
+        </ul>
+        <p><strong>Templates:</strong></p>
+        <ul>
+        <li><code>API.template.test.ts</code> - API test patterns</li>
+        <li><code>Component.template.test.tsx</code> - Component test
+        patterns</li>
+        </ul>
+        <h2 id="security-test-domains">Security Test Domains</h2>
+        <h3 id="domain-coverage-matrix">Domain Coverage Matrix</h3>
+        <table>
+        <thead>
+        <tr class="header">
+        <th>Domain</th>
+        <th>Focus Area</th>
+        <th>Test Files</th>
+        <th>Coverage</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="odd">
+        <td><strong>Secrets</strong></td>
+        <td>Token/credential safety</td>
+        <td>storage, logging, env-vars, build</td>
+        <td>90%+</td>
+        </tr>
+        <tr class="even">
+        <td><strong>XSS</strong></td>
+        <td>Input escaping, DOM safety</td>
+        <td>xss/*</td>
+        <td>85%+</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>CSRF</strong></td>
+        <td>Form protection, token validity</td>
+        <td>csrf/*</td>
+        <td>80%+</td>
+        </tr>
+        <tr class="even">
+        <td><strong>CSP</strong></td>
+        <td>Policy compliance, nonce validation</td>
+        <td>csp/*</td>
+        <td>75%+</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Headers</strong></td>
+        <td>Security headers, CORS validation</td>
+        <td>headers/*</td>
+        <td>85%+</td>
+        </tr>
+        <tr class="even">
+        <td><strong>Components</strong></td>
+        <td>Component security, error boundary</td>
+        <td>components/security</td>
+        <td>80%+</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Auth</strong></td>
+        <td>Authentication, authorization, RBAC</td>
+        <td>auth/*</td>
+        <td>90%+</td>
+        </tr>
+        <tr class="even">
+        <td><strong>API</strong></td>
+        <td>API security, error handling</td>
+        <td>api/*</td>
+        <td>85%+</td>
+        </tr>
+        <tr class="odd">
+        <td><strong>Services</strong></td>
+        <td>Service layer, client operations</td>
+        <td>services/*</td>
+        <td>80%+</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="add-new-security-tests">Add New Security Tests</h3>
+        <p><strong>Steps:</strong></p>
+        <ol type="1">
+        <li>Identify security concern (e.g., new authentication
+        method)</li>
+        <li>Create test file in appropriate domain:
+        <code>src/__tests__/security/[domain]/[feature].test.ts</code></li>
+        <li>Follow test template: <code>API.template.test.ts</code> or
+        <code>Component.template.test.tsx</code></li>
+        <li>Ensure 85%+ coverage for the feature</li>
+        <li>Document in security audit trail</li>
+        </ol>
+        <p><strong>Example:</strong></p>
+        <div class="sourceCode" id="cb10"><pre
+        class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/__tests__/security/secrets/biometric-auth.test.ts</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { describe<span class="op">,</span> it<span class="op">,</span> expect<span class="op">,</span> vi } <span class="im">from</span> <span class="st">&#39;vitest&#39;</span><span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&#39;Biometric Auth Security&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&#39;should not store biometric data&#39;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> storage <span class="op">=</span> <span class="kw">new</span> <span class="fu">BiometricAuth</span>()<span class="op">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> result <span class="op">=</span> storage<span class="op">.</span><span class="fu">authenticate</span>()<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;biometric&#39;</span>))<span class="op">.</span><span class="fu">toBeNull</span>()<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(result<span class="op">.</span><span class="at">token</span>)<span class="op">.</span><span class="fu">toBeDefined</span>()<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+        <h2 id="continuous-integration">Continuous Integration</h2>
+        <h3 id="pre-commit-testing">Pre-Commit Testing</h3>
+        <div class="sourceCode" id="cb11"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run security tests before commit</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/ <span class="at">--coverage</span></span></code></pre></div>
+        <h3 id="cicd-pipeline">CI/CD Pipeline</h3>
+        <ol type="1">
+        <li><strong>Unit Tests:</strong> All tests in
+        <code>src/__tests__/security/</code> must pass</li>
+        <li><strong>Coverage Check:</strong> Security code coverage must
+        ≥85%</li>
+        <li><strong>Lint Check:</strong> ESLint security rules must pass
+        (see <code>sast.md</code>)</li>
+        <li><strong>Build Verification:</strong> Production build must
+        not embed secrets</li>
+        </ol>
+        <h3 id="test-commands">Test Commands</h3>
+        <div class="sourceCode" id="cb12"><pre
+        class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all tests</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run security tests only</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> security/</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with coverage</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--coverage</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run in watch mode (development)</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--watch</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Run specific test file</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> auth/authorization</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Run tests matching pattern</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test <span class="at">--</span> <span class="at">--grep</span><span class="op">=</span><span class="st">&quot;CSRF&quot;</span></span></code></pre></div>
+        <h3 id="performance">Performance</h3>
+        <ul>
+        <li><strong>Target:</strong> Full test suite completes in &lt;30
+        seconds</li>
+        <li><strong>Parallel:</strong> Tests run in parallel (Vitest
+        default)</li>
+        <li><strong>Coverage:</strong> Coverage report generation &lt;5
+        seconds</li>
+        </ul>
+        <hr />
+        <h2 id="next-steps">Next Steps</h2>
+        <ul>
+        <li>See <a href="sast.html">SAST Strategy</a> for static code
+        analysis approach</li>
+        <li>See <a href="dast.html">DAST Strategy</a> for dynamic
+        security testing</li>
+        <li>See <a href="overview.html">Testing Overview</a> for
+        documentation guide</li>
+        </ul>
+        <h2 id="related-documentation">Related Documentation</h2>
+        <ul>
+        <li><a href="../checklists/">Security Checklists</a></li>
+        <li><a href="../compliance/">Compliance &amp; Standards</a></li>
+        <li><a href="../api/">API Security</a></li>
+        <li><a href="../auth/">Authentication</a></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p><strong>StockEase</strong> - Inventory Management System</p>
+      <p>Architecture Documentation | Frontend</p>
+      <p style="opacity:.7;font-size:.85rem;">© 2025 Team StockEase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
+
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
+    const navigation = {
+      'Frontend Docs': [
+        { label: 'Landing', href: 'index.html', isRoot: true },
+        { label: 'Architecture Index', href: 'index.html' },
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
+        { label: 'Docs Pipeline', href: 'docs-pipeline/overview.html' },
+        { label: 'Production Pipeline', href: 'pipeline/overview.html' },
+      ],
+      'Sections': [
+        { label: 'API Layer', href: 'src/api/overview.html' },
+        { label: 'Components', href: 'src/components/overview.html' },
+        { label: 'Security', href: 'src/security/overview.html' },
+        { label: 'Pages', href: 'src/pages/overview.html' },
+        { label: 'Services', href: 'src/services/overview.html' },
+        { label: 'Localization (i18n)', href: 'src/i18n/overview.html' },
+        { label: 'Docker Setup', href: 'src/docker_structure/overview.html' },
+        { label: 'Testing', href: 'src/tests/overview.html' },
+      ],
+      'Generated': [
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
+      ],
+      'Backend (external)': [
+        { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
+        { label: 'Backend API (ReDoc)', href: 'https://keglev.github.io/stockease/api-docs.html', external: true },
+        { label: 'Backend Coverage', href: 'https://keglev.github.io/stockease/coverage/', external: true },
+      ],
+    };
+
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
+
+    function buildSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      Object.entries(navigation).forEach(([section, links]) => {
+        const block = document.createElement('div');
+        block.className = 'nav-section';
+
+        const title = document.createElement('div');
+        title.className = 'nav-section-title';
+        title.textContent = section;
+        block.appendChild(title);
+
+        const ul = document.createElement('ul');
+        links.forEach(link => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
+            a.href = link.href;
+          } else if (link.isRoot) {
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
+          } else {
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
+          }
+
+          a.textContent = link.label;
+
+          // Active-state highlight
+          const current = window.location.pathname;
+          const linkPath = a.pathname.replace(/\.html$/, '');
+          if (current.endsWith(a.pathname) || current.includes(linkPath)) {
+            a.className = 'active';
+          }
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        block.appendChild(ul);
+        sidebar.appendChild(block);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildSidebar);
+  </script>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    });
+
+    // Convert fenced code blocks emitted by Pandoc to <div class="mermaid"> sources
+    const blocks = document.querySelectorAll('code.language-mermaid');
+    blocks.forEach(code => {
+      code.classList.remove('language-mermaid');
+      code.classList.add('mermaid');
+      if (code.parentElement.tagName === 'PRE') {
+        code.parentElement.classList.add('mermaid-block');
+      }
+    });
+
+    // Render all diagrams
+    (document.readyState === 'loading'
+      ? new Promise(r => document.addEventListener('DOMContentLoaded', r))
+      : Promise.resolve()
+    ).then(() => mermaid.run()).catch(err => console.error('Mermaid rendering error:', err));
+  </script>
+</body>
+</html>
