@@ -79,14 +79,21 @@ Security practices within React components, input validation, XSS prevention, an
 
 Deployment security, CI/CD pipeline protection, environment configuration, and production hardening.
 
-**Planned Sections:**
-- GitHub Actions secrets management
-- Docker security (multi-stage builds, minimal images)
-- nginx security headers (X-Frame-Options, CSP, etc.)
-- HTTPS/TLS enforcement
-- Build-time vs. runtime secrets
-- Docker image scanning
-- Container registry security
+**Subdirectories:**
+- **[Dependency Management & Supply Chain Security](./platform/dependencies.md)** — npm audit, Renovate automation, SCA rules, vulnerability triage
+- **[CI/CD Secrets & Pipeline Security](./platform/ci-secrets.md)** — GitHub Secrets, OIDC authentication, secret masking, rotation practices
+- **[Security Headers & nginx Configuration](./platform/headers-and-nginx.md)** — Clickjacking prevention, HSTS, MIME type sniffing, X-Frame-Options, Referrer-Policy
+
+**Key Topics:**
+- npm vulnerability scanning and automated updates
+- GitHub Secrets for sensitive configuration
+- OIDC token-based authentication
+- Secret masking in CI/CD logs
+- HTTP security headers implementation
+- nginx configuration and best practices
+- HSTS (HTTP Strict Transport Security)
+- MIME type sniffing prevention
+- Referrer policy for privacy
 
 ---
 
