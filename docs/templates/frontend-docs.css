@@ -104,6 +104,23 @@ header {
     color: white;
 }
 
+/* Ensure header links remain readable on hover over the dark gradient */
+.header-content .logo,
+.header-content #home-link,
+.header-content .nav-breadcrumb a {
+    color: white;
+}
+
+.header-content .logo:hover,
+.header-content #home-link:hover,
+.header-content .nav-breadcrumb a:hover,
+.header-content .nav-breadcrumb a:focus {
+    /* keep text bright on hover (do not inherit global a:hover color) */
+    color: #ffffff !important;
+    opacity: 0.95;
+    text-decoration: underline;
+}
+
 .nav-breadcrumb {
     font-size: 0.9rem;
     opacity: 0.9;
