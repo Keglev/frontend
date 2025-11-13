@@ -1,24 +1,6 @@
 import { render, cleanup } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import React from 'react';
-
-/**
- * Component Security Tests
- *
- * Tests for React component security including:
- * 1. Props Validation - Type safety and input validation
- * 2. Access Control - Role-based component rendering (RBAC)
- * 3. Data Sanitization - Preventing XSS through component props
- * 4. Safe Event Handlers - Preventing code injection through events
- * 5. Conditional Rendering - Secure visibility logic
- * 6. Component Composition Security - Safe component nesting
- *
- * Focus: Security issues in React components used in StockEase frontend
- */
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
 
 // Helper function to sanitize string props
 const sanitizeStringProp = (value: unknown): string => {
