@@ -109,16 +109,18 @@ header {
 .header-content #home-link,
 .header-content .nav-breadcrumb a {
     color: white;
+    text-decoration: none;
+    transition: color 160ms ease, opacity 160ms ease;
 }
 
+/* Hover/focus: change color only (no underline) to a warm high-contrast accent */
 .header-content .logo:hover,
 .header-content #home-link:hover,
 .header-content .nav-breadcrumb a:hover,
 .header-content .nav-breadcrumb a:focus {
-    /* keep text bright on hover (do not inherit global a:hover color) */
-    color: #ffffff !important;
-    opacity: 0.95;
-    text-decoration: underline;
+    color: #ffd966 !important; /* soft warm yellow that contrasts with blue header */
+    opacity: 1;
+    text-decoration: none !important;
 }
 
 .nav-breadcrumb {
