@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>$title$ - StockEase Frontend Docs</title>
   <!-- Will be set to a repo-relative path at runtime -->
-  <link id="frontend-docs-css" rel="stylesheet" href="">
+  <link rel="stylesheet" href="/frontend/templates/frontend-docs.css">
 </head>
 <body>
   <header>
@@ -36,41 +36,13 @@
   </footer>
 
   <script>
-    // Return a relative path from the current doc to the site root (/frontend/)
-    function getRootFrom(pathname) {
-      const parts = pathname.split('/').filter(Boolean);
-      // Find the repo pages root marker ("frontend") and the "architecture" folder
-      const idxFrontend = parts.indexOf('frontend');       // e.g. ['keglev','github','io','frontend',...]
-      const idxArch = parts.indexOf('architecture');
+    // Absolute base for the site on GitHub Pages
+    const BASE = '/frontend/';
 
-      // If we're at /frontend or /frontend/index.html
-      if (idxArch === -1) {
-        // path after /frontend
-        const afterFrontend = parts.slice(idxFrontend + 1);
-        // If we're exactly at /frontend/index.html (one segment after), go root './'
-        return afterFrontend.length <= 1 ? './' : '../'.repeat(afterFrontend.length - 1);
-      }
-
-      // We are under architecture/**
-      const afterArch = parts.slice(idxArch + 1); // e.g. ['src','components','overview.html']
-      const depth = Math.max(0, afterArch.length - 1); // exclude filename
-      return depth === 0 ? './' : '../'.repeat(depth);
-    }
-
-    (function initPaths(){
-      const root = getRootFrom(window.location.pathname);
-      // CSS is always reachable via <root>/templates/frontend-docs.css
-      document.getElementById('frontend-docs-css').href = root + 'templates/frontend-docs.css';
-      // Home link back to root
-      const home = root + 'index.html';
-      document.getElementById('home-link').href = home;
-      document.getElementById('home-crumb').href = home;
-    })();
-
-    // Sidebar (frontend-focused). Paths are relative to architecture/ by default.
+    // Sidebar (frontend-focused). Keep hrefs relative to 'architecture/' except where absolute noted.
     const navigation = {
       'Frontend Docs': [
-        { label: 'Landing', href: '../index.html', isRoot: true },
+        { label: 'Landing', href: 'index.html', isRoot: true },
         { label: 'Architecture Index', href: 'index.html' },
         { label: 'Overview', href: 'overview.html' },
         { label: 'Übersicht (Deutsch)', href: 'overview.de.html' },
@@ -87,8 +59,9 @@
         { label: 'Testing', href: 'src/tests/overview.html' },
       ],
       'Generated': [
-        { label: 'TypeDoc (TS API)', href: '../frontend/typedoc/index.html', goUp: true },
-        { label: 'Coverage (Vitest)', href: '../frontend/coverage/index.html', goUp: true },
+        // Use absolute internal paths so they always resolve with CSS
+        { label: 'TypeDoc (TS API)', href: '/frontend/typedoc/index.html', absolute: true },
+        { label: 'Coverage (Vitest)', href: '/frontend/coverage/index.html', absolute: true },
       ],
       'Backend (external)': [
         { label: 'Backend Docs', href: 'https://keglev.github.io/stockease/', external: true },
@@ -97,12 +70,18 @@
       ],
     };
 
-    function getArchRoot() { return getRootFrom(window.location.pathname); }
+    // Set header links to the site root
+    document.addEventListener('DOMContentLoaded', () => {
+      const home = BASE + 'index.html';
+      const homeLink = document.getElementById('home-link');
+      const homeCrumb = document.getElementById('home-crumb');
+      if (homeLink) homeLink.href = home;
+      if (homeCrumb) homeCrumb.href = home;
+    });
 
     function buildSidebar() {
       const sidebar = document.getElementById('sidebar');
       if (!sidebar) return;
-      const archRoot = getArchRoot();
 
       Object.entries(navigation).forEach(([section, links]) => {
         const block = document.createElement('div');
@@ -118,20 +97,25 @@
           const li = document.createElement('li');
           const a = document.createElement('a');
 
-          if (link.external) {
+          if (link.external || link.absolute) {
+            // external http(s) OR absolute internal '/frontend/...'
             a.href = link.href;
-          } else if (link.goUp) {
-            a.href = archRoot + '../' + link.href.replace('../','');
           } else if (link.isRoot) {
-            a.href = archRoot + link.href.replace('../','');
+            a.href = BASE + 'index.html';
+          } else if (link.isCoverage) {
+            a.href = BASE + 'coverage/index.html';
+          } else if (link.isApiDoc) {
+            a.href = BASE + 'api-docs.html';
           } else {
-            a.href = archRoot + link.href;
+            // default: architecture-relative
+            a.href = BASE + 'architecture/' + link.href;
           }
 
           a.textContent = link.label;
 
+          // Active-state highlight
           const current = window.location.pathname;
-          const linkPath = a.pathname.replace(/\.html$$/, '');
+          const linkPath = a.pathname.replace(/\.html$/, '');
           if (current.endsWith(a.pathname) || current.includes(linkPath)) {
             a.className = 'active';
           }
@@ -148,6 +132,7 @@
     document.addEventListener('DOMContentLoaded', buildSidebar);
   </script>
 
+  <!-- Mermaid.js for diagrams -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({
