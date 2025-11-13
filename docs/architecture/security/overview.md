@@ -58,14 +58,20 @@ Details on JWT-based authentication, token lifecycle, role-based access control 
 
 Security practices within React components, input validation, XSS prevention, and client-side protection mechanisms.
 
-**Planned Sections:**
+**Subdirectories:**
+- **[XSS Prevention & Input Sanitization](./frontend/xss-and-sanitization.md)** — Input validation rules, sanitization implementation, dangerous sinks, XSS testing
+- **[Content Security Policy (CSP)](./frontend/csp.md)** — CSP directives, nginx configuration, report-only rollout, violation handling
+- **[CORS & CSRF Protection](./frontend/cors-and-csrf.md)** — CORS contract, preflight requests, CSRF protection (token-based architecture)
+- **[Secrets & Configuration](./frontend/secrets-config.md)** — .env files, Vite variable exposure, GitHub Secrets, never logging sensitive data
+
+**Key Topics:**
 - XSS (Cross-Site Scripting) prevention
 - CSRF (Cross-Site Request Forgery) protection
 - Input sanitization and validation
-- Component-level access control
-- localStorage vs. sessionStorage
-- Secure password handling in forms
-- DOMPurify for HTML sanitization
+- Content Security Policy implementation
+- CORS validation and handling
+- Secure secret management
+- Preventing accidental data leaks
 
 ---
 

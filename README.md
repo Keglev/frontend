@@ -31,9 +31,9 @@ The system is fully integrated with the StockEase Backend (Spring Boot + Postgre
 
 8. [CI/CD](#cicd)
 
-9. [Available Scripts](#available-scripts)
+9. [Deployment](#deployment)
 
-10. [Deployment](#deployment)
+10. [Available Scripts](#available-scripts) 
 
 11. [Contributing](#contributing)
 
@@ -103,7 +103,7 @@ StockEase Frontend enforces secure communication with the backend using JWT auth
 
 Role-based access ensures that users (Admin/User) interact only with authorized components. Protected routes, input validation, and conditional rendering safeguard user sessions.
 
-  📖 View Security Architecture Documentation 
+📖 **View Security Architecture Documentation**: [Security Architecture](https://keglev.github.io/frontend/architecture/security/overview.html)  
 
 ---
 
@@ -113,31 +113,32 @@ Role-based access ensures that users (Admin/User) interact only with authorized 
 
 <a id="architecture-overview"></a>
 
-### 🏗️ Architecture Overview
+### 🏗️ Architecture Overview 
 
-Architecture Documentation: 🚧 Under Construction
+- [Index for Frontend Architecture Documentation](https://keglev.github.io/frontend/) - Complete architecture documentation with service catalog and design patterns
 
-Planned topics include component structure, routing flow, state management, and integration layers.
-
-Future updates will include diagrams showing data flow between the frontend and backend APIs.
-
+Reference: 
 - **Backend Architecture & API Docs:** [View Backend Docs](https://keglev.github.io/stockease/)
 
 <a id="testing-code-quality"></a>
 
 ## 🧪 Testing & Code Quality
 
-Frontend testing and coverage reporting are currently under construction.
+The frontend project interacts with StockEase project and includes comprehensive testing architecture with automated test execution and code quality analysis.
 
-Planned stack includes:
+Test stack includes:
 
-- Vitest / Jest for unit testing
+- **Vitest / Jest** for unit testing
 
-- React Testing Library for UI behavior tests
+- **React Testing Library** for UI behavior tests
 
-- ESLint + Prettier for code consistency
+- **ESLint + Prettier** for code consistency
 
-- Vite coverage plugin for reporting
+- **Vite coverage plugin** for reporting
+
+📚 **[View Testing Architecture Documentation](https://keglev.github.io/frontend/architecture/src/tests/overview.html)**
+
+**📊 Coverage Reports**: [Coverage Testing Report from Vitest](https://keglev.github.io/frontend/coverage/index.html)
 
 ---
 
@@ -182,17 +183,8 @@ Workflow Overview:
 
 - ✅ Deploy automatically to Vercel
 
-  📖 CI/CD Documentation link will be added once architecture docs are published.
-
----
-
-## 🧑‍💻 Available Scripts
-```sh
-npm run dev         # Starts the development server
-npm run build       # Builds the project for production
-npm run preview     # Previews the production build
-npm run lint        # Runs ESLint for code linting
-``` 
+-**Deployment Workflow documentation**: [CI/CD workflow docs](https://keglev.github.io/frontend/architecture/pipeline/overview.html)
+ 
 ---
 
 <a id="deployment"></a>
@@ -216,6 +208,15 @@ Deployment Highlights:
 
 🌐**Production URL**: [StockEase Frontend](https://stockeasefrontend.vercel.app/)
 
+---
+
+## 🧑‍💻 Available Scripts
+```sh
+npm run dev         # Starts the development server
+npm run build       # Builds the project for production
+npm run preview     # Previews the production build
+npm run lint        # Runs ESLint for code linting
+``` 
 ---
 
 <a id="contributing"></a>
